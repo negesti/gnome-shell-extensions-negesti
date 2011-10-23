@@ -1,0 +1,29 @@
+This extension can be customized by editing simpleMenu.json.
+The file can be opened using menu - utils - edit menu
+
+{
+  "key_binding": "run_command_1", // use one of apps.metacity.global_keybinding (run_command_1-10)
+  "hide_ally": "true",            // hide the accessability icon. visibility can be toggled using utils - Accessability menu
+  "terminal": "terminator -x",    // terminal that will be called if the items hast terminal: true
+  "editor": "gedit",
+  "position": "center",           // center -> show in the middle (clock this)
+                                  // all other values show the menu on the right side
+  "items": [
+    {
+      "display": "firefox",
+      "terminal": "false",
+      "command": ["firefox", "-jsconsole"]    // define command as array to pass parameters to the command
+    },
+    {
+      "display": "firefox",
+      "terminal": "false",
+      "command": "firefox"                    // call the command without paramters
+    },
+    {
+      "display": "localhost",
+      "terminal": "true",
+      "command": "myssh root@127.0.0.1"       // runs $termnal $command. e.g. terminal -x myssh root@127.0.0.1
+    },
+  ]
+}
+

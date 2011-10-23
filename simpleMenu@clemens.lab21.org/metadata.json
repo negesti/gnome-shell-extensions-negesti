@@ -1,0 +1,7 @@
+{
+  "shell-version": ["3.2.0"],
+  "uuid": "simpleMenu@clemens.lab21.org",
+  "name": "Simple Menu",
+  "description": "Some Shell utils (hide ally,..) and a json file managed menu",
+  "url": "https://github.com/negesti/gnome-shell-extensions-negesti"
+}
