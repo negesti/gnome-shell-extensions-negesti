@@ -143,6 +143,5 @@ function enable() {
 };
 
 function disable(){
-  _itemList = null;
   this._moveWindow.destroy();
 };
