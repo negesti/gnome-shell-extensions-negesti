@@ -1,4 +1,3 @@
-
 If you enable this extension the metacity move window keybindings are
 replaced.
 
@@ -10,12 +9,14 @@ replaced.
 - move_to_corners: widht 50% height 50%
 -- ne, se, sw, nw
 
+- move_to_center widht 50% height 50% and centered on primary screen
+
 Modify the keybindings using gconf-editor. The Treenode is
 apps.metacity.window_keybindings.
 
 
 ----------------- TODO --------------------------------
-* implement moveWindow with 2 screens
+* implement moveWindow with 2 screens (atm very simple)
 * maximize window
-* nobody needs move_to_center --> Search for my terminal and bring it to front
+* nobody needs move_to_center --> Search for my terminal and bring it to front (centered)
 * a lot of things i currently dont remember :)
