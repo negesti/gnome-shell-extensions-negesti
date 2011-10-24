@@ -87,37 +87,57 @@ MoveWindow.prototype = {
    * bind the keys
    **/
   _init: function() {
-    this._width = (global.screen_width/2);
+    let numMonitors = global.screen.get_n_monitors();
+
+    let offset = 0;
+    // currently only supports a 2 screen setup. primary is on the right side
+    if (numMonitors==2) {
+      let primary = global.screen.get_primary_monitor();
+      if (primary==0) {
+        offset = global.screen.get_monitor_geometry(1).width;
+      } else {
+        offset = global.screen.get_monitor_geometry(0).width;
+      }
+    }
+
+    this._width = (global.screen_width - offset)/2;
     let totalH = global.screen_height;
     this._height = (totalH / 2) - this._topBarHeight + 10;
     this._sy = totalH - this._height;
 
     // move to n, e, s an w
     this._addKeyBinding("move_to_side_n",
-      Lang.bind(this, function(){ this._moveFocused(0, this._topBarHeight, -1, this._height); })
+      Lang.bind(this, function(){ this._moveFocused(offset, this._topBarHeight, -1, this._height); })
     );
     this._addKeyBinding("move_to_side_e",
-      Lang.bind(this, function(){ this._moveFocused(this._width, this._topBarHeight, this._width, -1);})
+      Lang.bind(this, function(){ this._moveFocused(offset + this._width, this._topBarHeight, this._width, -1);})
     );
     this._addKeyBinding("move_to_side_s",
-      Lang.bind(this, function(){ this._moveFocused(0, this._sy, -1, this._height);})
+      Lang.bind(this, function(){ this._moveFocused(offset, this._sy, -1, this._height);})
     );
     this._addKeyBinding("move_to_side_w",
-      Lang.bind(this, function(){ this._moveFocused(0, this._topBarHeight, this._width, -1);})
+      Lang.bind(this, function(){ this._moveFocused(offset, this._topBarHeight, this._width, -1);})
     );
 
     // move to  nw, se, sw, nw
     this._addKeyBinding("move_to_corner_ne",
-      Lang.bind(this, function(){ this._moveFocused(this._width, this._topBarHeight, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused(offset + this._width, this._topBarHeight, this._width, this._height);})
     );
     this._addKeyBinding("move_to_corner_se",
-      Lang.bind(this, function(){ this._moveFocused(this._width, this._sy, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused(offset + this._width, this._sy, this._width, this._height);})
     );
     this._addKeyBinding("move_to_corner_sw",
-      Lang.bind(this, function(){ this._moveFocused(0, this._sy, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused(offset, this._sy, this._width, this._height);})
     );
     this._addKeyBinding("move_to_corner_nw",
-      Lang.bind(this, function(){ this._moveFocused(0, this._topBarHeight, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused(offset, this._topBarHeight, this._width, this._height);})
+    );
+
+    // move to center. fix 2 screen setup and resize to 50% 50%
+    this._addKeyBinding("move_to_center",
+      Lang.bind(this, function(){ this._moveFocused(offset + (this._width/2), this._topBarHeight + (this._height/2)
+
+      , this._width, this._height);})
     );
   },
 
