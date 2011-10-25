@@ -30,9 +30,9 @@ MoveWindow.prototype = {
   _shellwm: global.window_manager,
 
   _topBarHeight: 55,
-  _width: 0,
-  _height: 0,
-
+    
+  _primary: 0,
+  _screens: [],
 
   /**
    * Helper functions to takeover binding when enabled and release them
@@ -55,13 +55,92 @@ MoveWindow.prototype = {
   /**
    * pass width or height = -1 to maximize in this direction
    */
-  _moveFocused: function(x, y, width, height) {
+  _moveFocused: function(where) {
     let win = global.display.focus_window;
     if (win==null) {
         log("no window focused");
         return;
     }
-
+    // rectanlge presenting current position
+    var pos = win.get_outer_rect();
+    
+    let sIndex = this._primary;
+    let sl = this._screens.length;
+    
+    // left edge is sometimtes < 0...
+    pos.x = Math.abs(pos.x) + 10;
+    for (let i=0; i<sl; i++) {
+      if (i==sl-1) {
+        sIndex = i;
+        break;
+      }
+      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x) {
+        sIndex = i;
+        break;
+      }
+    }
+    
+    let s = this._screens[sIndex];
+    
+    let diff = null;
+    
+    if (where=="n") {
+      this._resize(win, s.x, s.y, -1, s.height);
+    } else if (where == "e") {    
+      if (sIndex < (sl-1) && this._samePoint(pos.height, s.totalHeight)
+            && pos.x + s.width > s.totalWidth) {
+        s = this._screens[(sIndex+1)];
+        this._resize(win, s.x, s.y, s.width, -1);
+      } else {
+        this._resize(win, (s.x + s.width), s.y, s.width, -1);
+      }
+    } else if (where == "s") {
+      this._resize(win, s.x, s.sy, -1, s.height);
+    } else if (where == "w") {
+      // if we are not on screen[0] move window to the left screen
+      if (sIndex>0 && this._samePoint(pos.height, s.totalHeight) && pos.x - s.width < s.x) {
+        s = this._screens[(sIndex-1)];
+        this._resize(win, (s.x + s.width), s.y, s.width, -1);
+      } else {
+        this._resize(win, s.x, s.y, s.width, -1);
+      }
+    } 
+    
+    if (where == "ne") {
+      this._resize(win, s.x + s.width, s.y, s.width, s.height)
+    } else if (where == "se") {
+      this._resize(win, s.x + s.width, s.sy, s.width, s.height)
+    } else if (where == "sw") {
+      this._resize(win, s.x, s.sy, s.width, s.height)
+    } else if (where == "nw") {
+      this._resize(win, s.x, s.y, s.width, s.height)
+    }
+    
+    // calculate the center position and check if the window is alread there
+    if (where == "c") {
+      let x = s.x + (s.width/2);
+      let y = s.y + (s.height/2);
+      
+      if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && 
+          this._samePoint(s.width, pos.width) && this._samePoint(s.height, pos.height)) {
+        // the window is alread centered -> maximize
+        this._resize(win, s.x, s.y, -1, -1);
+      } else {
+        // the window is somewhere else -> resize
+        this._resize(win, x, y, s.width, s.height)
+      }
+    }
+  },
+  
+  // moving the window and the actual position are not really the same
+  // if the points are < 30 points away asume as equal
+  _samePoint: function(p1, p2) {
+    return (Math.abs(p1-p2) < 30);
+  },
+  
+  // actual resizing
+  _resize: function(win, x, y, width, height) {
+    
     if (height == -1) {
       win.maximize(Meta.MaximizeFlags.VERTICAL);
       height = 400; // dont resize to width, -1
@@ -87,57 +166,64 @@ MoveWindow.prototype = {
    * bind the keys
    **/
   _init: function() {
+    this._primary = global.screen.get_primary_monitor();
+    
     let numMonitors = global.screen.get_n_monitors();
 
-    let offset = 0;
-    // currently only supports a 2 screen setup. primary is on the right side
-    if (numMonitors==2) {
-      let primary = global.screen.get_primary_monitor();
-      if (primary==0) {
-        offset = global.screen.get_monitor_geometry(1).width;
-      } else {
-        offset = global.screen.get_monitor_geometry(0).width;
-      }
+    // only tested with 2 screen setup
+    for (let i=0; i<numMonitors; i++) {
+      let geom = global.screen.get_monitor_geometry(i);
+      let offset = geom.x;
+      let totalHeight = geom.height;
+      
+      this._screens[i] =  {
+        x : offset,        
+        y: (i==this._primary) ? this._topBarHeight : 30,
+        totalWidth: geom.width,
+        totalHeight: geom.height,
+        width: geom.width / 2,
+        height: (totalHeight / 2) - this._topBarHeight + 10,
+      };
+      // the position.y for s, sw and se
+      this._screens[i].sy = totalHeight - this._screens[i].height;
     }
-
-    this._width = (global.screen_width - offset)/2;
-    let totalH = global.screen_height;
-    this._height = (totalH / 2) - this._topBarHeight + 10;
-    this._sy = totalH - this._height;
+    
+    // sort by x position. makes it easier to find the correct screen 
+    this._screens.sort(function(s1, s2) {
+        return s1.x - s2.x;
+    });
 
     // move to n, e, s an w
     this._addKeyBinding("move_to_side_n",
-      Lang.bind(this, function(){ this._moveFocused(offset, this._topBarHeight, -1, this._height); })
+      Lang.bind(this, function(){ this._moveFocused("n");}) // offset, this._topBarHeight, -1, this._height); })
     );
     this._addKeyBinding("move_to_side_e",
-      Lang.bind(this, function(){ this._moveFocused(offset + this._width, this._topBarHeight, this._width, -1);})
+      Lang.bind(this, function(){ this._moveFocused("e");}) // offset + this._width, this._topBarHeight, this._width, -1);})
     );
     this._addKeyBinding("move_to_side_s",
-      Lang.bind(this, function(){ this._moveFocused(offset, this._sy, -1, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("s");}) // offset, this._sy, -1, this._height);})
     );
     this._addKeyBinding("move_to_side_w",
-      Lang.bind(this, function(){ this._moveFocused(offset, this._topBarHeight, this._width, -1);})
+      Lang.bind(this, function(){ this._moveFocused("w");}) // offset, this._topBarHeight, this._width, -1);})
     );
 
     // move to  nw, se, sw, nw
     this._addKeyBinding("move_to_corner_ne",
-      Lang.bind(this, function(){ this._moveFocused(offset + this._width, this._topBarHeight, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("ne");}) // offset + this._width, this._topBarHeight, this._width, this._height);})
     );
     this._addKeyBinding("move_to_corner_se",
-      Lang.bind(this, function(){ this._moveFocused(offset + this._width, this._sy, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("se");}) // offset + this._width, this._sy, this._width, this._height);})
     );
     this._addKeyBinding("move_to_corner_sw",
-      Lang.bind(this, function(){ this._moveFocused(offset, this._sy, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("sw");}) // offset, this._sy, this._width, this._height);})
     );
     this._addKeyBinding("move_to_corner_nw",
-      Lang.bind(this, function(){ this._moveFocused(offset, this._topBarHeight, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("nw");}) // offset, this._topBarHeight, this._width, this._height);})
     );
 
     // move to center. fix 2 screen setup and resize to 50% 50%
     this._addKeyBinding("move_to_center",
-      Lang.bind(this, function(){ this._moveFocused(offset + (this._width/2), this._topBarHeight + (this._height/2)
-
-      , this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("c");}) // offset + (this._width/2), this._topBarHeight + (this._height/2), this._width, this._height);})
     );
   },
 
