@@ -83,12 +83,14 @@ MoveWindow.prototype = {
     let s = this._screens[sIndex];
     
     let diff = null;
-    
+    let sameWidth = this._samePoint(pos.width, s.width);
+    let sameHeight = this._samePoint(s.height, pos.height);
+    let maxH = this._samePoint(pos.height, s.totalHeight);
+        
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
     } else if (where == "e") {    
-      if (sIndex < (sl-1) && this._samePoint(pos.height, s.totalHeight)
-            && pos.x + s.width > s.totalWidth) {
+      if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width > s.totalWidth) {
         s = this._screens[(sIndex+1)];
         this._resize(win, s.x, s.y, s.width, -1);
       } else {
@@ -98,7 +100,7 @@ MoveWindow.prototype = {
       this._resize(win, s.x, s.sy, -1, s.height);
     } else if (where == "w") {
       // if we are not on screen[0] move window to the left screen
-      if (sIndex>0 && this._samePoint(pos.height, s.totalHeight) && pos.x - s.width < s.x) {
+      if (sIndex>0 && sameWidth && maxH && pos.x - s.width < s.x) {
         s = this._screens[(sIndex-1)];
         this._resize(win, (s.x + s.width), s.y, s.width, -1);
       } else {
@@ -121,8 +123,7 @@ MoveWindow.prototype = {
       let x = s.x + (s.width/2);
       let y = s.y + (s.height/2);
       
-      if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && 
-          this._samePoint(s.width, pos.width) && this._samePoint(s.height, pos.height)) {
+      if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameWidth && sameHeight) {
         // the window is alread centered -> maximize
         this._resize(win, s.x, s.y, -1, -1);
       } else {
@@ -135,7 +136,7 @@ MoveWindow.prototype = {
   // moving the window and the actual position are not really the same
   // if the points are < 30 points away asume as equal
   _samePoint: function(p1, p2) {
-    return (Math.abs(p1-p2) < 30);
+    return (Math.abs(p1-p2) <= 32);
   },
   
   // actual resizing
