@@ -5,10 +5,21 @@ putWindow
 -----------------------------------------------------------------------
 move and resize windows similar to compiz put plugin
 
-To check the predefined keyboard bindings (or modify them) open gconf-editor and 
-navigate to "apps.metacity.window_keybindings". 
+Please check the wiki or create a issue if you have any problem.
 
-If you enable this extension the functionality ofmetacity move window
+Changes: 
+
+----- December 11, 2011
+
+ * reduced the horizontal and vertical "gap" between windows
+ * hitting move_to_center twice will now correctly maximize evolution
+
+--------------- 
+
+To check the predefined keyboard bindings (or modify them) open gconf-editor and 
+navigate to "apps.metacity.window_keybindings". (check the wiki for details)
+
+If you enable this extension the functionality of metacity move window
 keybindings are replaced:
 
 - move_to_side_n.... move to north edge, height: 50% width 100%
@@ -24,10 +35,11 @@ keybindings are replaced:
 
 2 screen setup support:
 the extention works well with 2 screens in horizontal setup.
-Moving windows from one screen to another only possible widh side_e and side_w
+Moving windows from one screen to another only possible with side_e and side_w
 and only if windows was at side_e (or side_w) before. eg.
 * a window in corner_nw of the right screen is not move to the left screen.
 * a window at side_e of the right screen is move to the left screen (side_w)
+
 
 
 simpleMenu
