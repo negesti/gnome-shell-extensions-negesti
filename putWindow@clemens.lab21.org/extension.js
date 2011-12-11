@@ -29,16 +29,15 @@ MoveWindow.prototype = {
   _bindings: [],
   _shellwm: global.window_manager,
 
-  _topBarHeight: 55,
+  _topBarHeight: 26,
     
   _primary: 0,
   _screens: [],
 
   /**
    * Helper functions to takeover binding when enabled and release them
-   * on disbale.
-   * TODO. find "_shellwm.release_keybinding" to restore normal keybindig
-   * after disable. (currently only disables the new binding.
+   * on disbale. Will change when 3.4 is available and extensions can register
+   * bindings.
    */
   _addKeyBinding: function(keybinding, handler) {
     if (this._keyBindingHandlers[keybinding])
@@ -61,14 +60,13 @@ MoveWindow.prototype = {
         log("no window focused");
         return;
     }
-    // rectanlge presenting current position
     var pos = win.get_outer_rect();
     
     let sIndex = this._primary;
     let sl = this._screens.length;
     
-    // left edge is sometimtes < 0...
-    pos.x = Math.abs(pos.x) + 10;
+    // left edge is sometimes -1px... 
+    pos.x = pos.x < 0 ? 0 : pos.x;
     for (let i=0; i<sl; i++) {
       if (i==sl-1) {
         sIndex = i;
@@ -118,12 +116,14 @@ MoveWindow.prototype = {
       this._resize(win, s.x, s.y, s.width, s.height)
     }
     
-    // calculate the center position and check if the window is alread there
+    // calculate the center position and check if the window is already there
     if (where == "c") {
       let x = s.x + (s.width/2);
       let y = s.y + (s.height/2);
       
-      if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameWidth && sameHeight) {
+      // do not check window.width. until i find get_size_hint(), or min_width..
+      // windows that have a min_width < our width it will not work (evolution for example)
+      if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameHeight) {
         // the window is alread centered -> maximize
         this._resize(win, s.x, s.y, -1, -1);
       } else {
@@ -136,7 +136,7 @@ MoveWindow.prototype = {
   // moving the window and the actual position are not really the same
   // if the points are < 30 points away asume as equal
   _samePoint: function(p1, p2) {
-    return (Math.abs(p1-p2) <= 32);
+    return (Math.abs(p1-p2) <= 20);
   },
   
   // actual resizing
@@ -155,13 +155,29 @@ MoveWindow.prototype = {
     } else {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
-
-    // snap, widht, height, force
-    win.resize(true, width, height, true);
+    
+    // first move the window
+    let padding = this._getPadding(win);
+    // snap, width, height, force
+    win.resize(true, width - padding.width, height - padding.height);
     // snap, x, y
-    win.move(true, x, y);
+    win.move_frame(true, x - padding.x, y - padding.y);
+    
   },
 
+  // the difference between input and outer rect as object.
+  // * width /4 looks better
+  _getPadding: function(win) {
+    let outer = win.get_outer_rect(),
+      inner = win.get_input_rect();
+    return {
+      x: outer.x - inner.x,
+      y: (outer.y - inner.y),
+      width: (inner.width - outer.width) / 4,
+      height: (inner.height - outer.height)
+    };
+  },
+  
   /**
    * Get global.screen_width and global.screen_height and
    * bind the keys
@@ -173,20 +189,21 @@ MoveWindow.prototype = {
 
     // only tested with 2 screen setup
     for (let i=0; i<numMonitors; i++) {
-      let geom = global.screen.get_monitor_geometry(i);
-      let offset = geom.x;
-      let totalHeight = geom.height;
+      let geom = global.screen.get_monitor_geometry(i),
+        offset = geom.x,
+        totalHeight = geom.height;
       
       this._screens[i] =  {
-        x : offset,        
-        y: (i==this._primary) ? this._topBarHeight : 30,
+        x : offset,
+        y: (i==this._primary) ? this._topBarHeight : 0,
         totalWidth: geom.width,
-        totalHeight: geom.height,
+        totalHeight: totalHeight,
         width: geom.width / 2,
-        height: (totalHeight / 2) - this._topBarHeight + 10,
+        height: totalHeight/2 - this._topBarHeight
       };
+      
       // the position.y for s, sw and se
-      this._screens[i].sy = totalHeight - this._screens[i].height;
+      this._screens[i].sy = (totalHeight + this._topBarHeight)/2;
     }
     
     // sort by x position. makes it easier to find the correct screen 
@@ -196,35 +213,35 @@ MoveWindow.prototype = {
 
     // move to n, e, s an w
     this._addKeyBinding("move_to_side_n",
-      Lang.bind(this, function(){ this._moveFocused("n");}) // offset, this._topBarHeight, -1, this._height); })
+      Lang.bind(this, function(){ this._moveFocused("n");})
     );
     this._addKeyBinding("move_to_side_e",
-      Lang.bind(this, function(){ this._moveFocused("e");}) // offset + this._width, this._topBarHeight, this._width, -1);})
+      Lang.bind(this, function(){ this._moveFocused("e");})
     );
     this._addKeyBinding("move_to_side_s",
-      Lang.bind(this, function(){ this._moveFocused("s");}) // offset, this._sy, -1, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("s");})
     );
     this._addKeyBinding("move_to_side_w",
-      Lang.bind(this, function(){ this._moveFocused("w");}) // offset, this._topBarHeight, this._width, -1);})
+      Lang.bind(this, function(){ this._moveFocused("w");})
     );
 
     // move to  nw, se, sw, nw
     this._addKeyBinding("move_to_corner_ne",
-      Lang.bind(this, function(){ this._moveFocused("ne");}) // offset + this._width, this._topBarHeight, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("ne");})
     );
     this._addKeyBinding("move_to_corner_se",
-      Lang.bind(this, function(){ this._moveFocused("se");}) // offset + this._width, this._sy, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("se");})
     );
     this._addKeyBinding("move_to_corner_sw",
-      Lang.bind(this, function(){ this._moveFocused("sw");}) // offset, this._sy, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("sw");})
     );
     this._addKeyBinding("move_to_corner_nw",
-      Lang.bind(this, function(){ this._moveFocused("nw");}) // offset, this._topBarHeight, this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("nw");})
     );
 
     // move to center. fix 2 screen setup and resize to 50% 50%
     this._addKeyBinding("move_to_center",
-      Lang.bind(this, function(){ this._moveFocused("c");}) // offset + (this._width/2), this._topBarHeight + (this._height/2), this._width, this._height);})
+      Lang.bind(this, function(){ this._moveFocused("c");})
     );
   },
 
@@ -232,7 +249,7 @@ MoveWindow.prototype = {
    * disconnect all keyboard bindings that were added with _addKeyBinding
    **/
   destroy: function() {
-    var size = this._bindings.length;
+    let size = this._bindings.length;
     for(let i = 0; i<size; i++) {
         this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
     }
