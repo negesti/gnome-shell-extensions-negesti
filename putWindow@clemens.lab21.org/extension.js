@@ -68,7 +68,7 @@ MoveWindow.prototype = {
     // left edge is sometimes -1px... 
     pos.x = pos.x < 0 ? 0 : pos.x;
     for (let i=0; i<sl; i++) {
-      if (i==sl-1) {
+      if (i == sl-1) {
         sIndex = i;
         break;
       }
@@ -80,15 +80,17 @@ MoveWindow.prototype = {
     
     let s = this._screens[sIndex];
     
-    let diff = null;
-    let sameWidth = this._samePoint(pos.width, s.width);
-    let sameHeight = this._samePoint(s.height, pos.height);
-    let maxH = this._samePoint(pos.height, s.totalHeight);
-        
+    let diff = null,
+      sameWidth = this._samePoint(pos.width, s.width),
+      sameHeight = this._samePoint(s.height, pos.height);
+      
+    // sIndex is the the target index if we move to another screen.-> primary!=sIndex
+    let maxH = this._samePoint((this._primary!=sIndex) ? (pos.height + this._topBarHeight) : pos.height, s.totalHeight);
+    
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
     } else if (where == "e") {    
-      if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width > s.totalWidth) {
+      if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
         s = this._screens[(sIndex+1)];
         this._resize(win, s.x, s.y, s.width, -1);
       } else {
@@ -97,8 +99,8 @@ MoveWindow.prototype = {
     } else if (where == "s") {
       this._resize(win, s.x, s.sy, -1, s.height);
     } else if (where == "w") {
-      // if we are not on screen[0] move window to the left screen
-      if (sIndex>0 && sameWidth && maxH && pos.x - s.width < s.x) {
+      // if we are not on screen[i>0] move window to the left screen
+      if (sIndex > 0 && sameWidth && maxH && pos.x - s.width < s.x) {
         s = this._screens[(sIndex-1)];
         this._resize(win, (s.x + s.width), s.y, s.width, -1);
       } else {
