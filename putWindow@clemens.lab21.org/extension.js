@@ -57,7 +57,7 @@ MoveWindow.prototype = {
   _moveFocused: function(where) {
     let win = global.display.focus_window;
     if (win==null) {
-        log("no window focused");
+        //global.loglog("putWindow._moveFocused: no window focused");
         return;
     }
     var pos = win.get_outer_rect();
@@ -83,24 +83,28 @@ MoveWindow.prototype = {
     let diff = null,
       sameWidth = this._samePoint(pos.width, s.width),
       sameHeight = this._samePoint(s.height, pos.height);
-      
+
     // sIndex is the the target index if we move to another screen.-> primary!=sIndex
-    let maxH = this._samePoint((this._primary!=sIndex) ? (pos.height + this._topBarHeight) : pos.height, s.totalHeight);
+    let maxH = this._samePoint((this._primary!=sIndex) 
+      ? (pos.height + this._topBarHeight) 
+      : pos.height, s.totalHeight);
     
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
-    } else if (where == "e") {    
+    } else if (where == "e") {
       if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
         s = this._screens[(sIndex+1)];
         this._resize(win, s.x, s.y, s.width, -1);
       } else {
         this._resize(win, (s.x + s.width), s.y, s.width, -1);
       }
+      win.last_move = "e";
     } else if (where == "s") {
       this._resize(win, s.x, s.sy, -1, s.height);
     } else if (where == "w") {
       // if we are not on screen[i>0] move window to the left screen
-      if (sIndex > 0 && sameWidth && maxH && pos.x - s.width < s.x) {
+      let newX = pos.x - s.width;
+      if (sIndex > 0 && sameWidth && maxH && newX < (s.width + 150)) {
         s = this._screens[(sIndex-1)];
         this._resize(win, (s.x + s.width), s.y, s.width, -1);
       } else {
@@ -160,10 +164,10 @@ MoveWindow.prototype = {
     
     // first move the window
     let padding = this._getPadding(win);
-    // snap, width, height, force
-    win.resize(true, width - padding.width, height - padding.height);
     // snap, x, y
     win.move_frame(true, x - padding.x, y - padding.y);
+    // snap, width, height, force
+    win.resize(true, width - padding.width, height - padding.height);
     
   },
 
@@ -175,7 +179,7 @@ MoveWindow.prototype = {
     return {
       x: outer.x - inner.x,
       y: (outer.y - inner.y),
-      width: (inner.width - outer.width) / 4,
+      width: 2, //(inner.width - outer.width),
       height: (inner.height - outer.height)
     };
   },
