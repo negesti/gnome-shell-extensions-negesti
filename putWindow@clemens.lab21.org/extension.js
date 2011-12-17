@@ -1,7 +1,7 @@
 const Gettext = imports.gettext;
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
-
+const Main = imports.ui.main;
 
 /**
  * load the moveWindow.js file
@@ -83,11 +83,20 @@ MoveWindow.prototype = {
     let diff = null,
       sameWidth = this._samePoint(pos.width, s.width),
       sameHeight = this._samePoint(s.height, pos.height);
+    
+    // the main panel is hidden
+    if (Main.panel.hidden) {
+      s.y = 0;
+      s.height = s.totalHeight/2 - 4;
+      s.sy = (s.totalHeight)/2 -4;
+    } else {
+      height: s.totalHeight/2 - this._topBarHeight
+      s.sy = (s.totalHeight + this._topBarHeight)/2;
+    }
 
     // sIndex is the the target index if we move to another screen.-> primary!=sIndex
-    let maxH = this._samePoint((this._primary!=sIndex) 
-      ? (pos.height + this._topBarHeight) 
-      : pos.height, s.totalHeight);
+    let winHeight = this._primary!=sIndex ? pos.height + this._topBarHeight : pos.height;
+    let maxH = (winHeight > s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
     
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
@@ -190,7 +199,6 @@ MoveWindow.prototype = {
    **/
   _init: function() {
     this._primary = global.screen.get_primary_monitor();
-    
     let numMonitors = global.screen.get_n_monitors();
 
     // only tested with 2 screen setup
