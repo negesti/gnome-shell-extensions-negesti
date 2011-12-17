@@ -9,6 +9,10 @@ Please check the wiki or create a issue if you have any problem.
 
 Changes: 
 
+----- December 17, 2011
+ * fix a bug that occures if the top panel is hidden.
+ ->  checkout https://extensions.gnome.org/extension/42/auto-hide-top-panel/ it's awesome!
+
 ----- December 11, 2011
 
  * reduced the horizontal and vertical "gap" between windows
