@@ -57,7 +57,6 @@ MoveWindow.prototype = {
   _moveFocused: function(where) {
     let win = global.display.focus_window;
     if (win==null) {
-        //global.loglog("putWindow._moveFocused: no window focused");
         return;
     }
     var pos = win.get_outer_rect();
@@ -90,14 +89,14 @@ MoveWindow.prototype = {
       s.height = s.totalHeight/2 - 4;
       s.sy = (s.totalHeight)/2 -4;
     } else {
-      height: s.totalHeight/2 - this._topBarHeight
+      s.height = s.totalHeight/2 - this._topBarHeight
       s.sy = (s.totalHeight + this._topBarHeight)/2;
     }
 
-    // sIndex is the the target index if we move to another screen.-> primary!=sIndex
-    let winHeight = this._primary!=sIndex ? pos.height + this._topBarHeight : pos.height;
-    let maxH = (winHeight > s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
-    
+    // sIndex is the target index if we move to another screen.-> primary!=sIndex
+    let winHeight = pos.height + this._topBarHeight;
+    let maxH = (pos.height >= s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
+ 
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
     } else if (where == "e") {
