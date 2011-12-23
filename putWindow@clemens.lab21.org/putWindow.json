@@ -1,0 +1,32 @@
+{
+  "locations": {
+    "Terminator": {
+      "lastPosition": "0",
+      "autoMove": "false",
+      "positions": [{
+        "screen": "0",
+        "width": "0.85",
+        "height": "1",
+        "x": "0.15",
+        "y": "0"
+      },{
+        "screen": "1",
+        "width": "0.7",
+        "height": "1",
+        "x": "0.3",
+        "y": "0"
+      }]
+    },
+    "Skype": {
+      "lastPosition": "0",
+      "autoMove": "true",
+      "positions": [{
+        "screen": "0",
+        "width": "0.15",
+        "height": "1",
+        "x": "0",
+        "y": "0"
+      }]
+    }
+  }
+}

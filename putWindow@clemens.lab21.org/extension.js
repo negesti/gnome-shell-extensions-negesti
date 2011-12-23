@@ -2,13 +2,9 @@ const Gettext = imports.gettext;
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
+const Shell = imports.gi.Shell;
 
-/**
- * load the moveWindow.js file
- *
- * const Extension = imports.ui.extensionSystem.extensions["putWindow@clemens.lab21.org"];
- * const MoveWindow = Extension.moveWindow;
- **/
+let _path;
 
 /**
  * Handles all keybinding stuff and moving windows.
@@ -17,6 +13,12 @@ const Main = imports.ui.main;
  *  - move_to_side_n/e/s/w move and resize windows
  *  - move_to_corner_ne/se/sw/nw move an resize to the corners
  *
+ * Thanks to: 
+ * gcampax for auto-move-window extension and 
+ * vibou_ for gtile and his getInner/OuterPadding than is used in nearly every 
+ *        extension that moves windows aroun
+ *
+ * Believe in the force! Read the source!
  **/
 function MoveWindow() {
   this._init();
@@ -25,6 +27,7 @@ function MoveWindow() {
 MoveWindow.prototype = {
 
   // private variables
+  _configuration : {},
   _keyBindingHandlers: [],
   _bindings: [],
   _shellwm: global.window_manager,
@@ -33,6 +36,26 @@ MoveWindow.prototype = {
     
   _primary: 0,
   _screens: [],
+
+  _readFile: function() {
+    let ret = null;
+    let content;
+    try {
+      content = Shell.get_file_contents_utf8_sync(_path+"putWindow.json");
+    } catch (e) {
+      Main.notifyError("Error reading file", e.message);
+      return {};
+    }
+
+    try {
+      ret = JSON.parse(content);
+    } catch (e) {
+       Main.notifyError("Error parsing json file!", e.message);
+       return {};
+    }
+
+    return ret;
+  },
 
   /**
    * Helper functions to takeover binding when enabled and release them
@@ -57,7 +80,6 @@ MoveWindow.prototype = {
   _moveFocused: function(where) {
     let win = global.display.focus_window;
     if (win==null) {
-        //global.loglog("putWindow._moveFocused: no window focused");
         return;
     }
     var pos = win.get_outer_rect();
@@ -90,14 +112,14 @@ MoveWindow.prototype = {
       s.height = s.totalHeight/2 - 4;
       s.sy = (s.totalHeight)/2 -4;
     } else {
-      height: s.totalHeight/2 - this._topBarHeight
+      s.height = s.totalHeight/2 - this._topBarHeight
       s.sy = (s.totalHeight + this._topBarHeight)/2;
     }
 
-    // sIndex is the the target index if we move to another screen.-> primary!=sIndex
-    let winHeight = this._primary!=sIndex ? pos.height + this._topBarHeight : pos.height;
-    let maxH = (winHeight > s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
-    
+    // sIndex is the target index if we move to another screen.-> primary!=sIndex
+    let winHeight = pos.height + this._topBarHeight;
+    let maxH = (pos.height >= s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
+ 
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
     } else if (where == "e") {
@@ -148,6 +170,69 @@ MoveWindow.prototype = {
     }
   },
   
+  _moveConfiguredWhenCreated: function(display, win, noResurce) {
+    if (!this._windowTracker.is_window_interesting(win)) {
+      return;
+    }
+    
+    let app = win.get_wm_class();
+    
+    if (!app) {
+      if (!noRecurse) {
+        // window is not tracked yet
+        Mainloop.idle_add(Lang.bind(this, function() {
+          this._moveConfiguredWhenCreated(display, win, true);
+          return false;
+        }));
+      }
+      return;
+    }
+    
+    // move the window if a location is configured and autoMove is set to true
+    if (this._configuration.locations[app]) {
+      if (this._configuration.locations[app].autoMove && this._configuration.locations[app].autoMove=="true") {
+        this._moveToConfiguredLocation(win, app);
+      }
+    }
+  },
+  
+  /**
+   * check if the current focus window has a configured location. If so move it there ;)
+   */
+  _moveToConfiguredLocation: function(win, appName) {
+    
+    if (!win || !appName) {
+      win = global.display.focus_window;
+      if (win==null) {
+          return;
+      }
+      
+      appName = win.get_wm_class();
+    }
+    
+    let config = this._configuration.locations[appName];
+    if (!config) {
+      return;
+    }
+    let pos = config.positions[config.lastPosition];
+    if (config.positions.length > (config.lastPosition + 1)) {
+      this._configuration.locations[appName].lastPosition++;
+    } else {
+      this._configuration.locations[appName].lastPosition = 0;
+    }
+    
+    let s = this._screens[pos.screen];
+    
+    let x = (pos.x=="0") ? s.x : s.x + (s.totalWidth * pos.x);
+    let y = (pos.y=="0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y));
+    
+    // _resize will maximize the window if width/height is -1
+    let width = (pos.width == 1) ? -1 : s.totalWidth * pos.width;
+    let height = (pos.height == 1) ? -1 : s.totalHeight * pos.height;
+    
+    this._resize(win, x, y, width, height);
+  },
+  
   // moving the window and the actual position are not really the same
   // if the points are < 30 points away asume as equal
   _samePoint: function(p1, p2) {
@@ -175,9 +260,9 @@ MoveWindow.prototype = {
     let padding = this._getPadding(win);
     // snap, x, y
     win.move_frame(true, x - padding.x, y - padding.y);
+    
     // snap, width, height, force
     win.resize(true, width - padding.width, height - padding.height);
-    
   },
 
   // the difference between input and outer rect as object.
@@ -198,6 +283,14 @@ MoveWindow.prototype = {
    * bind the keys
    **/
   _init: function() {
+    // read configuration and init the windowTracker
+    this._configuration = this._readFile();
+    this._windowTracker = Shell.WindowTracker.get_default();
+    
+    let display = global.screen.get_display();
+    this._windowCreatedListener = display.connect_after('window-created', Lang.bind(this, this._moveConfiguredWhenCreated));
+    
+    // get monotor(s) geometry
     this._primary = global.screen.get_primary_monitor();
     let numMonitors = global.screen.get_n_monitors();
 
@@ -257,12 +350,22 @@ MoveWindow.prototype = {
     this._addKeyBinding("move_to_center",
       Lang.bind(this, function(){ this._moveFocused("c");})
     );
+    
+    this._addKeyBinding("move_to_workspace_1",
+      Lang.bind(this, function(){ this._moveToConfiguredLocation();})
+    );
   },
 
   /**
    * disconnect all keyboard bindings that were added with _addKeyBinding
    **/
   destroy: function() {
+    
+    if (this._windowCreatedId) {
+      global.screen.get_display().disconnect(this._windowCreatedListener);
+      this._windowCreatedListener = 0;
+    }
+        
     let size = this._bindings.length;
     for(let i = 0; i<size; i++) {
         this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
@@ -271,6 +374,7 @@ MoveWindow.prototype = {
 }
 
 function init(meta) {
+  _path = meta.path+"/";
   let userExtensionLocalePath = meta.path + '/locale';
   Gettext.bindtextdomain("putWindow", userExtensionLocalePath);
   Gettext.textdomain("putWindow");
