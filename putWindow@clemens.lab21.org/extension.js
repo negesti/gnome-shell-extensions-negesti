@@ -220,8 +220,9 @@ MoveWindow.prototype = {
     } else {
       this._configuration.locations[appName].lastPosition = 0;
     }
-    
-    let s = this._screens[pos.screen];
+   
+    // config may be for 2 screens but currenty only 1 is connected 
+    let s = (this._screens.length > pos.screen+1) ? this._screens[pos.screen] : this._screens[0];
     
     let x = (pos.x=="0") ? s.x : s.x + (s.totalWidth * pos.x);
     let y = (pos.y=="0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y));
