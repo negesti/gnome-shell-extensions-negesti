@@ -222,7 +222,8 @@ MoveWindow.prototype = {
     }
    
     // config may be for 2 screens but currenty only 1 is connected 
-    let s = (this._screens.length > pos.screen+1) ? this._screens[pos.screen] : this._screens[0];
+    log(this._screens.length + " " +pos.screen);
+    let s = (this._screens.length > pos.screen) ? this._screens[pos.screen] : this._screens[0];
     
     let x = (pos.x=="0") ? s.x : s.x + (s.totalWidth * pos.x);
     let y = (pos.y=="0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y));
@@ -362,7 +363,7 @@ MoveWindow.prototype = {
    **/
   destroy: function() {
     
-    if (this._windowCreatedId) {
+    if (this._windowCreatedListener) {
       global.screen.get_display().disconnect(this._windowCreatedListener);
       this._windowCreatedListener = 0;
     }
