@@ -210,6 +210,9 @@ MoveWindow.prototype = {
     if (!config) {
       return;
     }
+    if (!config.lastPosition) {
+      config.lastPosition = 0;
+    }
     let pos = config.positions[config.lastPosition];
     if (config.positions.length > (config.lastPosition + 1)) {
       this._configuration.locations[appName].lastPosition++;
@@ -220,12 +223,12 @@ MoveWindow.prototype = {
     // config may be for 2 screens but currenty only 1 is connected
     let s = (this._screens.length > pos.screen) ? this._screens[pos.screen] : this._screens[0];
 
-    let x = (pos.x=="0") ? s.x : s.x + (s.totalWidth * pos.x);
-    let y = (pos.y=="0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y));
+    let x = (pos.x=="0.0") ? s.x : s.x + (s.totalWidth * pos.x/100);
+    let y = (pos.y=="0.0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y/100));
 
     // _resize will maximize the window if width/height is -1
-    let width = (pos.width == 1) ? -1 : s.totalWidth * pos.width;
-    let height = (pos.height == 1) ? -1 : s.totalHeight * pos.height;
+    let width = (pos.width == 100) ? -1 : s.totalWidth * pos.width/100;
+    let height = (pos.height == 100) ? -1 : s.totalHeight * pos.height/100;
 
     this._resize(win, x, y, width, height);
   },
