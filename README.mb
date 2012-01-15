@@ -1,5 +1,5 @@
-Put Window
-= = = 
+## Put Window
+
 
 If you enable this extension the metacity move window keybindings are
 replaced.
@@ -8,11 +8,12 @@ replaced.
 
 Changes:
 
------ December 17, 2011
+__December 17, 2011__
+
  * fix a bug that occures if the top panel is hidden.
  ->  checkout https://extensions.gnome.org/extension/42/auto-hide-top-panel/ it's awesome!
 
------ December 11, 2011
+__December 11, 2011__
 
  * reduced the horizontal and vertical "gap" between windows
  * hitting move_to_center twice will now correctly maximize evolution
