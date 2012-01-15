@@ -8,6 +8,11 @@ replaced.
 
 Changes:
 
+__January 15, 2012__
+
+* added a config ui
+ * position.x/y/width/height must be integers between 0 and 100 (was 0...1)
+
 __December 17, 2011__
 
  * fix a bug that occures if the top panel is hidden.
