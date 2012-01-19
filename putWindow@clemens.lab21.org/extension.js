@@ -24,6 +24,12 @@ function MoveWindow() {
 
 MoveWindow.prototype = {
 
+  // -------------- CONFIGURATION --------------
+  // configure the width and height of windows when moved to center
+  // If one value is not valid e.g. not between 0 and 100, is is changed to 50
+  _centerWidth: 60,
+  _centerHeight: 60,
+
   // private variables
   _keyBindingHandlers: [],
   _bindings: [],
@@ -57,7 +63,7 @@ MoveWindow.prototype = {
   _moveFocused: function(where) {
     let win = global.display.focus_window;
     if (win==null) {
-        //global.loglog("putWindow._moveFocused: no window focused");
+        //global.log("putWindow._moveFocused: no window focused");
         return;
     }
     var pos = win.get_outer_rect();
@@ -86,8 +92,7 @@ MoveWindow.prototype = {
     s.sy = (s.totalHeight + tbHeight)/2 + s.geomY;
 
     let diff = null,
-      sameWidth = this._samePoint(pos.width, s.width),
-      sameHeight = this._samePoint(s.height, pos.height);
+      sameWidth = this._samePoint(pos.width, s.width);
 
     // sIndex is the the target index if we move to another screen.-> primary!=sIndex
     let winHeight = this._primary!=sIndex ? pos.height + this._topBarHeight : pos.height;
@@ -128,8 +133,11 @@ MoveWindow.prototype = {
 
     // calculate the center position and check if the window is already there
     if (where == "c") {
-      let x = s.x + (s.width/2);
-      let y = s.y + (s.height/2);
+      let w = s.totalWidth * (this._centerWidth / 100),
+        h = s.totalHeight * (this._centerHeight / 100),
+        x = s.x + (s.totalWidth - w) / 2,
+        y = s.y + (s.totalHeight - h) / 2,
+        sameHeight = this._samePoint(h, pos.height);
 
       // do not check window.width. until i find get_size_hint(), or min_width..
       // windows that have a min_width < our width it will not work (evolution for example)
@@ -137,8 +145,8 @@ MoveWindow.prototype = {
         // the window is alread centered -> maximize
         this._resize(win, s.x, s.y, -1, -1);
       } else {
-        // the window is somewhere else -> resize
-        this._resize(win, x, y, s.width, s.height)
+        // the window is not centered -> resize
+        this._resize(win, x, y, w, h);
       }
     }
   },
@@ -188,11 +196,25 @@ MoveWindow.prototype = {
     };
   },
 
+  _checkSize: function(p, fallback) {
+    if (!p || p < 0 || p > 100) {
+      return fallback;
+    }
+
+    return p;
+  },
+
   /**
    * Get global.screen_width and global.screen_height and
    * bind the keys
    **/
   _init: function() {
+    // Check if the _center* values are valid
+    this._centerWidth = this._checkSize(this._centerWidth, 50);
+    this._centerHeight = this._checkSize(this._centerHeight, 50);
+
+
+
     this._primary = global.screen.get_primary_monitor();
     let numMonitors = global.screen.get_n_monitors();
 
