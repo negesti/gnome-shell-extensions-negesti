@@ -111,7 +111,6 @@ MoveWindow.prototype = {
 
     // east and west
     let winHeight = (pos.height + tbHeight);
-
     let sameWidth = this._samePoint(pos.width, s.width),
       maxH = (winHeight > s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
 
