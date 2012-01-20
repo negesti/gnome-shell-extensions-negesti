@@ -91,25 +91,37 @@ MoveWindow.prototype = {
     s.height = (s.totalHeight)/2  - tbHeight;
     s.sy = (s.totalHeight + tbHeight)/2 + s.geomY;
 
-    let diff = null,
-      sameWidth = this._samePoint(pos.width, s.width);
-
-    // sIndex is the the target index if we move to another screen.-> primary!=sIndex
-    let winHeight = this._primary!=sIndex ? pos.height + this._topBarHeight : pos.height;
-    let maxH = (winHeight > s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
-
+    // north and south
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
-    } else if (where == "e") {
+    } else if (where == "s") {
+      this._resize(win, s.x, s.sy, -1, s.height);
+    }
+
+    // corners
+    if (where == "ne") {
+      this._resize(win, s.x + s.width, s.y, s.width, s.height)
+    } else if (where == "se") {
+      this._resize(win, s.x + s.width, s.sy, s.width, s.height)
+    } else if (where == "sw") {
+      this._resize(win, s.x, s.sy, s.width, s.height)
+    } else if (where == "nw") {
+      this._resize(win, s.x, s.y, s.width, s.height)
+    }
+
+    // east and west
+    let winHeight = (pos.height + tbHeight);
+
+    let sameWidth = this._samePoint(pos.width, s.width),
+      maxH = (winHeight > s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
+
+    if (where == "e") {
       if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
         s = this._screens[(sIndex+1)];
         this._resize(win, s.x, s.y, s.width, -1);
       } else {
         this._resize(win, (s.x + s.width), s.y, s.width, -1);
       }
-      win.last_move = "e";
-    } else if (where == "s") {
-      this._resize(win, s.x, s.sy, -1, s.height);
     } else if (where == "w") {
       // if we are not on screen[i>0] move window to the left screen
       let newX = pos.x - s.width;
@@ -119,16 +131,6 @@ MoveWindow.prototype = {
       } else {
         this._resize(win, s.x, s.y, s.width, -1);
       }
-    }
-
-    if (where == "ne") {
-      this._resize(win, s.x + s.width, s.y, s.width, s.height)
-    } else if (where == "se") {
-      this._resize(win, s.x + s.width, s.sy, s.width, s.height)
-    } else if (where == "sw") {
-      this._resize(win, s.x, s.sy, s.width, s.height)
-    } else if (where == "nw") {
-      this._resize(win, s.x, s.y, s.width, s.height)
     }
 
     // calculate the center position and check if the window is already there
