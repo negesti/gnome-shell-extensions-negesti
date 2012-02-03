@@ -138,8 +138,6 @@ SettingsWindow.prototype = {
 
     let valueLabel = new St.Label({ text: "" + value, style_class: "popup-menu-item" });
 
-    global.log("slider: "+configName);
-
     let slider = new PopupMenu.PopupSliderMenuItem( (value/100) );
     slider.connect("value-changed",
       Lang.bind(this, function(slider, newValue) {
@@ -377,6 +375,7 @@ let _saveFile = function(data) {
   try {
     let file = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/test.json");
     file.replace_contents(JSON.stringify(data), null, false, 0, null);
+    Main.notify(_("Saved!"), _("Your changes have been successfully saved"));
   } catch (e) {
     Main.notifyError("Error saving settings " + e);
   }
