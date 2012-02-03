@@ -4,6 +4,9 @@ const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 
+// const Extension = imports.ui.extensionSystem.extensions['putWindow@clemens.lab21.org'];
+// const SettingWIndow = Extension.settingsWindow.SettingWindow;
+
 let _path;
 
 /**
