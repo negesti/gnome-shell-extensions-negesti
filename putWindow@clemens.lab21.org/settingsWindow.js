@@ -4,6 +4,7 @@ const _ = Gettext.gettext;
 
 const Gio = imports.gi.Gio;
 const ModalDialog = imports.ui.modalDialog;
+const Params = imports.misc.params;
 const PopupMenu = imports.ui.popupMenu;
 const St = imports.gi.St;
 
@@ -45,16 +46,18 @@ SettingsWindow.prototype = {
     });
 
     let menu = new PopupMenu.PopupMenu(mainBox.actor);
-    menu.addMenuItem(this._mainSettings());
-    menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+    menu.addMenuItem(this._createAddButton());
+    menu.addMenuItem(this._createDeleteButton());
+    // menu.addMenuItem(this._mainSettings());
+    // menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-    if (typeof(this._settings["locations"]) != "undefined") {
-      let apps = Object.getOwnPropertyNames(_readFile()["locations"]),
-        appsLength = apps.length;
-      for(let i=0; i< appsLength; i++) {
-        menu.addMenuItem(this._createAppSetting(apps[i], this._settings["locations"][apps[i]]));
-      }
-    }
+    // if (typeof(this._settings["locations"]) != "undefined") {
+    //   let apps = Object.getOwnPropertyNames(_readFile()["locations"]),
+    //     appsLength = apps.length;
+    //   for(let i=0; i< appsLength; i++) {
+    //     menu.addMenuItem(this._createAppSetting(apps[i], this._settings["locations"][apps[i]]));
+    //   }
+    // }
     mainBox.add(menu.actor);
 
     this.setButtons([{
@@ -206,12 +209,83 @@ SettingsWindow.prototype = {
     return section;
   },
 
+  _getConfiguredApps: function() {
+    return Object.getOwnPropertyNames(this._getParameter("locations"));
+  },
+
+  _getRunningApps: function(exclude) {
+    if (!this.appSys) {
+      this.appSys = Shell.AppSystem.get_default();
+    }
+
+    let exludeLength = exclude.length;
+
+    let apps = this.appSys.get_running();
+    let ret = [];
+
+    for (let i=0; i < apps.length; i++) {
+      let wm =  apps[i].get_windows()[0].get_wm_class(),
+        found = false;
+
+      // dont add excluded entries to the returned value
+      for (let j=0; j < exludeLength; j++) {
+        if (exclude[j] == wm) {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        ret[i] = [ i, wm];
+      }
+    }
+    return ret;
+  },
+
+  _createAddButton: function() {
+    let items = this._getRunningApps(this._getConfiguredApps());
+
+    items.push( [items.length, "All"] );
+
+    let fn = Lang.bind(this,
+      function() {
+        let item = ret.getSelectedItem();
+        Main.notify("Create Config for '" + item[1] +"'");
+      }
+    );
+    return new ComboButtonItem(_("Add Application"), { items: items, selectedValue: 'All', buttonClicked: fn} );
+  },
+
+  _createDeleteButton: function() {
+
+    let apps = this._getConfiguredApps();
+    let items = [ [0, 'Select'] ];
+
+    for (let i = 1; i <= apps.length; i++) {
+      items[i] = [i, apps[ (i-1) ] ];
+    }
+
+    let fn = Lang.bind(this,
+      function() {
+        let item = ret.getSelectedItem();
+        Main.notify("Delete config for '" + item[1] +"'");
+      }
+    );
+
+    let ret =  new ComboButtonItem(_("Delete Application"), { items: items, selectedValue: 'Select', buttonClicked: fn} );
+
+    return ret;
+  },
+
   _mainSettings: function() {
 
     let menu = new Accordion("Common Settings");
     menu.menu.addMenuItem(this._createSwitch("panelButtonVisible", _("Show Settings Button")));
     menu.menu.addMenuItem(this._createSlider("centerWidth", _("Center Width"), 0, 100));
     menu.menu.addMenuItem(this._createSlider("centerHeight", _("Center Height"), 0, 100));
+    menu.menu.addMenuItem(this._createSlider("sideWidth", _("Side Width"), 0, 100));
+    menu.menu.addMenuItem(this._createSlider("cornerWidth", _("Corner Width"), 0, 100));
+    menu.menu.addMenuItem(this._createSlider("cornerHeight", _("Corner Height"), 0, 100));
     //menu.menu.addMenuItem(this._createCombo("combo box", ["1", "2", "3"], "a test combobox"));
     return menu;
   },
@@ -219,17 +293,6 @@ SettingsWindow.prototype = {
   _createAppSetting: function(name, config) {
     let menu = new Accordion(name);
 
-    //  "Skype": {
-    //   "lastPosition": "0",
-    //   "autoMove": "true",
-    //   "positions": [{
-    //     "screen": "0",
-    //     "width": "0.15",
-    //     "height": "1",
-    //     "x": "0",
-    //     "y": "0"
-    //   }]
-    // }
     let prefix = "locations." + name + ".";
     menu.menu.addMenuItem(this._createSwitch(prefix + "autoMove", _("Move on create")));
     menu.menu.addMenuItem(this._createCombo(prefix + "lastPosition", _("Startscreen"), this._screenItems));
@@ -238,7 +301,9 @@ SettingsWindow.prototype = {
     let positions = this._getParameter(prefix + "positions");
     for (let i=0; i< positions.length; i++) {
       // TODO: add a css-style that underlines the text and moves it 2px left
-      menu.menu.addMenuItem(new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false}));
+      let sep = new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false});
+      set.setShowDot(true)
+      menu.menu.addMenuItem(sep);
       menu.menu.addMenuItem(this._createCombo(prefix + "positions." + i + ".screen", _("Screen"), this._screenItems));
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".width", _("Width"), 0, 100));
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".height", _("Height"), 0, 100));
@@ -246,8 +311,81 @@ SettingsWindow.prototype = {
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".y", _("Y-Position"), 0, 100));
     }
     return menu;
+  }
+};
+
+function ComboButtonItem() {
+  this._init.apply(this, arguments);
+}
+
+ComboButtonItem.prototype = {
+  __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+  _init: function(text, params) {
+
+    // fill with fallback params
+    params = Params.parse(params, {
+      reactive: false,
+      activate: true,
+      hover: true,
+      sensitive: true,
+      style_class: null,
+      items: [[0, "nothing defined"]],
+      selectedValue: 0,
+      buttonClicked: function(btn) {}
+    });
+
+    // remove params PopupBaseMenuItem can not handle
+    this._items = params.items;
+    delete params.items;
+
+    let buttonClicked = params.buttonClicked;
+    delete params.buttonClicked;
+
+    let selectedValue = params.selectedValue;
+    delete params.selectedValue;
+
+    // call _init on BaseMenuItem
+    PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
+
+    this._combo = new PopupMenu.PopupComboBoxMenuItem( {} );
+
+    for (let i = 0; i<this._items.length; i++) {
+      this._combo.addMenuItem(new PopupMenu.PopupMenuItem( this._items[i][1] ), this._items[i][0]);
+    }
+
+    this.setSelectedItem(selectedValue);
+
+    this._combo.connect("active-item-changed",
+      Lang.bind(this, function(menuItem, id) {
+        this._selectedItem = this._items[id];
+      })
+    );
+
+    this.addActor(this._combo.actor, {span: 6, align: St.Align.START} );
+
+    let button = new St.Button ({ label: text, style_class: 'modal-dialog-button' });
+    button.connect("clicked", Lang.bind(this, buttonClicked));
+    this.addActor(button, {span: 6, align: St.Align.END} );
   },
 
+  getSelectedItem: function() {
+    return this._selectedItem;
+  },
+
+  getValueIndex: function(value) {
+    for (let i=0; i<this._items.length; i++) {
+      if (this._items[i][1] == value) {
+        return i;
+      }
+    }
+    return 0;
+  },
+
+  setSelectedItem: function(value) {
+    this._selectedItem = value;
+    this._combo.setActiveItem(this.getValueIndex(value));
+  }
 };
 
 // A PopupSubMenuItem that only open/close when the label is clicked
