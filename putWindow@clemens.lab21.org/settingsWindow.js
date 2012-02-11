@@ -3,10 +3,13 @@ const Gettext = imports.gettext;
 const _ = Gettext.gettext;
 
 const Gio = imports.gi.Gio;
-const ModalDialog = imports.ui.modalDialog;
-const Params = imports.misc.params;
-const PopupMenu = imports.ui.popupMenu;
 const St = imports.gi.St;
+
+const Params = imports.misc.params;
+
+const PopupMenu = imports.ui.popupMenu;
+const ModalDialog = imports.ui.modalDialog;
+const MessageTray = imports.ui.messageTray
 
 function SettingsWindow(settings) {
   this._init(settings);
@@ -14,6 +17,17 @@ function SettingsWindow(settings) {
 
 SettingsWindow.prototype = {
   __proto__: ModalDialog.ModalDialog.prototype,
+
+
+  _startConfig: {
+    autoMove: false,
+    positions: [{
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50
+    }]
+  },
 
   _screenItems: [[0, "Screen 1"], [1, "Screen 2"]],
 
@@ -48,22 +62,25 @@ SettingsWindow.prototype = {
     let menu = new PopupMenu.PopupMenu(mainBox.actor);
     menu.addMenuItem(this._createAddButton());
     menu.addMenuItem(this._createDeleteButton());
-    // menu.addMenuItem(this._mainSettings());
-    // menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+    menu.addMenuItem(this._mainSettings());
+    menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-    // if (typeof(this._settings["locations"]) != "undefined") {
-    //   let apps = Object.getOwnPropertyNames(_readFile()["locations"]),
-    //     appsLength = apps.length;
-    //   for(let i=0; i< appsLength; i++) {
-    //     menu.addMenuItem(this._createAppSetting(apps[i], this._settings["locations"][apps[i]]));
-    //   }
-    // }
+    this._appSection = new PopupMenu.PopupMenuSection();
+    if (typeof(this._settings["locations"]) != "undefined") {
+      let apps = Object.getOwnPropertyNames(_readFile()["locations"]),
+        appsLength = apps.length;
+      for(let i=0; i< appsLength; i++) {
+        this._appSection.addMenuItem(this._createAppSetting(apps[i], this._settings["locations"][apps[i]]));
+      }
+    }
+    menu.addMenuItem(this._appSection);
     mainBox.add(menu.actor);
 
     this.setButtons([{
         label: _("Cancel"),
         action: Lang.bind(this, function() {
           this.close();
+          this.destroy();
         }),
         key: Clutter.Escape
       }, {
@@ -98,13 +115,38 @@ SettingsWindow.prototype = {
 
       return value;
     } catch (e) {
-      Main.notifyError("Error getting config '" + name + "' defaulting to " + defaultValue + " "+e.message);
+      Main.notifyError(_("Error getting config '%s' defaulting to '%s'").format(name, defaultValue), e.message);
       return defaultValue;
     }
   },
 
+  _unsetParameter: function(name) {
+    let path = name.split("."),
+      conf = this._settings[path[0]],
+      pathLength = path.length - 1;
+
+    for (let i=1; i < pathLength; i++) {
+      conf = conf[path[i]];
+    }
+
+    delete conf[ path[pathLength] ];
+  },
+
   _setParameter: function(name, value) {
-    this._settings[name] = value;
+    try {
+      let path = name.split("."),
+        conf = this._settings[path[0]],
+        pathLength = path.length - 1;
+
+      for (let i=1; i < pathLength; i++) {
+          conf = conf[path[i]];
+      }
+
+      conf[ path[pathLength] ] = value;
+
+    } catch (e) {
+      Main.notifyError(_("Error setting config '%s'").format(name), e.message);
+    }
   },
 
   _toNumber: function(value, defaultValue) {
@@ -158,7 +200,6 @@ SettingsWindow.prototype = {
     let section = new PopupMenu.PopupMenuSection(),
       box = new St.BoxLayout({ vertical: false });
 
-    // if a St.Label it is placed at the left edge an
     let label = new St.Label({ text: txt, reactive: false, style_class: "popup-menu-item" });
 
     box.add(label, {span: 3, expand: true});
@@ -194,7 +235,6 @@ SettingsWindow.prototype = {
     combo.connect("active-item-changed",
       Lang.bind(this, function(menuItem, id) {
         // value = id
-        // dock.settings.set_enum(settingsUrl, id);
       })
     );
 
@@ -210,7 +250,16 @@ SettingsWindow.prototype = {
   },
 
   _getConfiguredApps: function() {
-    return Object.getOwnPropertyNames(this._getParameter("locations"));
+    if (!this._appSection) {
+      return Object.getOwnPropertyNames(this._getParameter("locations"));
+    }
+
+    Main.notify("Get visible appsections");
+    return this._appSection.actor.get_children().map(function (actor) {
+      return actor.name;
+    }).filter(function(item) {
+      return item instanceof Accordion;
+    });
   },
 
   _getRunningApps: function(exclude) {
@@ -236,7 +285,7 @@ SettingsWindow.prototype = {
       }
 
       if (!found) {
-        ret[i] = [ i, wm];
+        ret.push( [ret.length, wm]);
       }
     }
     return ret;
@@ -249,11 +298,22 @@ SettingsWindow.prototype = {
 
     let fn = Lang.bind(this,
       function() {
-        let item = ret.getSelectedItem();
-        Main.notify("Create Config for '" + item[1] +"'");
+        let item = this._addApplicationItem.getSelectedItem(),
+          configPath = "locations." + item[1];
+        this._setParameter(configPath, this._startConfig);
+        let newApp = this._createAppSetting(item[1], this._getParameter(configPath));
+        this._appSection.addMenuItem(newApp);
+        newApp.openAccordion(true);
+
+        this._addApplicationItem.setSelectedItem('All');
+        this._deleteApplicationItem.addComboItem(item);
+        this._addApplicationItem.removeComboItem(item);
       }
     );
-    return new ComboButtonItem(_("Add Application"), { items: items, selectedValue: 'All', buttonClicked: fn} );
+
+    this._addApplicationItem = new ComboButtonItem(_("Add Application"), { items: items, selectedValue: 'All', buttonClicked: fn} );
+
+    return this._addApplicationItem;
   },
 
   _createDeleteButton: function() {
@@ -267,25 +327,45 @@ SettingsWindow.prototype = {
 
     let fn = Lang.bind(this,
       function() {
-        let item = ret.getSelectedItem();
-        Main.notify("Delete config for '" + item[1] +"'");
+        let item = this._deleteApplicationItem.getSelectedItem();
+        global.log(item + "0 "+item[0]+"  "+item[1]);
+        if (item == "Select" || item[1] == "Select") {
+          return;
+        }
+
+        try {
+          this._unsetParameter("locations."+item[1]);
+          let menus = this._appSection._getMenuItems(),
+            menuLength = menus.length,
+            i;
+          for (i=0; i< menuLength; i++) {
+            if (menus[i].name == item[1]) {
+              this._appSection.actor.remove_actor(menus[i].actor);
+              break;
+            }
+          }
+          this._deleteApplicationItem.setSelectedItem('Select');
+          this._deleteApplicationItem.removeComboItem(item);
+          this._addApplicationItem.addComboItem(item);
+        } catch(e) {
+          Main.notifyError(e);
+        }
       }
     );
 
-    let ret =  new ComboButtonItem(_("Delete Application"), { items: items, selectedValue: 'Select', buttonClicked: fn} );
+    this._deleteApplicationItem =  new ComboButtonItem(_("Delete Application"), { items: items, selectedValue: 'Select', buttonClicked: fn} );
 
-    return ret;
+    return this._deleteApplicationItem;
   },
 
   _mainSettings: function() {
 
     let menu = new Accordion("Common Settings");
     menu.menu.addMenuItem(this._createSwitch("panelButtonVisible", _("Show Settings Button")));
-    menu.menu.addMenuItem(this._createSlider("centerWidth", _("Center Width"), 0, 100));
-    menu.menu.addMenuItem(this._createSlider("centerHeight", _("Center Height"), 0, 100));
-    menu.menu.addMenuItem(this._createSlider("sideWidth", _("Side Width"), 0, 100));
-    menu.menu.addMenuItem(this._createSlider("cornerWidth", _("Corner Width"), 0, 100));
-    menu.menu.addMenuItem(this._createSlider("cornerHeight", _("Corner Height"), 0, 100));
+    menu.menu.addMenuItem(this._createSlider("centerWidth", _("Center width"), 0, 100));
+    menu.menu.addMenuItem(this._createSlider("centerHeight", _("Center height"), 0, 100));
+    menu.menu.addMenuItem(this._createSlider("sideWidth", _("Side/Corner width"), 0, 100));
+    menu.menu.addMenuItem(this._createSlider("sideHeight", _("Side/Corner height"), 0, 100));
     //menu.menu.addMenuItem(this._createCombo("combo box", ["1", "2", "3"], "a test combobox"));
     return menu;
   },
@@ -302,7 +382,7 @@ SettingsWindow.prototype = {
     for (let i=0; i< positions.length; i++) {
       // TODO: add a css-style that underlines the text and moves it 2px left
       let sep = new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false});
-      set.setShowDot(true)
+      sep.setShowDot(true)
       menu.menu.addMenuItem(sep);
       menu.menu.addMenuItem(this._createCombo(prefix + "positions." + i + ".screen", _("Screen"), this._screenItems));
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".width", _("Width"), 0, 100));
@@ -335,7 +415,7 @@ ComboButtonItem.prototype = {
       buttonClicked: function(btn) {}
     });
 
-    // remove params PopupBaseMenuItem can not handle
+    // delete params PopupBaseMenuItem can not handle
     this._items = params.items;
     delete params.items;
 
@@ -362,11 +442,28 @@ ComboButtonItem.prototype = {
       })
     );
 
-    this.addActor(this._combo.actor, {span: 6, align: St.Align.START} );
+    this.addActor(this._combo.actor, {align: St.Align.START} );
 
     let button = new St.Button ({ label: text, style_class: 'modal-dialog-button' });
     button.connect("clicked", Lang.bind(this, buttonClicked));
-    this.addActor(button, {span: 6, align: St.Align.END} );
+    this.addActor(button, {align: St.Align.END} );
+  },
+
+  removeComboItem: function(value) {
+      global.log(value);
+      let index = this.getValueIndex(value[1]);
+      this._items.splice(index, 1);
+      this._combo._menu.box.remove_actor(this._combo._menu.box.get_children()[index]);
+      this._combo.setActiveItem(0);
+      // TODO remove the PopupMenuItem with the given value from this._combo
+  },
+
+  addComboItem: function(value) {
+    value[0] = this._items.length;
+    this._items.push(value);
+    let newItem = new PopupMenu.PopupMenuItem(value[1]);
+    this._combo.addMenuItem(newItem, value[0]);
+    this._combo.setActiveItem(value[0]);
   },
 
   getSelectedItem: function() {
@@ -388,9 +485,8 @@ ComboButtonItem.prototype = {
   }
 };
 
-// A PopupSubMenuItem that only open/close when the label is clicked
-// e.g. overwrite the keyPressEvents with empty function and replace the
-// label with a button
+// A PopupSubMenuItem that only open/close when the label is clicked e.g. overwrite
+// the keyPressEvents with empty function and replace the label with a button
 // TODO: style
 function Accordion() {
    this._init.apply(this, arguments);
@@ -402,6 +498,7 @@ Accordion.prototype = {
   _init: function(text) {
     PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {reactive: true, activate:true});
 
+    this.name = text;
     this.actor.add_style_class_name('popup-menu-item');
 
     this.label = new St.Label({text: text});
@@ -412,6 +509,10 @@ Accordion.prototype = {
 
     this.menu = new AccordionContent(this.actor, this._triangle);
     //this.menu.connect('button-press-event', Lang.bind(this, this._subMenuOpenStateChanged));
+  },
+
+  openAccordion: function(animate) {
+    this.menu.openAccordion(animate);
   },
 
   //do nothing
@@ -511,6 +612,7 @@ let _readFile = function() {
 
 let _saveFile = function(data) {
   try {
+    global.log(JSON.stringify(data));
     let file = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/test.json");
     file.replace_contents(JSON.stringify(data), null, false, 0, null);
     Main.notify(_("Saved!"), _("Your changes have been successfully saved"));
