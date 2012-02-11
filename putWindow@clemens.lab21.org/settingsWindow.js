@@ -145,6 +145,7 @@ SettingsWindow.prototype = {
       conf[ path[pathLength] ] = value;
 
     } catch (e) {
+      global.log(e.message);
       Main.notifyError(_("Error setting config '%s'").format(name), e.message);
     }
   },
@@ -250,16 +251,7 @@ SettingsWindow.prototype = {
   },
 
   _getConfiguredApps: function() {
-    if (!this._appSection) {
-      return Object.getOwnPropertyNames(this._getParameter("locations"));
-    }
-
-    Main.notify("Get visible appsections");
-    return this._appSection.actor.get_children().map(function (actor) {
-      return actor.name;
-    }).filter(function(item) {
-      return item instanceof Accordion;
-    });
+    return Object.getOwnPropertyNames(this._getParameter("locations"));
   },
 
   _getRunningApps: function(exclude) {
@@ -328,7 +320,6 @@ SettingsWindow.prototype = {
     let fn = Lang.bind(this,
       function() {
         let item = this._deleteApplicationItem.getSelectedItem();
-        global.log(item + "0 "+item[0]+"  "+item[1]);
         if (item == "Select" || item[1] == "Select") {
           return;
         }
@@ -366,7 +357,6 @@ SettingsWindow.prototype = {
     menu.menu.addMenuItem(this._createSlider("centerHeight", _("Center height"), 0, 100));
     menu.menu.addMenuItem(this._createSlider("sideWidth", _("Side/Corner width"), 0, 100));
     menu.menu.addMenuItem(this._createSlider("sideHeight", _("Side/Corner height"), 0, 100));
-    //menu.menu.addMenuItem(this._createCombo("combo box", ["1", "2", "3"], "a test combobox"));
     return menu;
   },
 
@@ -450,20 +440,21 @@ ComboButtonItem.prototype = {
   },
 
   removeComboItem: function(value) {
-      global.log(value);
-      let index = this.getValueIndex(value[1]);
-      this._items.splice(index, 1);
-      this._combo._menu.box.remove_actor(this._combo._menu.box.get_children()[index]);
-      this._combo.setActiveItem(0);
-      // TODO remove the PopupMenuItem with the given value from this._combo
+    let hideIndex = this.getValueIndex(value[1]);
+    this._combo.setItemVisible(hideIndex, false);
   },
 
   addComboItem: function(value) {
-    value[0] = this._items.length;
-    this._items.push(value);
-    let newItem = new PopupMenu.PopupMenuItem(value[1]);
-    this._combo.addMenuItem(newItem, value[0]);
-    this._combo.setActiveItem(value[0]);
+    let alreadExistsIndex = this.getValueIndex(value[1]);
+    if (alreadExistsIndex>-1) {
+      this._combo.setItemVisible(alreadExistsIndex, true);
+    } else {
+      value[0] = this._items.length;
+      this._items.push(value);
+      let newItem = new PopupMenu.PopupMenuItem(value[1]);
+      this._combo.addMenuItem(newItem, value[0]);
+      this._combo.setActiveItem(value[0]);
+    }
   },
 
   getSelectedItem: function() {
@@ -476,7 +467,7 @@ ComboButtonItem.prototype = {
         return i;
       }
     }
-    return 0;
+    return -1;
   },
 
   setSelectedItem: function(value) {
@@ -612,7 +603,6 @@ let _readFile = function() {
 
 let _saveFile = function(data) {
   try {
-    global.log(JSON.stringify(data));
     let file = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/test.json");
     file.replace_contents(JSON.stringify(data), null, false, 0, null);
     Main.notify(_("Saved!"), _("Your changes have been successfully saved"));
