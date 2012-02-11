@@ -1,0 +1,61 @@
+.put-window-settings-dialog {
+    /* this is the width of the entire modal popup */
+    width: 600px;
+}
+
+.put-window-main-layout {
+    spacing: 2px;
+    padding: 1px;
+}
+
+.put-window-headline {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #666666;
+}
+
+.popup-combo-menu {
+    background-color: rgba(0,0,0,0.9);
+    padding: 1em 0em;
+    color: #ffffff;
+    font-size: 10.5pt;
+    border: 1px solid #5f5f5f;
+    border-radius: 9px;
+}
+
+
+.put-window-button {
+    color: white;
+    border: 1px solid #8b8b8b;
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(255, 255, 255, 0.2);
+    background-gradient-end: rgba(255, 255, 255, 0);
+
+    border-radius: 9px;
+    font-size: 11pt;
+    color: white;
+
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 4px 32px 5px;
+    border-radius: 18px;
+    font-size: 11pt;
+    color: white;
+
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 4px 32px 5px;
+}
+
+.put-window-button:hover {
+    background-gradient-start: rgba(255, 255, 255, 0.3);
+    background-gradient-end: rgba(255, 255, 255, 0.1);
+}
+
+.put-window-button:disabled {
+    color: rgb(60, 60, 60);
+}
+
+.put-window-button:focus {
+    padding: 3px 31px 4px;
+}

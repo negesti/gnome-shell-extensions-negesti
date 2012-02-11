@@ -37,10 +37,10 @@ SettingsWindow.prototype = {
     this._dock = {};
     this._primary = true;
 
-    ModalDialog.ModalDialog.prototype._init.call(this, {styleClass: "polkit-dialog"});
+    ModalDialog.ModalDialog.prototype._init.call(this, {styleClass: "putwindow-settings-dialog"});
 
     let mainBox = new St.BoxLayout({
-      style_class: "polkit-dialog-main-layout", //, polkit-dialog-main-layout",
+      style_class: "put-window-main-layout",
       vertical: true
     });
     this.contentLayout.add(mainBox, {
@@ -49,7 +49,7 @@ SettingsWindow.prototype = {
     });
 
     let headline = new St.Label({
-      style_class: "polkit-dialog-headline",
+      style_class: "put-window-headline",
       text: _("PutWindow Configuration")
     });
 
@@ -292,6 +292,9 @@ SettingsWindow.prototype = {
       function() {
         let item = this._addApplicationItem.getSelectedItem(),
           configPath = "locations." + item[1];
+        if (item == "All" || item[1] == "All") {
+          return;
+        }
         this._setParameter(configPath, this._startConfig);
         let newApp = this._createAppSetting(item[1], this._getParameter(configPath));
         this._appSection.addMenuItem(newApp);
@@ -366,14 +369,14 @@ SettingsWindow.prototype = {
     let prefix = "locations." + name + ".";
     menu.menu.addMenuItem(this._createSwitch(prefix + "autoMove", _("Move on create")));
     menu.menu.addMenuItem(this._createCombo(prefix + "lastPosition", _("Startscreen"), this._screenItems));
-    menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
     let positions = this._getParameter(prefix + "positions");
     for (let i=0; i< positions.length; i++) {
       // TODO: add a css-style that underlines the text and moves it 2px left
-      let sep = new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false});
-      sep.setShowDot(true)
-      menu.menu.addMenuItem(sep);
+      let header = new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false});
+      header.setShowDot(true)
+      menu.menu.addMenuItem(header);
+      menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
       menu.menu.addMenuItem(this._createCombo(prefix + "positions." + i + ".screen", _("Screen"), this._screenItems));
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".width", _("Width"), 0, 100));
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".height", _("Height"), 0, 100));
@@ -434,7 +437,7 @@ ComboButtonItem.prototype = {
 
     this.addActor(this._combo.actor, {align: St.Align.START} );
 
-    let button = new St.Button ({ label: text, style_class: 'modal-dialog-button' });
+    let button = new St.Button ({ label: text, style_class: 'put-window-button' });
     button.connect("clicked", Lang.bind(this, buttonClicked));
     this.addActor(button, {align: St.Align.END} );
   },
@@ -451,7 +454,7 @@ ComboButtonItem.prototype = {
     } else {
       value[0] = this._items.length;
       this._items.push(value);
-      let newItem = new PopupMenu.PopupMenuItem(value[1]);
+      let newItem = new PositionpupMenu.PopupMenuItem(value[1]);
       this._combo.addMenuItem(newItem, value[0]);
       this._combo.setActiveItem(value[0]);
     }
@@ -610,5 +613,22 @@ let _saveFile = function(data) {
     Main.notifyError("Error saving settings " + e);
   }
 };
+
+let loadTheme = function(){
+  let dir = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/stylesheet.css");
+  let themeContext = St.ThemeContext.get_for_stage(global.stage);
+  let theme = themeContext.get_theme();
+  let stylesheetFile = dir.get_child('stylesheet.css');
+  if (stylesheetFile.query_exists(null)) {
+      try {
+          theme.load_stylesheet(stylesheetFile.get_path());
+      } catch (e) {
+          logExtensionError(uuid, 'Stylesheet parse error: ' + e);
+          return;
+      }
+  }
+}
+
+loadTheme();
 
 let b = new SettingsWindow(_readFile());
