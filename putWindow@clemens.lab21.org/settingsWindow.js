@@ -37,7 +37,7 @@ SettingsWindow.prototype = {
     this._dock = {};
     this._primary = true;
 
-    ModalDialog.ModalDialog.prototype._init.call(this, {styleClass: "putwindow-settings-dialog"});
+    ModalDialog.ModalDialog.prototype._init.call(this, {styleClass: "put-window-settings-dialog", shellReactive: true});
 
     let mainBox = new St.BoxLayout({
       style_class: "put-window-main-layout",
@@ -135,11 +135,14 @@ SettingsWindow.prototype = {
   _setParameter: function(name, value) {
     try {
       let path = name.split("."),
-        conf = this._settings[path[0]],
+        conf = this._settings,
         pathLength = path.length - 1;
 
-      for (let i=1; i < pathLength; i++) {
-          conf = conf[path[i]];
+      for (let i=0; i < pathLength; i++) {
+        if (!conf[path[i]]) {
+          conf[path[i]] = {};
+        }
+        conf = conf[path[i]];
       }
 
       conf[ path[pathLength] ] = value;
@@ -198,7 +201,7 @@ SettingsWindow.prototype = {
       })
     );
 
-    let section = new PopupMenu.PopupMenuSection(),
+    let section = new PopupMenu.PopupMenuSection({reactive: false}),
       box = new St.BoxLayout({ vertical: false });
 
     let label = new St.Label({ text: txt, reactive: false, style_class: "popup-menu-item" });
@@ -614,8 +617,10 @@ let _saveFile = function(data) {
   }
 };
 
+let b = new SettingsWindow(_readFile());
+
 let loadTheme = function(){
-  let dir = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/stylesheet.css");
+  let dir = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/");
   let themeContext = St.ThemeContext.get_for_stage(global.stage);
   let theme = themeContext.get_theme();
   let stylesheetFile = dir.get_child('stylesheet.css');
@@ -623,12 +628,12 @@ let loadTheme = function(){
       try {
           theme.load_stylesheet(stylesheetFile.get_path());
       } catch (e) {
-          logExtensionError(uuid, 'Stylesheet parse error: ' + e);
+          global.log('Stylesheet parse error: ' + e);
           return;
       }
+  } else {
+    global.log("this file does not exist!");
   }
 }
 
 loadTheme();
-
-let b = new SettingsWindow(_readFile());
