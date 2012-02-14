@@ -5,23 +5,19 @@
     background-color: rgba(0.0, 0.0, 0.0, 0.9);
     border: 2px solid #868686;
     color: #babdb6;
-
-    padding-right: 6px;
-    padding-left: 6px;
-    padding-bottom: 6px;
-    padding-top: 6px;
 }
 
 .put-window-main-layout {
-    padding: 0px;
-    margin: 0px;
+    spacing: 0px;
+    padding-right: 0px;
+    padding-bottom: 16px;
 }
 
 .put-window-headline {
     font-size: 12pt;
     font-weight: bold;
     color: #666666;
-    padding-bottom:2px;
+    padding-bottom: 16px;
 }
 
 .popup-combo-menu {
@@ -33,9 +29,17 @@
     border-radius: 2px;
 }
 
+.put-window-menu-container {
+    font-size: 10.5pt;
+    border: 2px solid #a5a5a5;
+    border-radius: 8px;
+    -arrow-background-color: rgba(0,0,0,0.9);
+    -arrow-border-color: #a5a5a5;
+}
+
 .put-window-button {
     color: white;
-    border: 1px solid #8b8b8b;
+    border: 2px solid #8b8b8b;
     background-gradient-direction: vertical;
     background-gradient-start: rgba(255, 255, 255, 0.2);
     background-gradient-end: rgba(255, 255, 255, 0);

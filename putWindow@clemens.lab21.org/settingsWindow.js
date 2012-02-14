@@ -59,11 +59,13 @@ SettingsWindow.prototype = {
       x_fill: true
     });
 
-    let menu = new PopupMenu.PopupMenu(mainBox.actor);
+    let menu = new PopupMenu.PopupMenu(mainBox);
+    // menuItems are drawn outside of the border if .popup-menu-boxpointer is used
+    menu.actor.style_class = "put-window-menu-container";
+
     menu.addMenuItem(this._createAddButton());
     menu.addMenuItem(this._createDeleteButton());
     menu.addMenuItem(this._mainSettings());
-    menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
     this._appSection = new PopupMenu.PopupMenuSection();
     if (typeof(this._settings["locations"]) != "undefined") {
@@ -74,7 +76,7 @@ SettingsWindow.prototype = {
       }
     }
     menu.addMenuItem(this._appSection);
-    mainBox.add(menu.actor);
+    mainBox.add(menu.actor, {span: 1, expand: true, align: St.Align.START});
 
     this.setButtons([{
         label: _("Cancel"),
@@ -371,7 +373,6 @@ SettingsWindow.prototype = {
 
     let prefix = "locations." + name + ".";
     menu.menu.addMenuItem(this._createSwitch(prefix + "autoMove", _("Move on create")));
-    menu.menu.addMenuItem(this._createCombo(prefix + "lastPosition", _("Startscreen"), this._screenItems));
 
     let positions = this._getParameter(prefix + "positions");
     for (let i=0; i< positions.length; i++) {
@@ -379,7 +380,6 @@ SettingsWindow.prototype = {
       let header = new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false});
       header.setShowDot(true)
       menu.menu.addMenuItem(header);
-      menu.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
       menu.menu.addMenuItem(this._createCombo(prefix + "positions." + i + ".screen", _("Screen"), this._screenItems));
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".width", _("Width"), 0, 100));
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".height", _("Height"), 0, 100));
@@ -493,10 +493,8 @@ Accordion.prototype = {
   __proto__: PopupMenu.PopupSubMenuMenuItem.prototype,
 
   _init: function(text) {
-    PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {reactive: true, activate:true});
-
+    PopupMenu.PopupBaseMenuItem.prototype._init.call(this, {reactive: true, activate:true, style_class: "popup-sub-menu"});
     this.name = text;
-    this.actor.add_style_class_name('popup-menu-item');
 
     this.label = new St.Label({text: text});
 
@@ -505,7 +503,6 @@ Accordion.prototype = {
     this.addActor(this._triangle, { align: St.Align.END });
 
     this.menu = new AccordionContent(this.actor, this._triangle);
-    //this.menu.connect('button-press-event', Lang.bind(this, this._subMenuOpenStateChanged));
   },
 
   openAccordion: function(animate) {
@@ -519,10 +516,6 @@ Accordion.prototype = {
 
   // toggle AccordionContent
   _onButtonReleaseEvent: function(actor, event) {
-    this.menu.toggle();
-  },
-
-  _subMenuOpenStateChanged: function(menu, open) {
     this.menu.toggle();
   },
 
@@ -636,4 +629,5 @@ let loadTheme = function(){
   }
 }
 
-loadTheme();
+//loadTheme();
+
