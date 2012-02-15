@@ -11,13 +11,12 @@ const PopupMenu = imports.ui.popupMenu;
 const ModalDialog = imports.ui.modalDialog;
 const MessageTray = imports.ui.messageTray
 
-function SettingsWindow(settings) {
-  this._init(settings);
+function SettingsWindow(fileName) {
+  this._init(fileName);
 }
 
 SettingsWindow.prototype = {
   __proto__: ModalDialog.ModalDialog.prototype,
-
 
   _startConfig: {
     autoMove: false,
@@ -31,8 +30,9 @@ SettingsWindow.prototype = {
 
   _screenItems: [[0, "Screen 1"], [1, "Screen 2"]],
 
-  _init: function(settings) {
-    this._settings = settings;
+  _init: function(fileName) {
+    this._fileName = fileName;
+    this._settings = this._readFile();
 
     this._dock = {};
     this._primary = true;
@@ -69,7 +69,7 @@ SettingsWindow.prototype = {
 
     this._appSection = new PopupMenu.PopupMenuSection();
     if (typeof(this._settings["locations"]) != "undefined") {
-      let apps = Object.getOwnPropertyNames(_readFile()["locations"]),
+      let apps = Object.getOwnPropertyNames(this.getParameter("locations")),
         appsLength = apps.length;
       for(let i=0; i< appsLength; i++) {
         this._appSection.addMenuItem(this._createAppSetting(apps[i], this._settings["locations"][apps[i]]));
@@ -80,15 +80,17 @@ SettingsWindow.prototype = {
 
     this.setButtons([{
         label: _("Cancel"),
+        key: Clutter.Escape,
         action: Lang.bind(this, function() {
+          // restore the old config
+          this._settings = this._readFile();
           this.close();
           this.destroy();
-        }),
-        key: Clutter.Escape
+        })
       }, {
         label: _("Save"),
         action: Lang.bind(this, function() {
-          _saveFile(this._settings);
+          this._saveFile(this._settings);
         })
       }
     ]);
@@ -96,16 +98,48 @@ SettingsWindow.prototype = {
     this.open();
   },
 
+  _readFile: function() {
+    let ret = {};
+
+    try {
+      let file = Gio.file_new_for_path(this._fileName);
+
+      if(file.query_exists(null)) {
+        [flag, data] = file.load_contents(null);
+        if(flag) {
+          ret = JSON.parse(data);
+        } else {
+          Main.notifyError("Error loading settings");
+        }
+      }
+    } catch (e) {
+      Main.notifyError("Error loading settings " + e);
+      ret = {};
+    }
+
+    return ret;
+  },
+
+  _saveFile: function(data) {
+    try {
+      let file = Gio.file_new_for_path(this._fileName);
+      file.replace_contents(JSON.stringify(data), null, false, 0, null);
+      Main.notify(_("Saved!"), _("Your changes have been successfully saved"));
+    } catch (e) {
+      Main.notifyError("Error saving settings " + e);
+    }
+  },
+
   getBoolean: function(name, defaultValue) {
-    let ret = this._getParameter(name, defaultValue);
+    let ret = this.getParameter(name, defaultValue);
     return ret == "true" || ret == "1";
   },
 
   getNumber: function(name, defaultValue) {
-    return this._toNumber(this._getParameter(name, defaultValue), defaultValue);
+    return this._toNumber(this.getParameter(name, defaultValue), defaultValue);
   },
 
-  _getParameter: function(name, defaultValue) {
+  getParameter: function(name, defaultValue) {
     try {
       let path = name.split("."),
       value = this._settings[path[0]],
@@ -134,7 +168,7 @@ SettingsWindow.prototype = {
     delete conf[ path[pathLength] ];
   },
 
-  _setParameter: function(name, value) {
+  setParameter: function(name, value) {
     try {
       let path = name.split("."),
         conf = this._settings,
@@ -200,7 +234,7 @@ SettingsWindow.prototype = {
 
     slider.connect("drag-end",
       Lang.bind(this, function() {
-        this._setParameter(configName, value);
+        this.setParameter(configName, value);
       })
     );
 
@@ -222,7 +256,7 @@ SettingsWindow.prototype = {
     let btn = new PopupMenu.PopupSwitchMenuItem(txt, active);
     btn.connect('activate',
       Lang.bind(this, function(){
-        this._setParameter(configName, btn.state)
+        this.setParameter(configName, btn.state)
       })
     );
 
@@ -263,7 +297,7 @@ SettingsWindow.prototype = {
   },
 
   _getConfiguredApps: function() {
-    return Object.getOwnPropertyNames(this._getParameter("locations"));
+    return Object.getOwnPropertyNames(this.getParameter("locations"));
   },
 
   _getRunningApps: function(exclude) {
@@ -307,8 +341,8 @@ SettingsWindow.prototype = {
         if (item == "All" || item[1] == "All") {
           return;
         }
-        this._setParameter(configPath, this._startConfig);
-        let newApp = this._createAppSetting(item[1], this._getParameter(configPath));
+        this.setParameter(configPath, this._startConfig);
+        let newApp = this._createAppSetting(item[1], this.getParameter(configPath));
         this._appSection.addMenuItem(newApp);
         newApp.openAccordion(true);
 
@@ -381,7 +415,7 @@ SettingsWindow.prototype = {
     let prefix = "locations." + name + ".";
     menu.menu.addMenuItem(this._createSwitch(prefix + "autoMove", _("Move on create")));
 
-    let positions = this._getParameter(prefix + "positions");
+    let positions = this.getParameter(prefix + "positions");
     for (let i=0; i< positions.length; i++) {
       // TODO: add a css-style that underlines the text and moves it 2px left
       let header = new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false});
@@ -464,7 +498,7 @@ ComboButtonItem.prototype = {
     } else {
       value[0] = this._items.length;
       this._items.push(value);
-      let newItem = new PositionpupMenu.PopupMenuItem(value[1]);
+      let newItem = new PopupMenu.PopupMenuItem(value[1]);
       this._combo.addMenuItem(newItem, value[0]);
       this._combo.setActiveItem(value[0]);
     }
@@ -584,40 +618,7 @@ function LabeledCombobox() {
   this._init.apply(this.arguments);
 }
 
-let _readFile = function() {
-  let ret = null;
-  let content;
-
-  try {
-    let file = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/putWindow.json");
-
-    if(file.query_exists(null)) {
-      [flag, data] = file.load_contents(null);
-      if(flag) {
-        ret = JSON.parse(data);
-      } else {
-        Main.notifyError("Error loading settings");
-      }
-    }
-  } catch (e) {
-    Main.notifyError("Error loading settings " + e);
-    ret = {};
-  }
-
-  return ret;
-};
-
-let _saveFile = function(data) {
-  try {
-    let file = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/test.json");
-    file.replace_contents(JSON.stringify(data), null, false, 0, null);
-    Main.notify(_("Saved!"), _("Your changes have been successfully saved"));
-  } catch (e) {
-    Main.notifyError("Error saving settings " + e);
-  }
-};
-
-let b = new SettingsWindow(_readFile());
+let b = new SettingsWindow("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/putWindow.json");
 
 let loadTheme = function(){
   let dir = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/");
