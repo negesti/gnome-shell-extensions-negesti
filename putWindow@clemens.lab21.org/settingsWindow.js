@@ -190,6 +190,7 @@ SettingsWindow.prototype = {
     let valueLabel = new St.Label({ text: "" + value, style_class: "popup-menu-item" });
 
     let slider = new PopupMenu.PopupSliderMenuItem( (value/100) );
+    slider.actor.add_style_class_name("padding-5");
     slider.connect("value-changed",
       Lang.bind(this, function(slider, newValue) {
         value = getDisplayValue((newValue*100));
@@ -204,7 +205,7 @@ SettingsWindow.prototype = {
     );
 
     let section = new PopupMenu.PopupMenuSection({reactive: false}),
-      box = new St.BoxLayout({ vertical: false });
+      box = new St.BoxLayout({ vertical: false, style_class: "padding-horizontal-5" });
 
     let label = new St.Label({ text: txt, reactive: false, style_class: "popup-menu-item" });
 
@@ -225,7 +226,12 @@ SettingsWindow.prototype = {
       })
     );
 
-    return btn;
+    let section = new PopupMenu.PopupMenuSection({reactive: false}),
+      box = new St.BoxLayout({ vertical: false, style_class: "padding-horizontal-5" });
+    box.add(btn.actor, {expand: true, align: St.Align.END});
+    section.addActor(box);
+
+    return section;
   },
 
   _createCombo: function(configName, txt, items) {
@@ -240,16 +246,17 @@ SettingsWindow.prototype = {
     combo.setActiveItem(value);
     combo.connect("active-item-changed",
       Lang.bind(this, function(menuItem, id) {
+        global.log("Combo value changed: " + id);
         // value = id
       })
     );
 
     let section = new PopupMenu.PopupMenuSection(),
-       box = new St.BoxLayout({ vertical: false }),
+       box = new St.BoxLayout({ vertical: false, style_class: "padding-horizontal-5" }),
        label = new St.Label({ text:txt, reactive: true, style_class: "popup-menu-item"});
 
     box.add(label, {span: 4, expand: true});
-    box.add(combo.actor, {span: 6, align: St.Align.END});
+    box.add(combo.actor, {span: 3, align: St.Align.END});
     section.addActor(box);
 
     return section;
@@ -378,7 +385,7 @@ SettingsWindow.prototype = {
     for (let i=0; i< positions.length; i++) {
       // TODO: add a css-style that underlines the text and moves it 2px left
       let header = new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false});
-      header.setShowDot(true)
+      //header.setShowDot(true)
       menu.menu.addMenuItem(header);
       menu.menu.addMenuItem(this._createCombo(prefix + "positions." + i + ".screen", _("Screen"), this._screenItems));
       menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".width", _("Width"), 0, 100));
@@ -438,11 +445,11 @@ ComboButtonItem.prototype = {
       })
     );
 
-    this.addActor(this._combo.actor, {align: St.Align.START} );
+    this.addActor(this._combo.actor, {span: 6, expand: true, align: St.Align.START} );
 
     let button = new St.Button ({ label: text, style_class: 'put-window-button' });
     button.connect("clicked", Lang.bind(this, buttonClicked));
-    this.addActor(button, {align: St.Align.END} );
+    this.addActor(button, {span: 6, expand: true, align: St.Align.END} );
   },
 
   removeComboItem: function(value) {
@@ -630,4 +637,3 @@ let loadTheme = function(){
 }
 
 //loadTheme();
-
