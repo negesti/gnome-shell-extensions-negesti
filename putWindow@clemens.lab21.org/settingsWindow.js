@@ -2,14 +2,19 @@
 const Gettext = imports.gettext;
 const _ = Gettext.gettext;
 
+const Lang = imports.lang;
+
+const Clutter = imports.gi.Clutter;
 const Gio = imports.gi.Gio;
+const Shell = imports.gi.Shell;
 const St = imports.gi.St;
 
 const Params = imports.misc.params;
 
 const PopupMenu = imports.ui.popupMenu;
-const ModalDialog = imports.ui.modalDialog;
+const Main = imports.ui.main;
 const MessageTray = imports.ui.messageTray
+const ModalDialog = imports.ui.modalDialog;
 
 function SettingsWindow(fileName) {
   this._init(fileName);
@@ -151,7 +156,7 @@ SettingsWindow.prototype = {
 
       return value;
     } catch (e) {
-      Main.notifyError(_("Error getting config '%s' defaulting to '%s'").format(name, defaultValue), e.message);
+      log("Error getting config "+ name + " defaulting to " + defaultValue + "'" + e.message);
       return defaultValue;
     }
   },
@@ -618,7 +623,7 @@ function LabeledCombobox() {
   this._init.apply(this.arguments);
 }
 
-let b = new SettingsWindow("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/putWindow.json");
+//let b = new SettingsWindow("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/putWindow.json");
 
 let loadTheme = function(){
   let dir = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/");

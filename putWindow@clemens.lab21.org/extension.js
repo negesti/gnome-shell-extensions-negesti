@@ -5,7 +5,7 @@ const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 
 const Extension = imports.ui.extensionSystem.extensions['putWindow@clemens.lab21.org'];
-const SettingWIndow = Extension.settingsWindow.SettingWindow;
+const SettingsWindow = Extension.settingsWindow.SettingsWindow;
 
 let _path;
 
@@ -142,13 +142,11 @@ MoveWindow.prototype = {
     // calculate the center position and check if the window is already there
     if (where == "c") {
 
-      let w = s.totalWidth * (this._settings.getNumber(this.CENTER_WIDTH) / 100),
-        h = s.totalHeight * (this._settings.getNumber(this.CENTER_HEIGHT) / 100),
+      let w = s.totalWidth * (this._settings.getNumber(this.CENTER_WIDTH, 50) / 100),
+        h = s.totalHeight * (this._settings.getNumber(this.CENTER_HEIGHT, 50) / 100),
         x = s.x + (s.totalWidth - w) / 2,
         y = s.y + (s.totalHeight - h) / 2,
         sameHeight = this._samePoint(h, pos.height);
-
-      log(x+"  "+pos.x + " "+ y + " " + pos.y+ " sameHeight: " + sameHeight);
 
       // do not check window.width. until i find get_size_hint(), or min_width..
       // windows that have a min_width < our width it will not work (evolution for example)
@@ -182,7 +180,7 @@ MoveWindow.prototype = {
 
     // move the window if a location is configured and autoMove is set to true
     let appPath = "locations." + app;
-    if (this._settings.getParameter(appPath) {
+    if (this._settings.getParameter(appPath)) {
       if (this._settings.getBoolean(appPath + ".autoMove", false)) {
         this._moveToConfiguredLocation(win, app);
       }
@@ -204,17 +202,22 @@ MoveWindow.prototype = {
     }
 
     let config = this._settings.getParameter("locations." + appName, false);
-
     if (!config) {
       return;
     }
 
-    let pos = this._settings.getNumber("locations." + appName + ".lastPosition", 0);
 
-    if (config.positions.length > (pos + 1)) {
-
-      this._settings.setParameter("locations." + appName + ".lastPosition", (pos++));
+    let pos = config.positions[config.lastPosition];
+    if (!pos) {
+      pos = config.positions[0];
+      config.lastPosition = 0;
+      this._settings.setParameter("locations." + appName + ".lastPosition", 1);
     } else {
+      config.lastPosition++;
+    }
+
+
+    if (config.lastPosition >= config.positions.length) {
       this._settings.setParameter("locations." + appName + ".lastPosition", 0);
     }
 
@@ -288,7 +291,7 @@ MoveWindow.prototype = {
    **/
   _init: function() {
     // read configuration and init the windowTracker
-    this._settings = new SettingsWindow.SettingsWindow(_path + "putWindow.json");
+    this._settings = new SettingsWindow(_path + "putWindow.json");
 
     this._windowTracker = Shell.WindowTracker.get_default();
 
@@ -300,8 +303,7 @@ MoveWindow.prototype = {
     let numMonitors = global.screen.get_n_monitors();
 
     let widthMultiplier = (this._settings.getNumber(this.SIDE_WIDTH, 50) / 100),
-      heightMultiplier = (this._settings.getNumber(this.SIDE_HEIGHT, 50) / 100),
-
+      heightMultiplier = (this._settings.getNumber(this.SIDE_HEIGHT, 50) / 100);
 
     // only tested with 2 screen setup
     for (let i=0; i<numMonitors; i++) {
