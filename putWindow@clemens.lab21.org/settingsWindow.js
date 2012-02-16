@@ -84,23 +84,25 @@ SettingsWindow.prototype = {
     mainBox.add(menu.actor, {span: 1, expand: true, align: St.Align.START});
 
     this.setButtons([{
+        label: _("Save"),
+        action: Lang.bind(this, function() {
+          this._saveFile(this._settings);
+        })
+      }, {
+        label: _("Close"),
+        action: Lang.bind(this, function() {
+          this.close();
+        })
+      }, {
         label: _("Cancel"),
         key: Clutter.Escape,
         action: Lang.bind(this, function() {
           // restore the old config
           this._settings = this._readFile();
           this.close();
-          this.destroy();
-        })
-      }, {
-        label: _("Save"),
-        action: Lang.bind(this, function() {
-          this._saveFile(this._settings);
         })
       }
     ]);
-
-    this.open();
   },
 
   _readFile: function() {

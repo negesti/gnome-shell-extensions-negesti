@@ -2,6 +2,7 @@ const Gettext = imports.gettext;
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
+const PanelMenu = imports.ui.panelMenu;
 const Shell = imports.gi.Shell;
 
 const Extension = imports.ui.extensionSystem.extensions['putWindow@clemens.lab21.org'];
@@ -33,7 +34,7 @@ MoveWindow.prototype = {
 
   //list of config parameters
   CENTER_WIDTH: "centerWidth",
-  CENTER_HEIGHT: "centetHeight",
+  CENTER_HEIGHT: "centerHeight",
   SIDE_WIDTH: "sideWidth",
   SIDE_HEIGHT: "sideHeight",
   PANEL_BUTTON_VISIBLE: "panelButtonVisible",
@@ -96,7 +97,7 @@ MoveWindow.prototype = {
     // check if we are on primary screen and if the main panel is visible
     let tbHeight = (s.primary && !Main.panel.hidden) ? this._topBarHeight : 4;
     s.y = s.geomY + tbHeight;
-    s.height = (s.totalHeight)/2  - tbHeight;
+    s.height = s.totalHeight/2 - tbHeight;
     s.sy = (s.totalHeight + tbHeight)/2 + s.geomY;
 
     let diff = null,
@@ -285,6 +286,14 @@ MoveWindow.prototype = {
     return p;
   },
 
+  _getSideWidth: function() {
+    return this._settings.getNumber(this.SIDE_WIDTH, 50) / 100;
+  },
+
+  _getSideHeight: function() {
+    return this._settings.getNumber(this.SIDE_HEIGHT, 50) / 100;
+  },
+
   /**
    * Get global.screen_width and global.screen_height and
    * bind the keys
@@ -292,6 +301,10 @@ MoveWindow.prototype = {
   _init: function() {
     // read configuration and init the windowTracker
     this._settings = new SettingsWindow(_path + "putWindow.json");
+    if (this._settings.getBoolean(this.PANEL_BUTTON_VISIBLE)) {
+      let settingsButton = new SettingButton(this._settings);
+      Main.panel._rightBox.insert_actor(settingsButton.actor, 0);
+    }
 
     this._windowTracker = Shell.WindowTracker.get_default();
 
@@ -302,27 +315,24 @@ MoveWindow.prototype = {
     this._primary = global.screen.get_primary_monitor();
     let numMonitors = global.screen.get_n_monitors();
 
-    let widthMultiplier = (this._settings.getNumber(this.SIDE_WIDTH, 50) / 100),
-      heightMultiplier = (this._settings.getNumber(this.SIDE_HEIGHT, 50) / 100);
-
     // only tested with 2 screen setup
     for (let i=0; i<numMonitors; i++) {
       let geom = global.screen.get_monitor_geometry(i),
         totalHeight = geom.height;
 
       this._screens[i] =  {
-        x : geom.x,
         y: (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
+        x : geom.x,
         geomY: geom.y,
         totalWidth: geom.width,
         totalHeight: totalHeight,
-        width: geom.width * widthMultiplier
+        width: geom.width * this._getSideWidth()
       };
 
       this._screens[i].primary = (i==this._primary)
 
       // the position.y for s, sw and se
-      this._screens[i].sy = (totalHeight - this._screens[i].y + this._topBarHeight) * heightMultiplier;
+      this._screens[i].sy = (totalHeight - this._screens[i].y + this._topBarHeight) * this._getSideHeight();
     }
 
     // sort by x position. makes it easier to find the correct screen
@@ -382,8 +392,32 @@ MoveWindow.prototype = {
     for(let i = 0; i<size; i++) {
         this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
     }
+
+    this._settings.destroy();
   }
 }
+
+function SettingButton(settings) {
+  this._init(settings);
+}
+
+SettingButton.prototype = {
+__proto__: PanelMenu.SystemStatusButton.prototype,
+
+  _settingsWindow: {},
+
+  _init: function(settings) {
+    this._settingsWindow = settings;
+    PanelMenu.SystemStatusButton.prototype._init.call(this, 'starred', 'PutWindow Settings');
+
+    this.connect("clicked", Lang.bind(this, this._onButtonPress));
+    Main.panel._menus.addMenu(this.menu);
+  },
+
+  _onButtonPress: function(actor, event) {
+    this._settingsWindow.open();
+  }
+};
 
 function init(meta) {
   _path = meta.path+"/";
