@@ -624,24 +624,3 @@ AccordionContent.prototype = {
 function LabeledCombobox() {
   this._init.apply(this.arguments);
 }
-
-//let b = new SettingsWindow("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/putWindow.json");
-
-let loadTheme = function(){
-  let dir = Gio.file_new_for_path("/home/negus/workspace/gnome-shell-extensions-negesti/putWindow@clemens.lab21.org/");
-  let themeContext = St.ThemeContext.get_for_stage(global.stage);
-  let theme = themeContext.get_theme();
-  let stylesheetFile = dir.get_child('stylesheet.css');
-  if (stylesheetFile.query_exists(null)) {
-      try {
-          theme.load_stylesheet(stylesheetFile.get_path());
-      } catch (e) {
-          global.log('Stylesheet parse error: ' + e);
-          return;
-      }
-  } else {
-    global.log("this file does not exist!");
-  }
-}
-
-//loadTheme();
