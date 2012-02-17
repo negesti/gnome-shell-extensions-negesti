@@ -110,6 +110,8 @@ SettingsWindow.prototype = {
   },
 
   toggle: function() {
+    this._updateAddButtonCombo();
+
     if (this._isOpen) {
       this.close();
     } else {
@@ -171,7 +173,7 @@ SettingsWindow.prototype = {
 
       return value;
     } catch (e) {
-      log("Error getting config "+ name + " defaulting to " + defaultValue + "'" + e.message);
+      global.log("PutWindow.getParameter: Error getting config "+ name + " defaulting to " + defaultValue + "'" + e.message);
       return defaultValue;
     }
   },
@@ -185,7 +187,13 @@ SettingsWindow.prototype = {
       conf = conf[path[i]];
     }
 
-    delete conf[ path[pathLength] ];
+    if (isNaN(path[pathLength])) {
+      // normal object
+      delete conf[ path[pathLength] ];
+    } else {
+      // an array
+      conf.pop(path[pathLength]);
+    }
   },
 
   setParameter: function(name, value) {
@@ -204,7 +212,7 @@ SettingsWindow.prototype = {
       conf[ path[pathLength] ] = value;
 
     } catch (e) {
-      global.log(e.message);
+      global.log("PutWindow.setParameter: " + e.message);
       Main.notifyError(_("Error setting config '%s'").format(name), e.message);
     }
   },
@@ -300,8 +308,7 @@ SettingsWindow.prototype = {
     combo.setActiveItem(value);
     combo.connect("active-item-changed",
       Lang.bind(this, function(menuItem, id) {
-        global.log("Combo value changed: " + id);
-        // value = id
+        this.setParameter(configName, id);
       })
     );
 
@@ -321,19 +328,17 @@ SettingsWindow.prototype = {
   },
 
   _getRunningApps: function(exclude) {
-    if (!this.appSys) {
-      this.appSys = Shell.AppSystem.get_default();
+    if (!this._appSystem) {
+      this._appSystem = Shell.AppSystem.get_default();
     }
 
     let exludeLength = exclude.length;
-
-    let apps = this.appSys.get_running();
+    let apps = this._appSystem.get_running();
     let ret = [];
 
     for (let i=0; i < apps.length; i++) {
       let wm =  apps[i].get_windows()[0].get_wm_class(),
         found = false;
-
       // dont add excluded entries to the returned value
       for (let j=0; j < exludeLength; j++) {
         if (exclude[j] == wm) {
@@ -349,10 +354,17 @@ SettingsWindow.prototype = {
     return ret;
   },
 
-  _createAddButton: function() {
+  _updateAddButtonCombo: function() {
     let items = this._getRunningApps(this._getConfiguredApps());
+    for (let i=0; i<items.length; i++) {
+      this._addApplicationItem.addComboItem(items[i]);
+    }
+    this._addApplicationItem.setSelectedItem('All');
+  },
 
-    items.push( [items.length, "All"] );
+  _createAddButton: function() {
+    //AppSystem has no running apps at startup -> only add "All")
+    let items = [[0, _("All")]];
 
     let fn = Lang.bind(this,
       function() {
@@ -368,6 +380,7 @@ SettingsWindow.prototype = {
 
         this._addApplicationItem.setSelectedItem('All');
         this._deleteApplicationItem.addComboItem(item);
+        this._deleteApplicationItem.setSelectedItem(item);
         this._addApplicationItem.removeComboItem(item);
       }
     );
@@ -375,6 +388,18 @@ SettingsWindow.prototype = {
     this._addApplicationItem = new ComboButtonItem(_("Add Application"), { items: items, selectedValue: 'All', buttonClicked: fn} );
 
     return this._addApplicationItem;
+  },
+
+  _getAppMenuByName: function(name) {
+    let menus = this._appSection._getMenuItems(),
+      menuLength = menus.length;
+
+    for (let i=0; i< menuLength; i++) {
+      if (menus[i].name == name) {
+        return menus[i];
+      }
+    }
+    return null;
   },
 
   _createDeleteButton: function() {
@@ -393,22 +418,18 @@ SettingsWindow.prototype = {
           return;
         }
 
-        try {
+        let menu = this._getAppMenuByName(item[1]);
+
+        if (menu!=null) {
           this._unsetParameter("locations."+item[1]);
-          let menus = this._appSection._getMenuItems(),
-            menuLength = menus.length,
-            i;
-          for (i=0; i< menuLength; i++) {
-            if (menus[i].name == item[1]) {
-              this._appSection.actor.remove_actor(menus[i].actor);
-              break;
-            }
-          }
+          menu.closeAccordion(false);
+          this._appSection.actor.remove_actor(menu.actor);
           this._deleteApplicationItem.setSelectedItem('Select');
           this._deleteApplicationItem.removeComboItem(item);
           this._addApplicationItem.addComboItem(item);
-        } catch(e) {
-          Main.notifyError(e);
+          this._addApplicationItem.setSelectedItem(item);
+        }else {
+          Main.notifyError("Error removing Application config for "+ item[1]);
         }
       }
     );
@@ -439,17 +460,59 @@ SettingsWindow.prototype = {
 
     let positions = this.getParameter(prefix + "positions");
     for (let i=0; i< positions.length; i++) {
-      // TODO: add a css-style that underlines the text and moves it 2px left
-      let header = new PopupMenu.PopupMenuItem((i+1) + ". Position", {reactive: false});
-      //header.setShowDot(true)
-      menu.menu.addMenuItem(header);
-      menu.menu.addMenuItem(this._createCombo(prefix + "positions." + i + ".screen", _("Screen"), this._screenItems));
-      menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".width", _("Width"), 0, 100));
-      menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".height", _("Height"), 0, 100));
-      menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".x", _("X-Postion"), 0, 100));
-      menu.menu.addMenuItem(this._createSlider(prefix + "positions." + i + ".y", _("Y-Position"), 0, 100));
+      let section = this._createPositionSection(name, prefix, i);
+      menu.menu.addMenuItem(section);
     }
     return menu;
+  },
+
+  _createPositionSection: function(appName, configLocation, index) {
+    let header = new PopupMenu.PopupMenuItem((index+1) + ". Position", {reactive: false});
+
+    let buttonContainer = new St.BoxLayout();
+
+    // first location may not be deleted
+    if (index > 0) {
+      let deleteBtn = new St.Button ({ label: _('-'), style_class: 'put-window-button' });
+      deleteBtn.add_style_class_name("put-window-add-button");
+      deleteBtn.connect("clicked",
+        Lang.bind(this, function() {
+          section.actor.get_parent().remove_actor(section.actor);
+          let deleteMe = configLocation + "positions." + index;
+          this._unsetParameter(deleteMe);
+
+        })
+      );
+      buttonContainer.add(deleteBtn, {x_align: St.Align.END})
+    }
+
+    let addBtn = new St.Button ({ label: _('+'), style_class: 'put-window-button' });
+    addBtn.add_style_class_name("put-window-add-button");
+    addBtn.connect("clicked",
+      Lang.bind(this, function() {
+        let parent = this._getAppMenuByName(appName),
+          length = this.getParameter(configLocation + "positions", []).length;
+
+        // ensure the new location is writen to the config
+        let newApp = configLocation + "positions." + length;
+        this.setParameter(newApp, this._startConfig.positions[0]);
+
+        parent.menu.addMenuItem(this._createPositionSection(appName, configLocation, length));
+      })
+    );
+    buttonContainer.add(addBtn, {x_align: St.Align.END})
+    header.addActor(buttonContainer, {expand: true, span: -1, align: St.Align.END});
+
+    let section = new PopupMenu.PopupMenuSection(),
+      loc =  configLocation + "positions." + index +".";
+
+    section.addMenuItem(header);
+    section.addMenuItem(this._createCombo(loc+ "screen", _("Screen"), this._screenItems));
+    section.addMenuItem(this._createSlider(loc + "width", _("Width"), 0, 100));
+    section.addMenuItem(this._createSlider(loc + "height", _("Height"), 0, 100));
+    section.addMenuItem(this._createSlider(loc + "x", _("X-Postion"), 0, 100));
+    section.addMenuItem(this._createSlider(loc + "y", _("Y-Position"), 0, 100));
+    return section;
   }
 };
 
@@ -505,7 +568,7 @@ ComboButtonItem.prototype = {
 
     let button = new St.Button ({ label: text, style_class: 'put-window-button' });
     button.connect("clicked", Lang.bind(this, buttonClicked));
-    this.addActor(button, {span: 6, expand: true, align: St.Align.END} );
+    this.addActor(button, {span: -1, expand: true, align: St.Align.END} );
   },
 
   removeComboItem: function(value) {
@@ -572,6 +635,10 @@ Accordion.prototype = {
     this.menu.openAccordion(animate);
   },
 
+  closeAccordion: function(animate) {
+    this.menu.closeAccordion(animate);
+  },
+
   //do nothing
   close: function(animate) { },
 
@@ -634,8 +701,3 @@ AccordionContent.prototype = {
     return true;
   }
 } // AccordionContent
-
-
-function LabeledCombobox() {
-  this._init.apply(this.arguments);
-}

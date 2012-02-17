@@ -30,6 +30,11 @@
     padding-bottom: 16px;
 }
 
+.put-window-add-button {
+    width: 16px;
+    height: 16px;
+}
+
 .popup-combo-menu {
     background-color: rgba(0,0,0,0.9);
     padding: 1em 0em;
