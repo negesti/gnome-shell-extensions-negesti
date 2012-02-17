@@ -73,7 +73,10 @@ MoveWindow.prototype = {
     let tbHeight = (s.primary && !Main.panel.hidden) ? this._topBarHeight : 4;
     s.y = s.geomY + tbHeight;
     s.height = s.totalHeight * this._getSideHeight() - tbHeight;
-    s.sy = (s.totalHeight - s.height) + s.geomY;
+
+    // -14 may produce a gap at the bottom, but otherwise the window
+    // may be outside of the screen
+    s.sy = (s.totalHeight - s.height) - 14 + s.geomY;
     s.width = s.totalWidth * this._getSideWidth();
 
     return s;
