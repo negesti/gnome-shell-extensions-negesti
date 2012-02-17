@@ -3,6 +3,7 @@ const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
+const PopupMenu = imports.ui.popupMenu;
 const Shell = imports.gi.Shell;
 
 const Extension = imports.ui.extensionSystem.extensions['putWindow@clemens.lab21.org'];
@@ -37,12 +38,14 @@ MoveWindow.prototype = {
   CENTER_HEIGHT: "centerHeight",
   SIDE_WIDTH: "sideWidth",
   SIDE_HEIGHT: "sideHeight",
-  PANEL_BUTTON_VISIBLE: "panelButtonVisible",
+  PANEL_BUTTON_VISIBLE: "panelButtonPosition",
 
   // private variables
   _keyBindingHandlers: [],
   _bindings: [],
   _shellwm: global.window_manager,
+  // settingsButton
+  _settingsButton: null,
 
   _topBarHeight: 28,
 
@@ -64,6 +67,16 @@ MoveWindow.prototype = {
 
     this._keyBindingHandlers[keybinding] =
         this._shellwm.connect('keybinding::' + keybinding, handler);
+  },
+
+  _recalcuteSizes: function(s) {
+    let tbHeight = (s.primary && !Main.panel.hidden) ? this._topBarHeight : 4;
+    s.y = s.geomY + tbHeight;
+    s.height = s.totalHeight * this._getSideHeight() - tbHeight;
+    s.sy = (s.totalHeight - s.height) + s.geomY;
+    s.width = s.totalWidth * this._getSideWidth();
+
+    return s;
   },
 
   /**
@@ -95,10 +108,12 @@ MoveWindow.prototype = {
     let s = this._screens[sIndex];
 
     // check if we are on primary screen and if the main panel is visible
-    let tbHeight = (s.primary && !Main.panel.hidden) ? this._topBarHeight : 4;
-    s.y = s.geomY + tbHeight;
-    s.height = s.totalHeight/2 - tbHeight;
-    s.sy = (s.totalHeight + tbHeight)/2 + s.geomY;
+    s = this._recalcuteSizes(s);
+
+    let moveRightX = s.x;
+    if (where.indexOf("e") > -1) {
+       moveRightX = s.geomX + s.totalWidth - s.width;
+    }
 
     let diff = null,
       sameWidth = this._samePoint(pos.width, s.width);
@@ -110,11 +125,12 @@ MoveWindow.prototype = {
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
     } else if (where == "e") {
+      // fixme. wont move left...
       if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
-        s = this._screens[(sIndex+1)];
+        s = this._recalcuteSizes(this._screens[(sIndex+1)]);
         this._resize(win, s.x, s.y, s.width, -1);
       } else {
-        this._resize(win, (s.x + s.width), s.y, s.width, -1);
+        this._resize(win, moveRightX, s.y, s.width, -1); //(s.x + s.width)
       }
       win.last_move = "e";
     } else if (where == "s") {
@@ -124,16 +140,17 @@ MoveWindow.prototype = {
       let newX = pos.x - s.width;
       if (sIndex > 0 && sameWidth && maxH && newX < (s.width + 150)) {
         s = this._screens[(sIndex-1)];
-        this._resize(win, (s.x + s.width), s.y, s.width, -1);
+        moveRightX = s.geomX + s.totalWidth - s.width;
+        this._resize(win, moveRightX, s.y, s.width, -1); // (s.x + s.width)
       } else {
         this._resize(win, s.x, s.y, s.width, -1);
       }
     }
 
     if (where == "ne") {
-      this._resize(win, s.x + s.width, s.y, s.width, s.height)
+      this._resize(win, moveRightX, s.y, s.width, s.height)
     } else if (where == "se") {
-      this._resize(win, s.x + s.width, s.sy, s.width, s.height)
+      this._resize(win, moveRightX, s.sy, s.width, s.height)
     } else if (where == "sw") {
       this._resize(win, s.x, s.sy, s.width, s.height)
     } else if (where == "nw") {
@@ -301,9 +318,18 @@ MoveWindow.prototype = {
   _init: function() {
     // read configuration and init the windowTracker
     this._settings = new SettingsWindow(_path + "putWindow.json");
-    if (this._settings.getBoolean(this.PANEL_BUTTON_VISIBLE)) {
-      let settingsButton = new SettingButton(this._settings);
-      Main.panel._rightBox.insert_actor(settingsButton.actor, 0);
+    let buttonPosition = this._settings.getNumber(this.PANEL_BUTTON_VISIBLE, 0);
+    if (buttonPosition == 1) {
+      this._settingsButton = new SettingButton(this._settings);
+      Main.panel._rightBox.insert_actor(this._settingsButton.actor, 0);
+    } else {
+      this._settingsButton = new PopupMenu.PopupMenuItem(_("PutWindow Settings"));
+      this._settingsButton.connect('activate',
+        Lang.bind(this, function() {
+          this._settings.toggle();
+        })
+      );
+      Main.panel._statusArea.userMenu.menu.addMenuItem(this._settingsButton, 5);
     }
 
     this._windowTracker = Shell.WindowTracker.get_default();
@@ -323,6 +349,7 @@ MoveWindow.prototype = {
       this._screens[i] =  {
         y: (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
         x : geom.x,
+        geomX: geom.x,
         geomY: geom.y,
         totalWidth: geom.width,
         totalHeight: totalHeight,
@@ -393,6 +420,9 @@ MoveWindow.prototype = {
         this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
     }
 
+    if (this._settingsButton) {
+      this._settingsButton.destroy();
+    }
     this._settings.destroy();
   }
 }
@@ -402,22 +432,39 @@ function SettingButton(settings) {
 }
 
 SettingButton.prototype = {
-__proto__: PanelMenu.SystemStatusButton.prototype,
+  __proto__: PanelMenu.ButtonBox.prototype,
 
   _settingsWindow: {},
 
-  _init: function(settings) {
-    this._settingsWindow = settings;
-    PanelMenu.SystemStatusButton.prototype._init.call(this, 'starred', 'PutWindow Settings');
+  _init : function(settings) {
+    PanelMenu.ButtonBox.prototype._init.call(this, {
+       reactive: true,
+       can_focus: true,
+       track_hover: true,
+       style_class: 'put-window-settings-icon'
+    });
 
-    this.connect("clicked", Lang.bind(this, this._onButtonPress));
-    Main.panel._menus.addMenu(this.menu);
+    this._settingsWindow = settings;
+    this.setTooltip(_("PutWindow Settings"));
+    this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
   },
 
-  _onButtonPress: function(actor, event) {
-    this._settingsWindow.open();
+  _onButtonPress: function(actor, event){
+    this._settingsWindow.toggle();
+  },
+
+  setTooltip: function(text) {
+    if (text != null) {
+      this.tooltip = text;
+      this.actor.has_tooltip = true;
+      this.actor.tooltip_text = text;
+    } else {
+      this.actor.has_tooltip = false;
+      this.tooltip = null;
+    }
   }
-};
+
+}
 
 function init(meta) {
   _path = meta.path+"/";

@@ -7,6 +7,16 @@
     color: #babdb6;
 }
 
+.put-window-settings-icon {
+    width: 16px;
+    height: 16px;
+    background-image: url("images/settings.svg");
+}
+
+.put-window-settings-icon:hover {
+    background-image: url("images/settings_hover.svg");
+}
+
 .put-window-main-layout {
     spacing: 0px;
     padding-right: 0px;

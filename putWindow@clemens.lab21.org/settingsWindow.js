@@ -23,6 +23,8 @@ function SettingsWindow(fileName) {
 SettingsWindow.prototype = {
   __proto__: ModalDialog.ModalDialog.prototype,
 
+  _isOpen: false,
+
   _startConfig: {
     autoMove: false,
     positions: [{
@@ -103,6 +105,15 @@ SettingsWindow.prototype = {
         })
       }
     ]);
+  },
+
+  toggle: function() {
+    if (this._isOpen) {
+      this.close();
+    } else {
+      this.open();
+    }
+    this._isOpen = !this._isOpen;
   },
 
   _readFile: function() {
@@ -408,7 +419,9 @@ SettingsWindow.prototype = {
   _mainSettings: function() {
 
     let menu = new Accordion("Common Settings");
-    menu.menu.addMenuItem(this._createSwitch("panelButtonVisible", _("Show Settings Button")));
+    let items = [ [0, _("Usermenu")], [1, _("Panel")] ];
+
+    menu.menu.addMenuItem(this._createCombo("panelButtonPosition", _("Settings Button"), items));
     menu.menu.addMenuItem(this._createSlider("centerWidth", _("Center width"), 0, 100));
     menu.menu.addMenuItem(this._createSlider("centerHeight", _("Center height"), 0, 100));
     menu.menu.addMenuItem(this._createSlider("sideWidth", _("Side/Corner width"), 0, 100));
