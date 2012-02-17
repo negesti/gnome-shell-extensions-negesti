@@ -93,6 +93,7 @@ SettingsWindow.prototype = {
       }, {
         label: _("Close"),
         action: Lang.bind(this, function() {
+          this._isOpen = false;
           this.close();
         })
       }, {
@@ -101,6 +102,7 @@ SettingsWindow.prototype = {
         action: Lang.bind(this, function() {
           // restore the old config
           this._settings = this._readFile();
+          this._isOpen = false;
           this.close();
         })
       }
