@@ -224,11 +224,15 @@ MoveWindow.prototype = {
     }
 
     let config = this._settings.getParameter("locations." + appName, false);
+    // no config for appName. maybe we have a config for "all"
     if (!config) {
-      return;
+      config = this._settings.getParameter("locations.All", false);
+      // no config for "all"
+      if (!config) {
+        return;
+      }
+      appName = "All";
     }
-
-
     let pos = config.positions[config.lastPosition];
     if (!pos) {
       pos = config.positions[0];

@@ -377,15 +377,16 @@ SettingsWindow.prototype = {
 
   _createAddButton: function() {
     //AppSystem has no running apps at startup -> only add "All")
-    let items = [[0, _("All")]];
+    let items = []
+    if (!this.getParameter("locations.All")) {
+      items.push([0, "All"]);
+    }
 
     let fn = Lang.bind(this,
       function() {
         let item = this._addApplicationItem.getSelectedItem(),
           configPath = "locations." + item[1];
-        if (item == "All" || item[1] == "All") {
-          return;
-        }
+        log(item)
         this.setParameter(configPath, this._startConfig);
         let newApp = this._createAppSetting(item[1], this.getParameter(configPath));
         this._appSection.addMenuItem(newApp);
