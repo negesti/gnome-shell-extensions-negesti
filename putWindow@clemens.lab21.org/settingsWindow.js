@@ -46,11 +46,11 @@ SettingsWindow.prototype = {
 
     ModalDialog.ModalDialog.prototype._init.call(this, {styleClass: "put-window-settings-dialog", shellReactive: true});
 
-    let mainBox = new St.BoxLayout({
+    this._mainBox = new St.BoxLayout({
       style_class: "put-window-main-layout",
       vertical: true
     });
-    this.contentLayout.add(mainBox, {
+    this.contentLayout.add(this._mainBox, {
       x_fill: true,
       y_fill: true
     });
@@ -60,30 +60,13 @@ SettingsWindow.prototype = {
       text: _("PutWindow Configuration")
     });
 
-    mainBox.add(headline, {
+    this._mainBox.add(headline, {
       y_align: St.Align.START,
       y_fill: true,
       x_fill: true
     });
 
-    let menu = new PopupMenu.PopupMenu(mainBox);
-    // menuItems are drawn outside of the border if .popup-menu-boxpointer is used
-    menu.actor.style_class = "put-window-menu-container";
-
-    menu.addMenuItem(this._createAddButton());
-    menu.addMenuItem(this._createDeleteButton());
-    menu.addMenuItem(this._mainSettings());
-
-    this._appSection = new PopupMenu.PopupMenuSection();
-    if (typeof(this._settings["locations"]) != "undefined") {
-      let apps = Object.getOwnPropertyNames(this.getParameter("locations")),
-        appsLength = apps.length;
-      for(let i=0; i< appsLength; i++) {
-        this._appSection.addMenuItem(this._createAppSetting(apps[i], this._settings["locations"][apps[i]]));
-      }
-    }
-    menu.addMenuItem(this._appSection);
-    mainBox.add(menu.actor, {span: 1, expand: true, align: St.Align.START});
+    this._initMenu();
 
     this.setButtons([{
         label: _("Save"),
@@ -102,11 +85,40 @@ SettingsWindow.prototype = {
         action: Lang.bind(this, function() {
           // restore the old config
           this._settings = this._readFile();
+          this._recreateMenu();
           this._isOpen = false;
           this.close();
         })
       }
     ]);
+  },
+
+  _initMenu: function() {
+    this._menu = new PopupMenu.PopupMenu(this._mainBox);
+    // menuItems are drawn outside of the border if .popup-menu-boxpointer is used
+    this._menu.actor.style_class = "put-window-menu-container";
+
+    this._menu.addMenuItem(this._createAddButton());
+    this._menu.addMenuItem(this._createDeleteButton());
+    this._menu.addMenuItem(this._mainSettings());
+
+    this._appSection = new PopupMenu.PopupMenuSection();
+    if (typeof(this._settings["locations"]) != "undefined") {
+      let apps = Object.getOwnPropertyNames(this.getParameter("locations")),
+        appsLength = apps.length;
+      for(let i=0; i< appsLength; i++) {
+        this._appSection.addMenuItem(this._createAppSetting(apps[i], this._settings["locations"][apps[i]]));
+      }
+    }
+    this._menu.addMenuItem(this._appSection);
+    this._mainBox.add(this._menu.actor, {span: 1, expand: true, align: St.Align.START});
+  },
+
+  // after the user clicked cancel, remove the PopupMenu (not the header) from the mainBox and recreate them
+  _recreateMenu: function() {
+    this._mainBox.remove_actor(this._menu.actor);
+    this._menu.destroy();
+    this._initMenu();
   },
 
   toggle: function() {
@@ -308,6 +320,7 @@ SettingsWindow.prototype = {
     combo.setActiveItem(value);
     combo.connect("active-item-changed",
       Lang.bind(this, function(menuItem, id) {
+        log("combo changed "+ configName + "id: "+ id);
         this.setParameter(configName, id);
       })
     );

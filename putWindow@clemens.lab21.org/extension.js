@@ -38,14 +38,15 @@ MoveWindow.prototype = {
   CENTER_HEIGHT: "centerHeight",
   SIDE_WIDTH: "sideWidth",
   SIDE_HEIGHT: "sideHeight",
-  PANEL_BUTTON_VISIBLE: "panelButtonPosition",
+  PANEL_BUTTON_POSITION: "panelButtonPosition",
 
   // private variables
   _keyBindingHandlers: [],
   _bindings: [],
   _shellwm: global.window_manager,
-  // settingsButton
+  // settingsButton/menu
   _settingsButton: null,
+  _settingsMenue: null,
 
   _topBarHeight: 28,
 
@@ -321,18 +322,18 @@ MoveWindow.prototype = {
   _init: function() {
     // read configuration and init the windowTracker
     this._settings = new SettingsWindow(_path + "putWindow.json");
-    let buttonPosition = this._settings.getNumber(this.PANEL_BUTTON_VISIBLE, 0);
+    let buttonPosition = this._settings.getNumber(this.PANEL_BUTTON_POSITION, 0);
     if (buttonPosition == 1) {
       this._settingsButton = new SettingButton(this._settings);
       Main.panel._rightBox.insert_actor(this._settingsButton.actor, 0);
     } else {
-      this._settingsButton = new PopupMenu.PopupMenuItem(_("PutWindow Settings"));
-      this._settingsButton.connect('activate',
+      this._settingsMenu = new PopupMenu.PopupMenuItem(_("PutWindow Settings"));
+      this._settingsMenu.connect('activate',
         Lang.bind(this, function() {
           this._settings.toggle();
         })
       );
-      Main.panel._statusArea.userMenu.menu.addMenuItem(this._settingsButton, 5);
+      Main.panel._statusArea.userMenu.menu.addMenuItem(this._settingsMenu, 5);
     }
 
     this._windowTracker = Shell.WindowTracker.get_default();
@@ -423,9 +424,17 @@ MoveWindow.prototype = {
         this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
     }
 
+    // destroy the settingsButton/Menu. user may have changed the config during runtime
     if (this._settingsButton) {
+      this._settingsButton.actor.get_parent().remove_actor(this._settingsButton.actor);
       this._settingsButton.destroy();
+      this._settingsButton = null;
+    } else if (this._settingsMenu) {
+      this._settingsMenu.actor.get_parent().remove_actor(this._settingsMenu.actor);
+      this._settingsMenu.destroy();
+      this._settingsMenu = null;
     }
+
     this._settings.destroy();
   }
 }
@@ -465,8 +474,11 @@ SettingButton.prototype = {
       this.actor.has_tooltip = false;
       this.tooltip = null;
     }
-  }
+  },
 
+  destroy: function() {
+    this.actor.destroy();
+  }
 }
 
 function init(meta) {
