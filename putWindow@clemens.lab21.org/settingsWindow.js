@@ -320,7 +320,6 @@ SettingsWindow.prototype = {
     combo.setActiveItem(value);
     combo.connect("active-item-changed",
       Lang.bind(this, function(menuItem, id) {
-        log("combo changed "+ configName + "id: "+ id);
         this.setParameter(configName, id);
       })
     );
@@ -386,7 +385,6 @@ SettingsWindow.prototype = {
       function() {
         let item = this._addApplicationItem.getSelectedItem(),
           configPath = "locations." + item[1];
-        log(item)
         this.setParameter(configPath, this._startConfig);
         let newApp = this._createAppSetting(item[1], this.getParameter(configPath));
         this._appSection.addMenuItem(newApp);
