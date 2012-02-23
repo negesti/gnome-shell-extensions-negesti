@@ -1,8 +1,8 @@
 {
-  "shell-version": ["3.2.0", "3.2.1"],
+  "shell-version": ["3.2"],
   "uuid": "putWindow@clemens.lab21.org",
   "name": "Put Windows",
-  "description": "Move and resize windows similar to compiz put plugin",
+  "description": "Move and resize windows similar to compiz put plugin. Configuration ui available in user status menu.",
   "url": "https://github.com/negesti/gnome-shell-extensions-negesti"
 }
 
