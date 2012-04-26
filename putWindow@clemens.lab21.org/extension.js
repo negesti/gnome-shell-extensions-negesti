@@ -41,49 +41,29 @@ MoveWindow.prototype = {
   PANEL_BUTTON_POSITION: "panelButtonPosition",
 
   // private variables
-  _keyBindingHandlers: [],
   _bindings: [],
-  _shellwm: global.window_manager,
-  // settingsButton/menu
-  _settingsButton: null,
-  _settingsMenue: null,
-
-  _topBarHeight: 28,
+  _padding: 2,
 
   _primary: 0,
   _screens: [],
 
   /**
-   * Helper functions to takeover binding when enabled and release them
-   * on disbale. Will change when 3.4 is available and extensions can register
-   * bindings.
+   * Helper functions to set custom handler for keybindings
    */
   _addKeyBinding: function(keybinding, handler) {
-	global.log("add binding " + keybinding);
+    this._bindings.push(keybinding);
     Meta.keybindings_set_custom_handler(keybinding, handler);
-    //Meta.keybindings_set_custom_handler("<ALT>KP_1", function(){global.log("blub")});
-    /*
-    if (this._keyBindingHandlers[keybinding])
-      this._shellwm.disconnect(this._keyBindingHandlers[keybinding]);
-    else {
-      this._shellwm.takeover_keybinding(keybinding);
-      this._bindings[this._bindings.length] = keybinding;
-    }
-
-
-    this._keyBindingHandlers[keybinding] =
-    this._shellwm.connect('keybinding::' + keybinding, handler);
-    */
   },
 
   _recalcuteSizes: function(s) {
-    let tbHeight = (s.primary && !Main.panel.hidden) ? this._topBarHeight : 4;
+
+    let tbHeight = s.primary ? Main.panel.actor.height : 0;
     s.y = s.geomY + tbHeight;
     s.height = s.totalHeight * this._getSideHeight() - tbHeight;
 
     // -14 may produce a gap at the bottom, but otherwise the window
     // may be outside of the screen
-    s.sy = (s.totalHeight - s.height) - 14 + s.geomY;
+    s.sy = (s.totalHeight - s.height) + s.geomY -17;
     s.width = s.totalWidth * this._getSideWidth();
 
     return s;
@@ -116,7 +96,6 @@ MoveWindow.prototype = {
     }
 
     let s = this._screens[sIndex];
-
     // check if we are on primary screen and if the main panel is visible
     s = this._recalcuteSizes(s);
 
@@ -128,9 +107,7 @@ MoveWindow.prototype = {
     let diff = null,
       sameWidth = this._samePoint(pos.width, s.width);
 
-    // sIndex is the target index if we move to another screen.-> primary!=sIndex
-    let winHeight = pos.height + this._topBarHeight;
-    let maxH = (pos.height >= s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
+    let maxH = (pos.height >= s.totalHeight) || this._samePoint(pos.height, s.totalHeight);
 
     if (where=="n") {
       this._resize(win, s.x, s.y, -1, s.height);
@@ -142,7 +119,6 @@ MoveWindow.prototype = {
       } else {
         this._resize(win, moveRightX, s.y, s.width, -1); //(s.x + s.width)
       }
-      win.last_move = "e";
     } else if (where == "s") {
       this._resize(win, s.x, s.sy, -1, s.height);
     } else if (where == "w") {
@@ -266,15 +242,18 @@ MoveWindow.prototype = {
     this._resize(win, x, y, width, height);
   },
 
-  // moving the window and the actual position are not really the same
-  // if the points are < 30 points away asume as equal
+  // On large screens the values used for moving/resizing windows, and the resulting
+  // window.rect are may not be not equal (==)
+  // --> Assume points are equal, if the difference is <= 40px
+  // @return true, if the difference between p1 and p2 is less then 41
   _samePoint: function(p1, p2) {
-    return (Math.abs(p1-p2) <= 20);
+    return (Math.abs(p1-p2) <= 40);
   },
 
   // actual resizing
   _resize: function(win, x, y, width, height) {
 
+    global.log("resize x:" + x + " y:" + y + " w:" + width + " h:" + height + " s+h "+ (y + height));
     if (height == -1) {
       win.maximize(Meta.MaximizeFlags.VERTICAL);
       height = 400; // dont resize to width, -1
@@ -289,24 +268,14 @@ MoveWindow.prototype = {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
 
-    // first move the window
-    let padding = this._getPadding(win);
-    // snap, x, y
-    win.move_frame(true, x - padding.x, y - padding.y);
-    // snap, width, height, force
-    win.resize(true, width - padding.width, height - padding.height);
-  },
-
-  // the difference between input and outer rect as object.
-  _getPadding: function(win) {
     let outer = win.get_outer_rect(),
-      inner = win.get_input_rect();
-    return {
-      x: outer.x - inner.x,
-      y: (outer.y - inner.y),
-      width: 2, //(inner.width - outer.width),
-      height: (inner.height - outer.height)
-    };
+          inner = win.get_input_rect();
+    y = y <= Main.panel.actor.height ? y : y - Math.abs(outer.y - inner.y);
+
+    // snap, x, y
+    win.move_frame(true, x, y);
+    // snap, width, height, force
+    win.resize(true, width - this._padding, height - this._padding);
   },
 
   _checkSize: function(p) {
@@ -332,19 +301,6 @@ MoveWindow.prototype = {
   _init: function() {
     // read configuration and init the windowTracker
     this._settings = new SettingsWindow.SettingsWindow(_path + "putWindow.json");
-    let buttonPosition = this._settings.getNumber(this.PANEL_BUTTON_POSITION, 0);
-    if (buttonPosition == 1) {
-      this._settingsButton = new SettingButton(this._settings);
-      Main.panel._rightBox.insert_actor(this._settingsButton.actor, 0);
-    } else {
-      this._settingsMenu = new PopupMenu.PopupMenuItem(_("PutWindow Settings"));
-      this._settingsMenu.connect('activate',
-        Lang.bind(this, function() {
-          this._settings.toggle();
-        })
-      );
-      Main.panel._statusArea.userMenu.menu.addMenuItem(this._settingsMenu, 5);
-    }
 
     this._windowTracker = Shell.WindowTracker.get_default();
 
@@ -361,7 +317,7 @@ MoveWindow.prototype = {
         totalHeight = geom.height;
 
       this._screens[i] =  {
-        y: (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
+        y: geom.y, // (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
         x : geom.x,
         geomX: geom.x,
         geomY: geom.y,
@@ -371,9 +327,6 @@ MoveWindow.prototype = {
       };
 
       this._screens[i].primary = (i==this._primary)
-
-      // the position.y for s, sw and se
-      this._screens[i].sy = (totalHeight - this._screens[i].y + this._topBarHeight) * this._getSideHeight();
     }
 
     // sort by x position. makes it easier to find the correct screen
@@ -430,64 +383,12 @@ MoveWindow.prototype = {
     }
 
     let size = this._bindings.length;
-    for(let i = 0; i<size; i++) {
-        this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
-    }
-
-    // destroy the settingsButton/Menu. user may have changed the config during runtime
-    if (this._settingsButton) {
-      this._settingsButton.actor.get_parent().remove_actor(this._settingsButton.actor);
-      this._settingsButton.destroy();
-      this._settingsButton = null;
-    } else if (this._settingsMenu) {
-      this._settingsMenu.actor.get_parent().remove_actor(this._settingsMenu.actor);
-      this._settingsMenu.destroy();
-      this._settingsMenu = null;
-    }
+    // TODO: remove handlers added by keybindings_set_custom_handler
+    //for(let i = 0; i<size; i++) {
+    //    this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
+    //}
 
     this._settings.destroy();
-  }
-}
-
-function SettingButton(settings) {
-  this._init(settings);
-}
-
-SettingButton.prototype = {
-  __proto__: PanelMenu.ButtonBox.prototype,
-
-  _settingsWindow: {},
-
-  _init : function(settings) {
-    PanelMenu.ButtonBox.prototype._init.call(this, {
-       reactive: true,
-       can_focus: true,
-       track_hover: true,
-       style_class: 'put-window-settings-icon'
-    });
-
-    this._settingsWindow = settings;
-    this.setTooltip(_("PutWindow Settings"));
-    this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
-  },
-
-  _onButtonPress: function(actor, event){
-    this._settingsWindow.toggle();
-  },
-
-  setTooltip: function(text) {
-    if (text != null) {
-      this.tooltip = text;
-      this.actor.has_tooltip = true;
-      this.actor.tooltip_text = text;
-    } else {
-      this.actor.has_tooltip = false;
-      this.tooltip = null;
-    }
-  },
-
-  destroy: function() {
-    this.actor.destroy();
   }
 }
 
