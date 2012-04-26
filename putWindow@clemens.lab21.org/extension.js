@@ -6,8 +6,8 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Shell = imports.gi.Shell;
 
-const Extension = imports.ui.extensionSystem.extensions['putWindow@clemens.lab21.org'];
-const SettingsWindow = Extension.settingsWindow.SettingsWindow;
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const SettingsWindow = Extension.imports.settingsWindow;
 
 let _path;
 
@@ -59,6 +59,10 @@ MoveWindow.prototype = {
    * bindings.
    */
   _addKeyBinding: function(keybinding, handler) {
+	global.log("add binding " + keybinding);
+    Meta.keybindings_set_custom_handler(keybinding, handler);
+    //Meta.keybindings_set_custom_handler("<ALT>KP_1", function(){global.log("blub")});
+    /*
     if (this._keyBindingHandlers[keybinding])
       this._shellwm.disconnect(this._keyBindingHandlers[keybinding]);
     else {
@@ -66,8 +70,10 @@ MoveWindow.prototype = {
       this._bindings[this._bindings.length] = keybinding;
     }
 
+
     this._keyBindingHandlers[keybinding] =
-        this._shellwm.connect('keybinding::' + keybinding, handler);
+    this._shellwm.connect('keybinding::' + keybinding, handler);
+    */
   },
 
   _recalcuteSizes: function(s) {
@@ -325,7 +331,7 @@ MoveWindow.prototype = {
    **/
   _init: function() {
     // read configuration and init the windowTracker
-    this._settings = new SettingsWindow(_path + "putWindow.json");
+    this._settings = new SettingsWindow.SettingsWindow(_path + "putWindow.json");
     let buttonPosition = this._settings.getNumber(this.PANEL_BUTTON_POSITION, 0);
     if (buttonPosition == 1) {
       this._settingsButton = new SettingButton(this._settings);
@@ -376,39 +382,39 @@ MoveWindow.prototype = {
     });
 
     // move to n, e, s an w
-    this._addKeyBinding("move_to_side_n",
+    this._addKeyBinding("move-to-side-n",
       Lang.bind(this, function(){ this._moveFocused("n");})
     );
-    this._addKeyBinding("move_to_side_e",
+    this._addKeyBinding("move-to-side-e",
       Lang.bind(this, function(){ this._moveFocused("e");})
     );
-    this._addKeyBinding("move_to_side_s",
+    this._addKeyBinding("move-to-side-s",
       Lang.bind(this, function(){ this._moveFocused("s");})
     );
-    this._addKeyBinding("move_to_side_w",
+    this._addKeyBinding("move-to-side-w",
       Lang.bind(this, function(){ this._moveFocused("w");})
     );
 
     // move to  nw, se, sw, nw
-    this._addKeyBinding("move_to_corner_ne",
+    this._addKeyBinding("move-to-corner-ne",
       Lang.bind(this, function(){ this._moveFocused("ne");})
     );
-    this._addKeyBinding("move_to_corner_se",
+    this._addKeyBinding("move-to-corner-se",
       Lang.bind(this, function(){ this._moveFocused("se");})
     );
-    this._addKeyBinding("move_to_corner_sw",
+    this._addKeyBinding("move-to-corner-sw",
       Lang.bind(this, function(){ this._moveFocused("sw");})
     );
-    this._addKeyBinding("move_to_corner_nw",
+    this._addKeyBinding("move-to-corner-nw",
       Lang.bind(this, function(){ this._moveFocused("nw");})
     );
 
     // move to center. fix 2 screen setup and resize to 50% 50%
-    this._addKeyBinding("move_to_center",
+    this._addKeyBinding("move-to-center",
       Lang.bind(this, function(){ this._moveFocused("c");})
     );
 
-    this._addKeyBinding("move_to_workspace_1",
+    this._addKeyBinding("move-to-workspace-1",
       Lang.bind(this, function(){ this._moveToConfiguredLocation();})
     );
   },
