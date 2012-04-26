@@ -1,4 +1,5 @@
-## Put Window
+Put Window
+==========
 
 
 If you enable this extension the metacity move window keybindings are
@@ -6,7 +7,14 @@ replaced.
 
 - - -
 
-Changes:
+ChangeLog
+-------
+
+__April 26, 2012__
+
+ * Extension is now **3.4** compatible (Tested with 3.4.1)
+ * SettingsWindow is disabled for the moment (will be replaced by tweak-tool "plugin")
+ * **The shell uses gsettings now!**
 
 __January 15, 2012__
 
@@ -24,33 +32,51 @@ __December 11, 2011__
  * hitting move_to_center twice will now correctly maximize evolution
 
 - - -
+Keybindings
+-----------
 
-To check the predefined keyboard bindings (or modify them) open gconf-editor and
-navigate to "apps.metacity.window_keybindings". (check the wiki for details)
+Details how to configure can be found in the [wiki](https://github.com/negesti/gnome-shell-extensions-negesti/wiki)
 
-* move_to_side_n.... move to north edge, height: 50% width 100%
-* move_to_side_e.... move to easth edge, height: 100% width 50%
-* move_to_side_s.... move to south edge, height: 50% width 100%
-* move_to_side_w.... move to west  edge, height: 100% width 50%
+Keybindings are configured using gsettings. Currently a predefined schema is used
 
-* move_to_corners: widht 50% height 50%
-* ne, se, sw, nw
+                org.gnome.desktop.wm.keybindings
 
-* move_to_center.... move to center of the screen, widht 50% height 50%
-                     Press twice to maximize the window
+The following keys are used:
 
-* move_to_workspace_1... resize to a configured location (see wiki for details)
+* move-to-side-n
+* * move to north edge, height: 50% width 100%
+* move-to-side-e
+* * move to easth edge, height: 100% width 50%
+* move-to-side-s
+* * move to south edge, height: 50% width 100%
+* move-to-side-w
+* * move to west  edge, height: 100% width 50%
+* move-to-corner-XY   width 50% height 50%
+* * move-to-corner-ne
+* * move-to-corner-se
+* * move-to-corner-sw
+* * move-to-corner-nw
+* move-to-center
+* * move to center of the screen, widht 50% height 50%. Press twice to maximize the window
+* move-to-workspace-1
+ * * resize to a configured location (see wiki for details)
 
-Modify the keybindings using gconf-editor. The Treenode is
-apps.metacity.window_keybindings.
+To modify this keybinding you can use dconf-editor or gsettings
+
+* *apt-get install dconf-tools* (for debian/ubuntu)
+* *org.gnome.desktop.wm.keybindings KeyName value*  
+* * **KeyName**... as described above (move-to-side-n,...)  
+* * **Value**..... for example "['<Alt>KP_8']" (with all both quotes) 
+
 
 - - -
 
-**2 screen setup support**
+2 screen setup support
+-------
 
-  the extention works well with 2 screens in horizontal setup.
+>  the extention works well with 2 screens in horizontal setup.
 
-  Moving windows from one screen to another only possible widh side_e and side_w
+>  Moving windows from one screen to another only possible widh side_e and side_w  
   and only if windows was at side_e (or side_w) before. eg.
 
 * a window in corner_nw of the right screen is not move to the left screen.
@@ -58,7 +84,8 @@ apps.metacity.window_keybindings.
 
 
 - - -
-### TODO
+TODO
+----
 
 * 2 screens support vor vertical alignment
 * a lot of things i currently dont remember :)
