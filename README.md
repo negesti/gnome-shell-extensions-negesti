@@ -5,7 +5,6 @@ Put Window
 If you enable this extension the metacity move window keybindings are
 replaced.
 
-- - -
 
 ChangeLog
 -------
@@ -31,7 +30,6 @@ __December 11, 2011__
  * reduced the horizontal and vertical "gap" between windows
  * hitting move_to_center twice will now correctly maximize evolution
 
-- - -
 Keybindings
 -----------
 
@@ -44,40 +42,40 @@ Keybindings are configured using gsettings. Currently a predefined schema is use
 The following keys are used:
 
 * move-to-side-n
-* * move to north edge, height: 50% width 100%
+  *  move to north edge, height: 50% width 100%
 * move-to-side-e
-* * move to easth edge, height: 100% width 50%
+  *  move to easth edge, height: 100% width 50%
 * move-to-side-s
-* * move to south edge, height: 50% width 100%
+  *  move to south edge, height: 50% width 100%
 * move-to-side-w
-* * move to west  edge, height: 100% width 50%
+  *  move to west  edge, height: 100% width 50%
 * move-to-corner-XY   width 50% height 50%
-* * move-to-corner-ne
-* * move-to-corner-se
-* * move-to-corner-sw
-* * move-to-corner-nw
+  *  move-to-corner-ne
+  *  move-to-corner-se
+  *  move-to-corner-sw
+  *  move-to-corner-nw
 * move-to-center
-* * move to center of the screen, widht 50% height 50%. Press twice to maximize the window
+  *  move to center of the screen, widht 50% height 50%. Press twice to maximize the window
 * move-to-workspace-1
- * * resize to a configured location (see wiki for details)
+  *  resize to a configured location (see wiki for details)
 
-To modify this keybinding you can use dconf-editor or gsettings
+To modify this keybinding you can use dconf-editor or gsettings  
 
-* *apt-get install dconf-tools* (for debian/ubuntu)
-* *org.gnome.desktop.wm.keybindings KeyName value*  
-* * **KeyName**... as described above (move-to-side-n,...)  
-* * **Value**..... for example "['<Alt>KP_8']" (with all both quotes) 
+                apt-get install dconf-tools (for debian/ubuntu)  
+                gsettings set org.gnome.desktop.wm.keybindings KeyName value
+
+* **KeyName**... as described above (move-to-side-n,...)  
+* **Value**..... for example "['<Alt>KP_8']" (with all both quotes) 
 
 
-- - -
 
 2 screen setup support
 -------
 
->  the extention works well with 2 screens in horizontal setup.
+the extention works well with 2 screens in horizontal setup.
 
->  Moving windows from one screen to another only possible widh side_e and side_w  
-  and only if windows was at side_e (or side_w) before. eg.
+Moving windows from one screen to another only possible widh side_e and side_w  
+and only if windows was at side_e (or side_w) before. eg.
 
 * a window in corner_nw of the right screen is not move to the left screen.
 * a window at side_e of the right screen is move to the left screen (side_w)
