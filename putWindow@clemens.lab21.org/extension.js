@@ -42,7 +42,7 @@ MoveWindow.prototype = {
 
   // private variables
   _bindings: [],
-  _padding: 2,
+  _padding: 4,
 
   _primary: 0,
   _screens: [],
@@ -60,11 +60,9 @@ MoveWindow.prototype = {
     let tbHeight = s.primary ? Main.panel.actor.height : 0;
     s.y = s.geomY + tbHeight;
     s.height = s.totalHeight * this._getSideHeight() - tbHeight;
-
-    // -14 may produce a gap at the bottom, but otherwise the window
-    // may be outside of the screen
-    s.sy = (s.totalHeight - s.height) + s.geomY -17;
     s.width = s.totalWidth * this._getSideWidth();
+
+    s.sy = (s.totalHeight - s.height) + s.geomY;
 
     return s;
   },
@@ -89,15 +87,13 @@ MoveWindow.prototype = {
         sIndex = i;
         break;
       }
-      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x) {
+      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > (pos.x + this._padding)) {
         sIndex = i;
         break;
       }
     }
 
-    let s = this._screens[sIndex];
-    // check if we are on primary screen and if the main panel is visible
-    s = this._recalcuteSizes(s);
+    let s = this._recalcuteSizes(this._screens[sIndex]);
 
     let moveRightX = s.x;
     if (where.indexOf("e") > -1) {
@@ -113,7 +109,7 @@ MoveWindow.prototype = {
       this._resize(win, s.x, s.y, -1, s.height);
     } else if (where == "e") {
       // fixme. wont move left...
-      if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
+      if (sIndex < (sl-1) && sameWidth && maxH && (pos.x + s.width + this._padding) >= s.totalWidth) {
         s = this._recalcuteSizes(this._screens[(sIndex+1)]);
         this._resize(win, s.x, s.y, s.width, -1);
       } else {
@@ -250,7 +246,7 @@ MoveWindow.prototype = {
     return (Math.abs(p1-p2) <= 40);
   },
 
-  // actual resizing
+  // actual resizing+
   _resize: function(win, x, y, width, height) {
 
     if (height == -1) {
@@ -267,14 +263,27 @@ MoveWindow.prototype = {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
 
-    let outer = win.get_outer_rect(),
-          inner = win.get_input_rect();
-    y = y <= Main.panel.actor.height ? y : y - Math.abs(outer.y - inner.y);
-
+    // y == screen.sy move it to the bottom to fill the remaining space
+    let padding = this._getPadding(win);
+    if (y > 100) {
+      y += (2 * padding.height);
+    }
     // snap, x, y
-    win.move_frame(true, x, y);
+    win.move(false, x, y - padding.y);
     // snap, width, height, force
-    win.resize(true, width - this._padding, height - this._padding);
+    win.resize(true, width, height - padding.height); //- padding.width, height - padding.height);
+  },
+
+  // the difference between input and outer rect as object.
+  _getPadding: function(win) {
+    let outer = win.get_outer_rect(),
+      inner = win.get_input_rect();
+    return {
+      x: outer.x - inner.x,
+      y: (outer.y - inner.y),
+      width: (inner.width - outer.width), // 2
+      height: (inner.height - outer.height)
+    };
   },
 
   _checkSize: function(p) {
