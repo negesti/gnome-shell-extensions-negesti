@@ -227,7 +227,6 @@ MoveWindow.prototype = {
 
     // config may be for 2 screens but currenty only 1 is connected
     let s = (this._screens.length > pos.screen) ? this._screens[pos.screen] : this._screens[0];
-
     let x = (pos.x=="0.0") ? s.x : s.x + (s.totalWidth * pos.x/100);
     let y = (pos.y=="0.0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y/100));
 
@@ -269,7 +268,7 @@ MoveWindow.prototype = {
       y += (2 * padding.height);
     }
     // snap, x, y
-    win.move(false, x, y - padding.y);
+    win.move(true, x, y - padding.y);
     // snap, width, height, force
     win.resize(true, width, height - padding.height); //- padding.width, height - padding.height);
   },
