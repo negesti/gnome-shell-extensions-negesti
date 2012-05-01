@@ -58,8 +58,11 @@ MoveWindow.prototype = {
   _recalcuteSizes: function(s) {
 
     let tbHeight = s.primary ? Main.panel.actor.height : 0;
+    if (tbHeight == 1) {
+      tbHeight = 0;
+    }
     s.y = s.geomY + tbHeight;
-    s.height = s.totalHeight * this._getSideHeight() - tbHeight;
+    s.height = s.totalHeight * this._getSideHeight() - (tbHeight/2);
     s.width = s.totalWidth * this._getSideWidth();
 
     s.sy = (s.totalHeight - s.height) + s.geomY;
@@ -265,10 +268,13 @@ MoveWindow.prototype = {
     // y == screen.sy move it to the bottom to fill the remaining space
     let padding = this._getPadding(win);
     if (y > 100) {
-      y += (2 * padding.height);
+      y -= padding.y;
+    } else if (padding.y!=0) {
+      y += padding.y/2;
     }
+   
     // snap, x, y
-    win.move(true, x, y - padding.y);
+    win.move(true, x, y + (padding.height + padding.y));
     // snap, width, height, force
     win.resize(true, width, height - padding.height); //- padding.width, height - padding.height);
   },
@@ -278,8 +284,8 @@ MoveWindow.prototype = {
     let outer = win.get_outer_rect(),
       inner = win.get_input_rect();
     return {
-      x: outer.x - inner.x,
-      y: (outer.y - inner.y),
+      x: outer.x - inner.x/2,
+      y: (outer.y - inner.y), 
       width: (inner.width - outer.width), // 2
       height: (inner.height - outer.height)
     };
@@ -324,7 +330,7 @@ MoveWindow.prototype = {
         totalHeight = geom.height;
 
       this._screens[i] =  {
-        y: geom.y, // (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
+        y: geom.y, 
         x : geom.x,
         geomX: geom.x,
         geomY: geom.y,
