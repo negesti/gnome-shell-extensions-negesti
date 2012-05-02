@@ -42,7 +42,7 @@ MoveWindow.prototype = {
 
   // private variables
   _bindings: [],
-  _padding: 4,
+  _padding: 2,
 
   _primary: 0,
   _screens: [],
@@ -62,7 +62,7 @@ MoveWindow.prototype = {
       tbHeight = 0;
     }
     s.y = s.geomY + tbHeight;
-    s.height = s.totalHeight * this._getSideHeight() - (tbHeight/2);
+    s.height = s.totalHeight * this._getSideHeight() - Math.floor(tbHeight/2);
     s.width = s.totalWidth * this._getSideWidth();
 
     s.sy = (s.totalHeight - s.height) + s.geomY;
@@ -90,13 +90,15 @@ MoveWindow.prototype = {
         sIndex = i;
         break;
       }
-      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > (pos.x + this._padding)) {
+      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x) {
         sIndex = i;
         break;
       }
     }
 
-    let s = this._recalcuteSizes(this._screens[sIndex]);
+    let s = this._screens[sIndex];
+    // check if we are on primary screen and if the main panel is visible
+    s = this._recalcuteSizes(s);
 
     let moveRightX = s.x;
     if (where.indexOf("e") > -1) {
@@ -112,7 +114,7 @@ MoveWindow.prototype = {
       this._resize(win, s.x, s.y, -1, s.height);
     } else if (where == "e") {
       // fixme. wont move left...
-      if (sIndex < (sl-1) && sameWidth && maxH && (pos.x + s.width + this._padding) >= s.totalWidth) {
+      if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
         s = this._recalcuteSizes(this._screens[(sIndex+1)]);
         this._resize(win, s.x, s.y, s.width, -1);
       } else {
@@ -230,6 +232,7 @@ MoveWindow.prototype = {
 
     // config may be for 2 screens but currenty only 1 is connected
     let s = (this._screens.length > pos.screen) ? this._screens[pos.screen] : this._screens[0];
+
     let x = (pos.x=="0.0") ? s.x : s.x + (s.totalWidth * pos.x/100);
     let y = (pos.y=="0.0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y/100));
 
@@ -248,7 +251,7 @@ MoveWindow.prototype = {
     return (Math.abs(p1-p2) <= 40);
   },
 
-  // actual resizing+
+  // actual resizing
   _resize: function(win, x, y, width, height) {
 
     if (height == -1) {
@@ -265,18 +268,16 @@ MoveWindow.prototype = {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
 
-    // y == screen.sy move it to the bottom to fill the remaining space
     let padding = this._getPadding(win);
-    if (y > 100) {
-      y -= padding.y;
-    } else if (padding.y!=0) {
-      y += padding.y/2;
-    }
-   
     // snap, x, y
-    win.move(true, x, y + (padding.height + padding.y));
+    if (win.decorated) {
+      win.move_frame(true, x, y);
+    } else {
+      win.move(true, x, y);
+    }
+
     // snap, width, height, force
-    win.resize(true, width, height - padding.height); //- padding.width, height - padding.height);
+    win.resize(true, width - this._padding, height - padding.height - padding.y);
   },
 
   // the difference between input and outer rect as object.
@@ -284,8 +285,8 @@ MoveWindow.prototype = {
     let outer = win.get_outer_rect(),
       inner = win.get_input_rect();
     return {
-      x: outer.x - inner.x/2,
-      y: (outer.y - inner.y), 
+      x: outer.x - inner.x,
+      y: (outer.y - inner.y),
       width: (inner.width - outer.width), // 2
       height: (inner.height - outer.height)
     };
@@ -330,7 +331,7 @@ MoveWindow.prototype = {
         totalHeight = geom.height;
 
       this._screens[i] =  {
-        y: geom.y, 
+        y: geom.y, // (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
         x : geom.x,
         geomX: geom.x,
         geomY: geom.y,
