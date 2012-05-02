@@ -58,15 +58,16 @@ MoveWindow.prototype = {
   _recalcuteSizes: function(s) {
 
     let tbHeight = s.primary ? Main.panel.actor.height : 0;
+    if (tbHeight == 1) {
+      tbHeight = 0;
+    }
     s.y = s.geomY + tbHeight;
-    s.height = s.totalHeight * this._getSideHeight() - tbHeight;
-
-    // -14 may produce a gap at the bottom, but otherwise the window
-    // may be outside of the screen
-    s.sy = (s.totalHeight - s.height) + s.geomY -17;
+    s.height = s.totalHeight * this._getSideHeight() - Math.floor(tbHeight/2);
     s.width = s.totalWidth * this._getSideWidth();
 
-    return s;
+    s.sy = (s.totalHeight - s.height) + s.geomY;
+
+    return s; 
   },
 
   /**
@@ -267,14 +268,28 @@ MoveWindow.prototype = {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
 
-    let outer = win.get_outer_rect(),
-          inner = win.get_input_rect();
-    y = y <= Main.panel.actor.height ? y : y - Math.abs(outer.y - inner.y);
-
+    let padding = this._getPadding(win);
     // snap, x, y
-    win.move_frame(true, x, y);
+    if (win.decorated) {
+      win.move_frame(true, x, y);
+    } else {
+      win.move(true, x, y);
+    }
+
     // snap, width, height, force
-    win.resize(true, width - this._padding, height - this._padding);
+    win.resize(true, width - this._padding, height - padding.height - padding.y);
+  },
+
+  // the difference between input and outer rect as object.
+  _getPadding: function(win) {
+    let outer = win.get_outer_rect(),
+      inner = win.get_input_rect();
+    return {
+      x: outer.x - inner.x,
+      y: (outer.y - inner.y),
+      width: (inner.width - outer.width), // 2
+      height: (inner.height - outer.height)
+    };
   },
 
   _checkSize: function(p) {
