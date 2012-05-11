@@ -1,6 +1,7 @@
 
 const Lang = imports.lang;
 const Gio = imports.gi.Gio;
+const Gtk = imports.gi.Gtk;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 
 function Utils() {
@@ -55,7 +56,7 @@ Utils.prototype = {
       file.replace_contents(JSON.stringify(this._settings, null, 2), null, false, 0, null);
       this.showMessage("Success!", "Changes successfully saved");
     } catch (e) {
-      this.showErrorMessage("Error saving settings ", e.Message);
+      this.showErrorMessage("Error saving settings ", e);
     }
   },
 
@@ -155,7 +156,7 @@ Utils.prototype = {
 
   showErrorMessage: function(title, message) {
     global.log("ERROR: " + title + " " + message);
-    /*var md = new Gtk.MessageDialog({
+    var md = new Gtk.MessageDialog({
       modal:true,
       message_type:Gtk.MessageType.ERROR,
       buttons:Gtk.ButtonsType.OK,
@@ -164,6 +165,6 @@ Utils.prototype = {
     });
 
     md.run();
-    md.destroy();*/
+    md.destroy();
   }
 };

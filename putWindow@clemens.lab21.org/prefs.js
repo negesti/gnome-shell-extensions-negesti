@@ -4,6 +4,7 @@ const GObject = imports.gi.GObject;
 const Gio = imports.gi.Gio;
 
 const Gdk = imports.gi.Gdk;
+const Wnck = imports.gi.Wnck;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -32,6 +33,7 @@ const PutWindowSettingsWidget = new GObject.Class({
   _init : function(params) {
     this.parent(params);
     this.orientation = Gtk.Orientation.VERTICAL;
+    this._wnckScreen = Wnck.Screen.get_default();
 
     // width and height when window is centered
     let mainConfig = new Gtk.Grid();
@@ -60,7 +62,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.pack_start(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL}), false, false, 1);
 
     // Application based settings
-    this.pack_start(new PutWindowLocationWidget(), true, true, 2);
+    this.pack_start(new PutWindowLocationWidget(this._wnckScreen), true, true, 2);
 
     let buttonPanel = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, margin: 4});
 
@@ -83,8 +85,9 @@ const PutWindowLocationWidget = new GObject.Class({
   Name: 'PutWindow.Prefs.PutWindowLocationWidget',
   GTypeName: 'PutWindowLocationWidget',
   Extends: Gtk.Box,
-  _init: function(params) {
-    this.parent(params);
+  _init: function(wnckScreen) {
+    this.parent();
+    this._wnckScreen = wnckScreen
     this.width = 4;
     this.margin = 4;
     this.orientation= Gtk.Orientation.HORIZONTAL;
@@ -121,6 +124,10 @@ const PutWindowLocationWidget = new GObject.Class({
     this.treeView.get_selection().connect("changed",
       Lang.bind(this, function(selection) {
         let s = selection.get_selected();
+        // no new selection
+        if (!s[0]) {
+          return;
+        }
         let selectedValue = s[1].get_value(s[2], 0);
         if (this._selectedApp != null && this._selectedApp == selectedValue) {
           return;
@@ -160,10 +167,16 @@ const PutWindowLocationWidget = new GObject.Class({
                 if (this._apps[i].name != this._selectedApp) {
                   continue;
                 }
-                // remove the widget, unset the parameter and remove the entry from _apps array
+                // remove the widget
+                if (this._appContainer.get_child()) {
+                  this._appContainer.get_child().destroy();
+                }
+                // remove the list entry
                 this.treeModel.remove(this._apps[i].listElement);
+                // unset the parameter
                 Utils.unsetParameter("locations." + this._apps[i].name);
-                this._apps.pop(apps[i]);
+                // remove the entry from _apps array
+                this._apps.pop(this._apps[i]);
                 break;
               }
             }
@@ -240,27 +253,24 @@ const PutWindowLocationWidget = new GObject.Class({
   },
 
   _getRunningApps: function(exclude) {
-    let ret = [];
-    ret.push( [ret.length, "test0"] );
-    ret.push( [ret.length, "test1"] );
-    ret.push( [ret.length, "test2"] );
-    ret.push( [ret.length, "test3"] );
-    return ret;
-    /*
-    if (!this._appSystem) {
-      this._appSystem = Shell.AppSystem.get_default();
+
+    let windows = this._wnckScreen.get_windows();
+
+    let winSize = windows.length;
+    let apps = [];
+    for (let i=0; i < winSize; i++) {
+      apps.push( windows[i].get_class_group_name() );
     }
 
-    let exludeLength = exclude.length;
-    let apps = this._appSystem.get_running();
-    let ret = [];
+    let ret = [],
+      exludeLength = exclude.length;
 
     for (let i=0; i < apps.length; i++) {
-      let wm =  apps[i].get_windows()[0].get_wm_class(),
+      let wm =  apps[i],
         found = false;
       // dont add excluded entries to the returned value
       for (let j=0; j < exludeLength; j++) {
-        if (exclude[j] == wm) {
+        if (exclude[j].name == wm || wm == "Update-notifier") {
           found = true;
           break;
         }
@@ -271,47 +281,6 @@ const PutWindowLocationWidget = new GObject.Class({
       }
     }
     return ret;
-    */
-  },
-
-  _addApplication: function() {
-    let dialog = new Gtk.Dialog({
-      title: _("Create new matching rule"),
-      transient_for: this.get_toplevel(),
-      modal: true
-    });
-
-    dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
-    dialog.add_button(_("Add"), Gtk.ResponseType.OK);
-    dialog.set_default_response(Gtk.ResponseType.OK);
-
-    dialog._appChooser = new Gtk.AppChooserWidget({ show_all: true });
-    dialog.get_content_area().pack_start(dialog._appChooser, true, true, 0);
-
-    dialog.connect('response',
-      Lang.bind(this, function(dialog, id) {
-        if (id != Gtk.ResponseType.OK) {
-          dialog.destroy();
-          return;
-        }
-
-
-        let appInfo = dialog._appChooser.get_app_info();
-        if (!appInfo) {
-          return;
-        }
-
-        let selection = appInfo.get_id();
-        let configPath = "locations." + selection;
-        Utils.setParameter(configPath, Utils.START_CONFIG);
-
-        this._addToTreeView(selection, true);
-
-        this._updateAppContainerContent(selection, this.createAppWidgets(selection));
-        dialog.destroy();
-      })
-    );
-    dialog.show_all();
   },
 
   createAppWidgets: function(appName) {
@@ -361,6 +330,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
     if (select && select == true) {
       this.treeView.get_selection().select_iter(iter);
+      this._selectedApp = value;
     }
   },
 
@@ -381,7 +351,6 @@ const PutWindowLocationWidget = new GObject.Class({
     let screenSelectRenderer = new Gtk.CellRendererText();
     screenSelector.pack_start(screenSelectRenderer, true);
     screenSelector.add_attribute(screenSelectRenderer, 'text', 0);
-
 
     let numScreens =  Gdk.Screen.get_default().get_n_monitors();
     for (let j = 0; j < numScreens; j++ ) {
