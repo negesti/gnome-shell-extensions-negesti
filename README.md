@@ -9,6 +9,12 @@ replaced.
 ChangeLog
 -------
 
+__May 12, 2012__
+
+ * Added GTK Settings window 
+  * Open from [extensions.gnome.org](https://extensions.gnome.org/local/)
+  * Open from command line `gnome-shell-extension-prefs putWindow@clemens.lab21.org`
+
 __April 26, 2012__
 
  * Extension is now **3.4** compatible (Tested with 3.4.1)

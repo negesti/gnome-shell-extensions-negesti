@@ -102,7 +102,7 @@ const PutWindowLocationWidget = new GObject.Class({
     this.treeView = new Gtk.TreeView({model: this.treeModel, headers_visible: false});
 
     this.treeView.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
-    let column = new Gtk.TreeViewColumn();
+    let column = new Gtk.TreeViewColumn({ min_width: 150 });
     let renderer = new Gtk.CellRendererText();
     column.pack_start(renderer, true);
     column.add_attribute(renderer, 'text', 0);
@@ -261,6 +261,7 @@ const PutWindowLocationWidget = new GObject.Class({
     for (let i=0; i < winSize; i++) {
       apps.push( windows[i].get_class_group_name() );
     }
+    apps.push("All");
 
     let ret = [],
       exludeLength = exclude.length;
@@ -280,6 +281,12 @@ const PutWindowLocationWidget = new GObject.Class({
         ret.push( [ret.length, wm]);
       }
     }
+
+    ret.sort(function(a, b){
+        return  a[1] < b[1] ? -1
+            : a[1]==b[1] ? 0 : 1;
+    });
+
     return ret;
   },
 
