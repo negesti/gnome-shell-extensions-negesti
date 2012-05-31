@@ -9,6 +9,9 @@ replaced.
 ChangeLog
 -------
 
+__May 31, 2012__
+ * dont maximize chrome, resize it to max-size (e.g. dont change into fullscreen mode)
+
 __May 12, 2012__
 
  * Added GTK Settings window 

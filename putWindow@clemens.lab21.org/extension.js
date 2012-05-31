@@ -111,26 +111,26 @@ MoveWindow.prototype = {
     let maxH = (pos.height >= s.totalHeight) || this._samePoint(pos.height, s.totalHeight);
 
     if (where=="n") {
-      this._resize(win, s.x, s.y, -1, s.height);
+      this._resize(win, s.x, s.y, s.totalWidth * -1, s.height);
     } else if (where == "e") {
       // fixme. wont move left...
       if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
         s = this._recalcuteSizes(this._screens[(sIndex+1)]);
-        this._resize(win, s.x, s.y, s.width, -1);
+        this._resize(win, s.x, s.y, s.width, s.totalHeight * -1);
       } else {
-        this._resize(win, moveRightX, s.y, s.width, -1); //(s.x + s.width)
+        this._resize(win, moveRightX, s.y, s.width, s.totalHeight * -1); //(s.x + s.width)
       }
     } else if (where == "s") {
-      this._resize(win, s.x, s.sy, -1, s.height);
+      this._resize(win, s.x, s.sy, s.totalWidth * -1, s.height);
     } else if (where == "w") {
       // if we are not on screen[i>0] move window to the left screen
       let newX = pos.x - s.width;
       if (sIndex > 0 && sameWidth && maxH && newX < (s.width + 150)) {
         s = this._screens[(sIndex-1)];
         moveRightX = s.geomX + s.totalWidth - s.width;
-        this._resize(win, moveRightX, s.y, s.width, -1); // (s.x + s.width)
+        this._resize(win, moveRightX, s.y, s.width, s.totalHeight * -1);
       } else {
-        this._resize(win, s.x, s.y, s.width, -1);
+        this._resize(win, s.x, s.y, s.width, s.totalHeight * -1);
       }
     }
 
@@ -157,7 +157,7 @@ MoveWindow.prototype = {
       // windows that have a min_width < our width it will not work (evolution for example)
       if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameHeight) {
         // the window is alread centered -> maximize
-        this._resize(win, s.x, s.y, -1, -1);
+        this._resize(win, s.x, s.y, s.totalWidth * -1, s.totalHeight * -1);
       } else {
         // the window is not centered -> resize
         this._resize(win, x, y, w, h);
@@ -257,14 +257,24 @@ MoveWindow.prototype = {
   // actual resizing
   _resize: function(win, x, y, width, height) {
 
-    if (height == -1) {
+    if (!win.decorated) {
+      if (height < 0) {
+        height = height * -1;
+      }
+      if (width < 0) {
+        width = width * -1;
+      }
+    }
+    global.log(height + "  " + win.decorated);
+
+    if (height < 0) {
       win.maximize(Meta.MaximizeFlags.VERTICAL);
       height = 400; // dont resize to width, -1
     } else {
       win.unmaximize(Meta.MaximizeFlags.VERTICAL);
     }
 
-    if (width == -1) {
+    if (width < 0) {
       win.maximize(Meta.MaximizeFlags.HORIZONTAL);
       width = 400;  // dont resize to height, -1
     } else {
@@ -329,8 +339,7 @@ MoveWindow.prototype = {
 
     // only tested with 2 screen setup
     for (let i=0; i<numMonitors; i++) {
-      let geom = global.screen.get_monitor_geometry(i),
-        totalHeight = geom.height;
+      let geom = global.screen.get_monitor_geometry(i);
 
       this._screens[i] =  {
         y: geom.y, // (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
@@ -338,7 +347,7 @@ MoveWindow.prototype = {
         geomX: geom.x,
         geomY: geom.y,
         totalWidth: geom.width,
-        totalHeight: totalHeight,
+        totalHeight: geom.height,
         width: geom.width * this._getSideWidth()
       };
 
