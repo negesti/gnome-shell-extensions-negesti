@@ -154,16 +154,6 @@ Utils.prototype = {
   },
 
   showErrorMessage: function(title, message) {
-    global.log("ERROR: " + title + " " + message);
-    var md = new Gtk.MessageDialog({
-      modal:true,
-      message_type:Gtk.MessageType.ERROR,
-      buttons:Gtk.ButtonsType.OK,
-      title: title,
-      text: " " + message
-    });
-
-    md.run();
-    md.destroy();
+    global.log("ERROR: " + title + " " + message);   
   }
 };
