@@ -1,5 +1,5 @@
 {
-  "shell-version": ["3.4", "3.2"],
+  "shell-version": ["3.4", "3.2", "3.5.2"],
   "uuid": "putWindow@clemens.lab21.org",
   "name": "Put Windows",
   "description": "Move and resize windows similar to compiz put plugin",
