@@ -34,10 +34,10 @@ MoveWindow.prototype = {
   _utils: {},
 
   //list of config parameters
-  CENTER_WIDTH: "centerWidth",
-  CENTER_HEIGHT: "centerHeight",
-  SIDE_WIDTH: "sideWidth",
-  SIDE_HEIGHT: "sideHeight",
+  CENTER_WIDTH: "center-width",
+  CENTER_HEIGHT: "center-height",
+  SIDE_WIDTH: "side-width",
+  SIDE_HEIGHT: "side-height",
   PANEL_BUTTON_POSITION: "panelButtonPosition",
 
   // private variables
@@ -50,9 +50,14 @@ MoveWindow.prototype = {
   /**
    * Helper functions to set custom handler for keybindings
    */
-  _addKeyBinding: function(keybinding, handler) {
-    this._bindings.push(keybinding);
-    Meta.keybindings_set_custom_handler(keybinding, handler);
+  _addKeyBinding: function(key, handler) {
+    this._bindings.push(key);
+    global.display.add_keybinding(
+      key,
+      this._utils.getSettingsObject(),
+      Meta.KeyBindingFlags.NONE,
+      handler
+    );
   },
 
   _recalcuteSizes: function(s) {
@@ -170,7 +175,7 @@ MoveWindow.prototype = {
       return;
     }
 
-    let app = win.get_wm_class();
+    let app = this._windowTracker.get_window_app(win);
 
     if (!app) {
       if (!noRecurse) {
@@ -182,10 +187,11 @@ MoveWindow.prototype = {
       }
       return;
     }
-
+    app = win.get_wm_class();
     // move the window if a location is configured and autoMove is set to true
     let appPath = "locations." + app;
-    if (this._utils.getParameter(appPath)) {
+
+    if (this._utils.getParameter(appPath, false)) {
       if (this._utils.getBoolean(appPath + ".autoMove", false)) {
         this._moveToConfiguredLocation(win, app);
       }
@@ -265,7 +271,6 @@ MoveWindow.prototype = {
         width = width * -1;
       }
     }
-    global.log(height + "  " + win.decorated);
 
     if (height < 0) {
       win.maximize(Meta.MaximizeFlags.VERTICAL);
@@ -360,39 +365,39 @@ MoveWindow.prototype = {
     });
 
     // move to n, e, s an w
-    this._addKeyBinding("move-to-side-n",
+    this._addKeyBinding("put-to-side-n",
       Lang.bind(this, function(){ this._moveFocused("n");})
     );
-    this._addKeyBinding("move-to-side-e",
+    this._addKeyBinding("put-to-side-e",
       Lang.bind(this, function(){ this._moveFocused("e");})
     );
-    this._addKeyBinding("move-to-side-s",
+    this._addKeyBinding("put-to-side-s",
       Lang.bind(this, function(){ this._moveFocused("s");})
     );
-    this._addKeyBinding("move-to-side-w",
+    this._addKeyBinding("put-to-side-w",
       Lang.bind(this, function(){ this._moveFocused("w");})
     );
 
     // move to  nw, se, sw, nw
-    this._addKeyBinding("move-to-corner-ne",
+    this._addKeyBinding("put-to-corner-ne",
       Lang.bind(this, function(){ this._moveFocused("ne");})
     );
-    this._addKeyBinding("move-to-corner-se",
+    this._addKeyBinding("put-to-corner-se",
       Lang.bind(this, function(){ this._moveFocused("se");})
     );
-    this._addKeyBinding("move-to-corner-sw",
+    this._addKeyBinding("put-to-corner-sw",
       Lang.bind(this, function(){ this._moveFocused("sw");})
     );
-    this._addKeyBinding("move-to-corner-nw",
+    this._addKeyBinding("put-to-corner-nw",
       Lang.bind(this, function(){ this._moveFocused("nw");})
     );
 
     // move to center. fix 2 screen setup and resize to 50% 50%
-    this._addKeyBinding("move-to-center",
+    this._addKeyBinding("put-to-center",
       Lang.bind(this, function(){ this._moveFocused("c");})
     );
 
-    this._addKeyBinding("move-to-workspace-1",
+    this._addKeyBinding("put-to-location",
       Lang.bind(this, function(){ this._moveToConfiguredLocation();})
     );
   },
@@ -409,9 +414,9 @@ MoveWindow.prototype = {
 
     let size = this._bindings.length;
     // TODO: remove handlers added by keybindings_set_custom_handler
-    //for(let i = 0; i<size; i++) {
-    //    this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
-    //}
+    for(let i = 0; i<size; i++) {
+      global.display.remove_keybinding(this._bindings[i]);
+    }
   }
 }
 

@@ -17,7 +17,7 @@ const _ = Gettext.gettext;
 let createSlider = function(configName) {
   let ret = new Gtk.Scale({digits: 0, sensitive: true, orientation: Gtk.Orientation.HORIZONTAL, margin_right: 6, margin_left: 6});
   ret.set_range(0, 100);
-  ret.set_value(Utils.getNumber(configName));
+  ret.set_value(Utils.getNumber(configName, 50));
   ret.set_value_pos(Gtk.PositionType.RIGHT);
   ret.connect("value-changed", function(obj, userData) {
     Utils.setParameter(configName, obj.get_value());
@@ -28,17 +28,19 @@ let createSlider = function(configName) {
 const PutWindowSettingsWidget = new GObject.Class({
   Name: 'PutWindow.Prefs.PutWindowSettingsWidget',
   GTypeName: 'PutWindowSettingsWidget',
-  Extends: Gtk.Box,
+  Extends: Gtk.Grid,
 
   _init : function(params) {
     this.parent(params);
     this.orientation = Gtk.Orientation.VERTICAL;
+    this.expand = true;
     this._wnckScreen = Wnck.Screen.get_default();
 
     // width and height when window is centered
+    let expander = new Gtk.Expander();
+    expander.set_label("Main settings");
     let mainConfig = new Gtk.Grid();
     mainConfig.width = 4;
-    mainConfig.margin = 4;
     mainConfig.column_homogeneous = true;
 
     mainConfig.attach(new Gtk.Label({label: "Center width:", halign: Gtk.Align.START, margin_left:2 }), 0, 0, 1, 1);
@@ -57,27 +59,113 @@ const PutWindowSettingsWidget = new GObject.Class({
     mainConfig.attach(new Gtk.Label({label: "Side height:", halign:Gtk.Align.START, margin_left:2 }), 0, 3, 1, 1);
     let scaleCoH = createSlider(Utils.SIDE_HEIGHT);
     mainConfig.attach(scaleCoH, 1, 3, 3, 1);
+    expander.add(mainConfig);
+    this.attach(expander, 0, 0, 1, 9);
 
-    this.pack_start(mainConfig, false, false, 0);
-    this.pack_start(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL}), false, false, 1);
+    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 10, 1, 1);
 
-    // Application based settings
-    this.pack_start(new PutWindowLocationWidget(this._wnckScreen), true, true, 2);
+    let keyExpander = new Gtk.Expander();
+    keyExpander.set_label("Keyboard Shortcuts");
+    keyExpander.add(this._createKeyboardConfig());
+    keyExpander.set_expanded(true);
+    this.attach(keyExpander, 0, 11, 1, 9);
 
-    let buttonPanel = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, margin: 4});
+    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 20, 1, 1);
+    this.attach(new PutWindowLocationWidget(this._wnckScreen), 0, 21, 1, 100);
 
-    let img = new Gtk.Image({stock: Gtk.STOCK_SAVE})
+    let buttonPanel = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL});
+    let img = new Gtk.Image({stock: Gtk.STOCK_SAVE});
 
     let saveButton = new Gtk.Button({label: Gtk.STOCK_SAVE});
     saveButton.set_use_stock(true);
-
     saveButton.connect("button-press-event", function() {
-      Utils.saveFile();
+      Utils.saveSettings();
     });
 
     buttonPanel.pack_end(saveButton, false, false, 2);
+    this.attach(buttonPanel, 0, 121, 1, 1);
+  },
 
-    this.pack_start(buttonPanel, false, false, 0);
+  _append_hotkey: function(model, name, binding) {
+
+  },
+
+
+  _createKeyboardConfig: function() {
+    let model = new Gtk.ListStore();
+
+    model.set_column_types([
+      GObject.TYPE_STRING,
+      GObject.TYPE_STRING,
+      GObject.TYPE_INT,
+      GObject.TYPE_INT
+    ]);
+
+    let bindings = {
+        "put-to-corner-ne": "Move to top right corner",
+        "put-to-corner-nw": "Move to top left corner",
+        "put-to-corner-se": "Move to bottom right corner",
+        "put-to-corner-sw": "Move to bottom left corner",
+        "put-to-side-n": "Move to top",
+        "put-to-side-e": "Move right",
+        "put-to-side-s": "Move to bottom",
+        "put-to-side-w": "Move to left",
+        "put-to-location": "Move to center/Maximize"
+    };
+
+    for (name in bindings) {
+      let [key, mods] = Gtk.accelerator_parse(Utils.get_strv(name, null)[0]);
+      let row = model.insert(10);
+      model.set(row, [0, 1, 2, 3], [name, bindings[name], mods, key ]);
+
+    }
+
+    let treeview = new Gtk.TreeView({
+      'expand': true,
+      'model': model
+    });
+
+
+    let cellrend = new Gtk.CellRendererText();
+    let col = new Gtk.TreeViewColumn({
+      'title': 'Keybinding',
+      'expand': true
+    });
+
+    col.pack_start(cellrend, true);
+    col.add_attribute(cellrend, 'text', 1);
+
+    treeview.append_column(col);
+
+    cellrend = new Gtk.CellRendererAccel({
+      'editable': true,
+      'accel-mode': Gtk.CellRendererAccelMode.GTK
+    });
+
+    cellrend.connect('accel-edited', function(rend, iter, key, mods) {
+      let value = Gtk.accelerator_name(key, mods);
+      let [succ, iterator ] = model.get_iter_from_string(iter);
+
+      if(!succ) {
+        throw new Error("Error updating Keybinding");
+      }
+
+      let name = model.get_value(iterator, 0);
+
+      model.set(iterator, [ 2, 3 ], [ mods, key ]);
+      global.log(value);
+      Utils.set_strv(name, [value]);
+    });
+
+    col = new Gtk.TreeViewColumn({'title': 'Accel'});
+
+    col.pack_end(cellrend, false);
+    col.add_attribute(cellrend, 'accel-mods', 2);
+    col.add_attribute(cellrend, 'accel-key', 3);
+
+    treeview.append_column(col);
+
+    return treeview;
   }
 });
 
@@ -249,7 +337,11 @@ const PutWindowLocationWidget = new GObject.Class({
 
     this._appContainer = new Gtk.Frame({ hexpand: true});
     this._appContainer.add(new Gtk.Label({label: _("Select an application to configure using the list on the left side.") }));
-    this.add(this._appContainer);
+    let scroll = new Gtk.ScrolledWindow({
+      'vexpand': true
+    });
+    scroll.add_with_viewport(this._appContainer);
+    this.add(scroll);
   },
 
   _getRunningApps: function(exclude) {
@@ -299,7 +391,7 @@ const PutWindowLocationWidget = new GObject.Class({
     let autoMoveBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL});
     autoMoveBox.pack_start(new Gtk.Label({label: "Auto-Move window when created", xalign: 0}), true, true, 0);
 
-    let btn = new Gtk.Switch({ active: Utils.getBoolean(configLocation + "autoMove")});
+    let btn = new Gtk.Switch({ active: Utils.getBoolean(configLocation + "autoMove", false) });
     btn.connect("notify::active", function(sw) {
       Utils.setParameter(configLocation + "autoMove", sw.get_active());
     })

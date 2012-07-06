@@ -3,7 +3,8 @@
   "uuid": "putWindow@clemens.lab21.org",
   "name": "Put Windows",
   "description": "Move and resize windows similar to compiz put plugin",
-  "url": "https://github.com/negesti/gnome-shell-extensions-negesti"
+  "url": "https://github.com/negesti/gnome-shell-extensions-negesti",
+  "settings-schema": "org.gnome.shell.extensions.org-lab21-putwindow"
 }
 
 
