@@ -38,7 +38,6 @@ Utils.prototype = {
   },
 
   loadSettings: function() {
-    global.log("loadSettings");
     let schema = Me.metadata['settings-schema'];
 
     const GioSSS = Gio.SettingsSchemaSource;
@@ -184,5 +183,6 @@ Utils.prototype = {
 
   showErrorMessage: function(title, message) {
     global.log("ERROR: " + title + " " + message);
+    //throw new Error(title + ' ' message);
   }
 };

@@ -67,7 +67,6 @@ const PutWindowSettingsWidget = new GObject.Class({
     let keyExpander = new Gtk.Expander();
     keyExpander.set_label("Keyboard Shortcuts");
     keyExpander.add(this._createKeyboardConfig());
-    keyExpander.set_expanded(true);
     this.attach(keyExpander, 0, 11, 1, 9);
 
     this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 20, 1, 1);
@@ -153,7 +152,6 @@ const PutWindowSettingsWidget = new GObject.Class({
       let name = model.get_value(iterator, 0);
 
       model.set(iterator, [ 2, 3 ], [ mods, key ]);
-      global.log(value);
       Utils.set_strv(name, [value]);
     });
 
