@@ -11,7 +11,6 @@ function Utils() {
 Utils.prototype = {
 
   _filename: "",
-  _settingsObject: { },
   _settings: "",
 
   CENTER_WIDTH: "centerWidth",
@@ -30,49 +29,31 @@ Utils.prototype = {
   },
 
   _init: function() {
-    this.loadSettings();
+    this.readFile();
   },
 
-  getSettingsObject: function() {
-    return this._settingsObject;
-  },
-
-  loadSettings: function() {
-    let schema = Me.metadata['settings-schema'];
-
-    const GioSSS = Gio.SettingsSchemaSource;
-
-    let schemaDir = Me.dir.get_child('schemas');
-    let schemaSource;
-    if (schemaDir.query_exists(null)) {
-      schemaSource = GioSSS.new_from_directory(schemaDir.get_path(), GioSSS.get_default(), false);
-    } else {
-      schemaSource = GioSSS.get_default();
-    }
-
-    let schema = schemaSource.lookup(schema, true);
-    if (!schema) {
-        throw new Error('Schema ' + schema + ' could not be found for extension '
-                        + Me.metadata.uuid + '. Please check your installation.');
-    }
-
-    this._settingsObject = new Gio.Settings({ settings_schema: schema });
-    this._settings = {
-      centerWidth: this._settingsObject.get_int("center-width"),
-      centerHeight: this._settingsObject.get_int("center-height"),
-      sideWidth: this._settingsObject.get_int("side-width"),
-      sideHeight: this._settingsObject.get_int("side-height"),
-      locations: JSON.parse(this._settingsObject.get_string("locations"))
-    };
-  },
-
-  saveSettings: function() {
+  readFile: function() {
     try {
-      this._settingsObject.set_int("center-width", this.getParameter(this.CENTER_WIDTH));
-      this._settingsObject.set_int("center-height", this.getParameter(this.CENTER_HEIGHT));
-      this._settingsObject.set_int("side-width", this.getParameter(this.SIDE_WIDTH));
-      this._settingsObject.set_int("side-height", this.getParameter(this.SIDE_HEIGHT));
-      this._settingsObject.set_string("locations", JSON.stringify(this._settings.locations));
+      let file = Me.dir.get_child("putWindow.json");
+
+      if(file.query_exists(null)) {
+        [flag, data] = file.load_contents(null);
+        if(flag) {
+          this._settings = JSON.parse(data);
+        } else {
+          this.showErrorMessage("Error loading settings!", "Can not read file");
+        }
+      }
+    } catch (e) {
+      this.showErrorMessage("Error loading settings!", e.Message);
+      this._settings = {};
+    }
+  },
+
+  saveFile: function() {
+    try {
+      let file = Me.dir.get_child("putWindow.json");
+      file.replace_contents(JSON.stringify(this._settings, null, 2), null, false, 0, null);
       this.showMessage("Success!", "Changes successfully saved");
     } catch (e) {
       this.showErrorMessage("Error saving settings ", e);
@@ -86,14 +67,6 @@ Utils.prototype = {
 
   getNumber: function(name, defaultValue) {
     return this._toNumber(this.getParameter(name, defaultValue), defaultValue);
-  },
-
-  get_strv: function(name) {
-    return this._settingsObject.get_strv(name);
-  },
-
-  set_strv: function(name, value) {
-    this._settingsObject.set_strv(name, value);
   },
 
   getParameter: function(name, defaultValue) {
@@ -183,6 +156,15 @@ Utils.prototype = {
 
   showErrorMessage: function(title, message) {
     global.log("ERROR: " + title + " " + message);
-    //throw new Error(title + ' ' message);
+    var md = new Gtk.MessageDialog({
+      modal:true,
+      message_type:Gtk.MessageType.ERROR,
+      buttons:Gtk.ButtonsType.OK,
+      title: title,
+      text: " " + message
+    });
+
+    md.run();
+    md.destroy();
   }
 };
