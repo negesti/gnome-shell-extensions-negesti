@@ -44,6 +44,15 @@ __December 11, 2011__
  * reduced the horizontal and vertical "gap" between windows
  * hitting move_to_center twice will now correctly maximize evolution
 
+Configuration
+-------------
+
+The extension can be configured using the gnome prefs tool. 
+ * Keybindings are updated when you edit them in the settings window.
+ * All other changes are not saved until you hit enter
+ * Currently the settings are not reloade. e.g. reload the shell or deactive/active the extension to use the updated config
+
+
 Keybindings
 -----------
 
@@ -54,22 +63,22 @@ modify the keybindings use the "prefs tool".
 
 The following keys are available:
 
-* move-to-side-n
+* put-to-side-n
   *  move to north edge, height: 50% width 100%
-* move-to-side-e
+* put-to-side-e
   *  move to easth edge, height: 100% width 50%
-* move-to-side-s
+* put-to-side-s
   *  move to south edge, height: 50% width 100%
-* move-to-side-w
+* put-to-side-w
   *  move to west  edge, height: 100% width 50%
-* move-to-corner-XY   width 50% height 50%
+* put-to-corner-XY   width 50% height 50%
   *  move-to-corner-ne
   *  move-to-corner-se
   *  move-to-corner-sw
   *  move-to-corner-nw
-* move-to-center
+* put-to-center
   *  move to center of the screen, widht 50% height 50%. Press twice to maximize the window
-* move-to-workspace-1
+* put-to-location
   *  resize to a configured location (see wiki for details)
 
 2 screen setup support
