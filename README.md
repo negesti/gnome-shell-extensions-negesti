@@ -9,6 +9,11 @@ replaced.
 ChangeLog
 -------
 
+__July 08, 2012__
+ * KNOWN ISSUES: config is not reloaded after modifying with the prefs tool (manual reload required)
+ * moved config to gsettings
+ * custom keybindings using gsettings
+
 __May 31, 2012__
  * dont maximize chrome, resize it to max-size (e.g. dont change into fullscreen mode)
 
@@ -44,11 +49,10 @@ Keybindings
 
 Details how to configure can be found in the [wiki](https://github.com/negesti/gnome-shell-extensions-negesti/wiki)
 
-Keybindings are configured using gsettings. Currently a predefined schema is used
+Keybindings are configured using gsettings stored in a custom schema file inside the extension directory. To
+modify the keybindings use the "prefs tool".
 
-                org.gnome.desktop.wm.keybindings
-
-The following keys are used:
+The following keys are available:
 
 * move-to-side-n
   *  move to north edge, height: 50% width 100%
@@ -68,16 +72,6 @@ The following keys are used:
 * move-to-workspace-1
   *  resize to a configured location (see wiki for details)
 
-To modify this keybinding you can use dconf-editor or gsettings  
-
-                apt-get install dconf-tools (for debian/ubuntu)  
-                gsettings set org.gnome.desktop.wm.keybindings KeyName value
-
-* **KeyName**... as described above (move-to-side-n,...)  
-* **Value**..... for example "['<Alt>KP_8']" (with all both quotes) 
-
-
-
 2 screen setup support
 -------
 
@@ -95,7 +89,6 @@ TODO
 ----
 
 * 2 screens support vor vertical alignment
-* a lot of things i currently dont remember :)
 
 
 Check https://github.com/negesti/gnome-shell-extensions-negesti/tree/master/putWindow@clemens.lab21.org
