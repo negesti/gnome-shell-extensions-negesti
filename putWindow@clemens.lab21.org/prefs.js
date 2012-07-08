@@ -85,11 +85,6 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.attach(buttonPanel, 0, 121, 1, 1);
   },
 
-  _append_hotkey: function(model, name, binding) {
-
-  },
-
-
   _createKeyboardConfig: function() {
     let model = new Gtk.ListStore();
 
@@ -109,7 +104,8 @@ const PutWindowSettingsWidget = new GObject.Class({
         "put-to-side-e": "Move right",
         "put-to-side-s": "Move to bottom",
         "put-to-side-w": "Move to left",
-        "put-to-location": "Move to center/Maximize"
+        "put-to-center": "Move to center/maximize",
+        "put-to-location": "Move to configured location"
     };
 
     for (name in bindings) {
@@ -125,17 +121,14 @@ const PutWindowSettingsWidget = new GObject.Class({
     });
 
 
+    // Action column
     let cellrend = new Gtk.CellRendererText();
-    let col = new Gtk.TreeViewColumn({
-      'title': 'Keybinding',
-      'expand': true
-    });
-
+    let col = new Gtk.TreeViewColumn({ 'title': 'Action', 'expand': true });
     col.pack_start(cellrend, true);
     col.add_attribute(cellrend, 'text', 1);
-
     treeview.append_column(col);
 
+    // keybinding column
     cellrend = new Gtk.CellRendererAccel({
       'editable': true,
       'accel-mode': Gtk.CellRendererAccelMode.GTK
@@ -151,11 +144,11 @@ const PutWindowSettingsWidget = new GObject.Class({
 
       let name = model.get_value(iterator, 0);
 
-      model.set(iterator, [ 2, 3 ], [ mods, key ]);
+      model.set(iterator, [ 2, 3], [ mods, key ]);
       Utils.set_strv(name, [value]);
     });
 
-    col = new Gtk.TreeViewColumn({'title': 'Accel'});
+    col = new Gtk.TreeViewColumn({'title': 'Modify'});
 
     col.pack_end(cellrend, false);
     col.add_attribute(cellrend, 'accel-mods', 2);
