@@ -2,8 +2,9 @@ Put Window
 ==========
 
 
-If you enable this extension the metacity move window keybindings are
-replaced.
+An gnome-shell extension that makes window movement a lot 
+easier. It can be compared with a basic version of the compiz 
+grid plugin.
 
 
 ChangeLog
@@ -50,16 +51,14 @@ Configuration
 The extension can be configured using the gnome prefs tool. 
  * Keybindings are updated when you edit them in the settings window.
  * All other changes are not saved until you hit enter
- * Currently the settings are not reloade. e.g. reload the shell or deactive/active the extension to use the updated config
+ * Currently the settings are not reloaded. e.g. reload the shell or deactive/active the extension to use the updated config
 
 
 Keybindings
 -----------
 
-Details how to configure can be found in the [wiki](https://github.com/negesti/gnome-shell-extensions-negesti/wiki)
-
 Keybindings are configured using gsettings stored in a custom schema file inside the extension directory. To
-modify the keybindings use the "prefs tool".
+modify the keybindings use the "gnome prefs tool".
 
 The following keys are available:
 
@@ -98,7 +97,5 @@ TODO
 ----
 
 * 2 screens support vor vertical alignment
+* reload config 
 
-
-Check https://github.com/negesti/gnome-shell-extensions-negesti/tree/master/putWindow@clemens.lab21.org
-for more details.
