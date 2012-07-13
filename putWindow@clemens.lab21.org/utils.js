@@ -14,10 +14,10 @@ Utils.prototype = {
   _settingsObject: { },
   _settings: "",
 
-  CENTER_WIDTH: "centerWidth",
-  CENTER_HEIGHT: "centerHeight",
-  SIDE_WIDTH: "sideWidth",
-  SIDE_HEIGHT: "sideHeight",
+  CENTER_WIDTH: "center-width",
+  CENTER_HEIGHT: "center-height",
+  SIDE_WIDTH: "side-width",
+  SIDE_HEIGHT: "side-height",
 
   START_CONFIG: {
     autoMove: false,
@@ -31,6 +31,15 @@ Utils.prototype = {
 
   _init: function() {
     this.loadSettings();
+
+    //this._settingsObject.connect('changed::center-width', this.loadSettings);
+    //this._settingsObject.connect('changed::center-height', this.loadSettings);
+    //this._settingsObject.connect('changed::side-width', this.loadSettings);
+    //this._settingsObject.connect('changed::side-height', this.loadSettings);
+
+    // saveSettings() triggers the event for all properties -> Only listen to
+    // the last one that's saved (locations)
+    this._settingsObject.connect('changed::locations', Lang.bind(this, this.loadSettings));
   },
 
   getSettingsObject: function() {
@@ -68,10 +77,10 @@ Utils.prototype = {
 
   saveSettings: function() {
     try {
-      this._settingsObject.set_int("center-width", this.getParameter(this.CENTER_WIDTH));
-      this._settingsObject.set_int("center-height", this.getParameter(this.CENTER_HEIGHT));
-      this._settingsObject.set_int("side-width", this.getParameter(this.SIDE_WIDTH));
-      this._settingsObject.set_int("side-height", this.getParameter(this.SIDE_HEIGHT));
+      this._settingsObject.set_int("center-width", this.getNumber(this.CENTER_WIDTH));
+      this._settingsObject.set_int("center-height", this.getNumber(this.CENTER_HEIGHT));
+      this._settingsObject.set_int("side-width", this.getNumber(this.SIDE_WIDTH));
+      this._settingsObject.set_int("side-height", this.getNumber(this.SIDE_HEIGHT));
       this._settingsObject.set_string("locations", JSON.stringify(this._settings.locations));
       this.showMessage("Success!", "Changes successfully saved");
     } catch (e) {
@@ -85,6 +94,10 @@ Utils.prototype = {
   },
 
   getNumber: function(name, defaultValue) {
+    if (name.indexOf("locations") == -1) {
+      return this._settingsObject.get_int(name);
+    }
+
     return this._toNumber(this.getParameter(name, defaultValue), defaultValue);
   },
 

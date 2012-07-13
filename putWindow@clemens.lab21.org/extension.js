@@ -9,8 +9,6 @@ const Shell = imports.gi.Shell;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
 
-let _path;
-
 /**
  * Handles all keybinding stuff and moving windows.
  * Binds following keyboard shortcuts:
@@ -33,13 +31,6 @@ MoveWindow.prototype = {
 
   _utils: {},
 
-  //list of config parameters
-  CENTER_WIDTH: "center-width",
-  CENTER_HEIGHT: "center-height",
-  SIDE_WIDTH: "side-width",
-  SIDE_HEIGHT: "side-height",
-  PANEL_BUTTON_POSITION: "panelButtonPosition",
-
   // private variables
   _bindings: [],
   _padding: 2,
@@ -52,6 +43,7 @@ MoveWindow.prototype = {
    */
   _addKeyBinding: function(key, handler) {
     this._bindings.push(key);
+
     global.display.add_keybinding(
       key,
       this._utils.getSettingsObject(),
@@ -151,9 +143,8 @@ MoveWindow.prototype = {
 
     // calculate the center position and check if the window is already there
     if (where == "c") {
-
-      let w = s.totalWidth * (this._utils.getNumber(this.CENTER_WIDTH, 50) / 100),
-        h = s.totalHeight * (this._utils.getNumber(this.CENTER_HEIGHT, 50) / 100),
+      let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH, 50) / 100),
+        h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT, 50) / 100),
         x = s.x + (s.totalWidth - w) / 2,
         y = s.y + (s.totalHeight - h) / 2,
         sameHeight = this._samePoint(h, pos.height);
@@ -230,7 +221,7 @@ MoveWindow.prototype = {
     if (!pos) {
       pos = config.positions[0];
       config.lastPosition = 0;
-      this._settings.setParameter("locations." + appName + ".lastPosition", 1);
+      this._utils.setParameter("locations." + appName + ".lastPosition", 1);
     } else {
       config.lastPosition++;
     }
@@ -319,11 +310,11 @@ MoveWindow.prototype = {
   },
 
   _getSideWidth: function() {
-    return this._utils.getNumber(this.SIDE_WIDTH, 50) / 100;
+    return this._utils.getNumber(this._utils.SIDE_WIDTH, 50) / 100;
   },
 
   _getSideHeight: function() {
-    return this._utils.getNumber(this.SIDE_HEIGHT, 50) / 100;
+    return this._utils.getNumber(this._utils.SIDE_HEIGHT, 50) / 100;
   },
 
   /**
@@ -398,7 +389,7 @@ MoveWindow.prototype = {
     );
 
     this._addKeyBinding("put-to-location",
-      Lang.bind(this, function(){ this._moveToConfiguredLocation();})
+      Lang.bind(this, function() { this._moveToConfiguredLocation();} )
     );
   },
 
@@ -421,10 +412,6 @@ MoveWindow.prototype = {
 }
 
 function init(meta) {
-  _path = meta.path+"/";
-  let userExtensionLocalePath = meta.path + '/locale';
-  Gettext.bindtextdomain("putWindow", userExtensionLocalePath);
-  Gettext.textdomain("putWindow");
 };
 
 function enable() {

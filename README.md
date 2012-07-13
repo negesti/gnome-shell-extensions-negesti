@@ -10,6 +10,9 @@ grid plugin.
 ChangeLog
 -------
 
+__July 13, 2012__
+ * Fixed config reload -> no need to reload the shell
+
 __July 08, 2012__
  * KNOWN ISSUES: config is not reloaded after modifying with the prefs tool (manual reload required)
  * moved config to gsettings
@@ -50,8 +53,7 @@ Configuration
 
 The extension can be configured using the gnome prefs tool. 
  * Keybindings are updated when you edit them in the settings window.
- * All other changes are not saved until you hit enter
- * Currently the settings are not reloaded. e.g. reload the shell or deactive/active the extension to use the updated config
+ * All other changes are not saved until you hit the save button
 
 
 Keybindings
