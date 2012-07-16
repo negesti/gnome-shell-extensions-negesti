@@ -6,6 +6,7 @@ An gnome-shell extension that makes window movement a lot
 easier. It can be compared with a basic version of the compiz 
 grid plugin.
 
+[![Friend of GNOME](http://www-old.gnome.org/friends/banners/friends-of-gnome.png)](http://www.gnome.org/friends/ "Friend of GNOME")
 
 ChangeLog
 -------
