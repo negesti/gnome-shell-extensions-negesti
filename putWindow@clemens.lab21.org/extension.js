@@ -10,12 +10,6 @@ const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
 
 /**
- * Handles all keybinding stuff and moving windows.
- * Binds following keyboard shortcuts:
- *  - run_command_1 to "Open SimpleMenu"
- *  - move_to_side_n/e/s/w move and resize windows
- *  - move_to_corner_ne/se/sw/nw move an resize to the corners
- *
  * Thanks to:
  * gcampax for auto-move-window extension and
  * vibou_ for gtile and his getInner/OuterPadding that is used in nearly every
