@@ -6,18 +6,10 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const Shell = imports.gi.Shell;
 
-const Extension = imports.ui.extensionSystem.extensions['putWindow@clemens.lab21.org'];
-const SettingsWindow = Extension.settingsWindow.SettingsWindow;
-
-let _path;
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const Utils = Extension.imports.utils;
 
 /**
- * Handles all keybinding stuff and moving windows.
- * Binds following keyboard shortcuts:
- *  - run_command_1 to "Open SimpleMenu"
- *  - move_to_side_n/e/s/w move and resize windows
- *  - move_to_corner_ne/se/sw/nw move an resize to the corners
- *
  * Thanks to:
  * gcampax for auto-move-window extension and
  * vibou_ for gtile and his getInner/OuterPadding that is used in nearly every
@@ -31,54 +23,40 @@ function MoveWindow() {
 
 MoveWindow.prototype = {
 
-  _settings: {},
-
-  //list of config parameters
-  CENTER_WIDTH: "centerWidth",
-  CENTER_HEIGHT: "centerHeight",
-  SIDE_WIDTH: "sideWidth",
-  SIDE_HEIGHT: "sideHeight",
-  PANEL_BUTTON_POSITION: "panelButtonPosition",
+  _utils: {},
 
   // private variables
-  _keyBindingHandlers: [],
   _bindings: [],
-  _shellwm: global.window_manager,
-  // settingsButton/menu
-  _settingsButton: null,
-  _settingsMenue: null,
-
-  _topBarHeight: 28,
+  _padding: 2,
 
   _primary: 0,
   _screens: [],
 
   /**
-   * Helper functions to takeover binding when enabled and release them
-   * on disbale. Will change when 3.4 is available and extensions can register
-   * bindings.
+   * Helper functions to set custom handler for keybindings
    */
-  _addKeyBinding: function(keybinding, handler) {
-    if (this._keyBindingHandlers[keybinding])
-      this._shellwm.disconnect(this._keyBindingHandlers[keybinding]);
-    else {
-      this._shellwm.takeover_keybinding(keybinding);
-      this._bindings[this._bindings.length] = keybinding;
-    }
+  _addKeyBinding: function(key, handler) {
+    this._bindings.push(key);
 
-    this._keyBindingHandlers[keybinding] =
-        this._shellwm.connect('keybinding::' + keybinding, handler);
+    global.display.add_keybinding(
+      key,
+      this._utils.getSettingsObject(),
+      Meta.KeyBindingFlags.NONE,
+      handler
+    );
   },
 
   _recalcuteSizes: function(s) {
-    let tbHeight = (s.primary && !Main.panel.hidden) ? this._topBarHeight : 4;
-    s.y = s.geomY + tbHeight;
-    s.height = s.totalHeight * this._getSideHeight() - tbHeight;
 
-    // -14 may produce a gap at the bottom, but otherwise the window
-    // may be outside of the screen
-    s.sy = (s.totalHeight - s.height) - 14 + s.geomY;
+    let tbHeight = s.primary ? Main.panel.actor.height : 0;
+    if (tbHeight == 1) {
+      tbHeight = 0;
+    }
+    s.y = s.geomY + tbHeight;
+    s.height = s.totalHeight * this._getSideHeight() - Math.floor(tbHeight/2);
     s.width = s.totalWidth * this._getSideWidth();
+
+    s.sy = (s.totalHeight - s.height) + s.geomY;
 
     return s;
   },
@@ -110,7 +88,6 @@ MoveWindow.prototype = {
     }
 
     let s = this._screens[sIndex];
-
     // check if we are on primary screen and if the main panel is visible
     s = this._recalcuteSizes(s);
 
@@ -122,32 +99,29 @@ MoveWindow.prototype = {
     let diff = null,
       sameWidth = this._samePoint(pos.width, s.width);
 
-    // sIndex is the target index if we move to another screen.-> primary!=sIndex
-    let winHeight = pos.height + this._topBarHeight;
-    let maxH = (pos.height >= s.totalHeight) || this._samePoint(winHeight, s.totalHeight);
+    let maxH = (pos.height >= s.totalHeight) || this._samePoint(pos.height, s.totalHeight);
 
     if (where=="n") {
-      this._resize(win, s.x, s.y, -1, s.height);
+      this._resize(win, s.x, s.y, s.totalWidth * -1, s.height);
     } else if (where == "e") {
       // fixme. wont move left...
       if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
         s = this._recalcuteSizes(this._screens[(sIndex+1)]);
-        this._resize(win, s.x, s.y, s.width, -1);
+        this._resize(win, s.x, s.y, s.width, s.totalHeight * -1);
       } else {
-        this._resize(win, moveRightX, s.y, s.width, -1); //(s.x + s.width)
+        this._resize(win, moveRightX, s.y, s.width, s.totalHeight * -1); //(s.x + s.width)
       }
-      win.last_move = "e";
     } else if (where == "s") {
-      this._resize(win, s.x, s.sy, -1, s.height);
+      this._resize(win, s.x, s.sy, s.totalWidth * -1, s.height);
     } else if (where == "w") {
       // if we are not on screen[i>0] move window to the left screen
       let newX = pos.x - s.width;
       if (sIndex > 0 && sameWidth && maxH && newX < (s.width + 150)) {
         s = this._screens[(sIndex-1)];
         moveRightX = s.geomX + s.totalWidth - s.width;
-        this._resize(win, moveRightX, s.y, s.width, -1); // (s.x + s.width)
+        this._resize(win, moveRightX, s.y, s.width, s.totalHeight * -1);
       } else {
-        this._resize(win, s.x, s.y, s.width, -1);
+        this._resize(win, s.x, s.y, s.width, s.totalHeight * -1);
       }
     }
 
@@ -163,9 +137,8 @@ MoveWindow.prototype = {
 
     // calculate the center position and check if the window is already there
     if (where == "c") {
-
-      let w = s.totalWidth * (this._settings.getNumber(this.CENTER_WIDTH, 50) / 100),
-        h = s.totalHeight * (this._settings.getNumber(this.CENTER_HEIGHT, 50) / 100),
+      let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH, 50) / 100),
+        h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT, 50) / 100),
         x = s.x + (s.totalWidth - w) / 2,
         y = s.y + (s.totalHeight - h) / 2,
         sameHeight = this._samePoint(h, pos.height);
@@ -174,7 +147,7 @@ MoveWindow.prototype = {
       // windows that have a min_width < our width it will not work (evolution for example)
       if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameHeight) {
         // the window is alread centered -> maximize
-        this._resize(win, s.x, s.y, -1, -1);
+        this._resize(win, s.x, s.y, s.totalWidth * -1, s.totalHeight * -1);
       } else {
         // the window is not centered -> resize
         this._resize(win, x, y, w, h);
@@ -187,7 +160,7 @@ MoveWindow.prototype = {
       return;
     }
 
-    let app = win.get_wm_class();
+    let app = this._windowTracker.get_window_app(win);
 
     if (!app) {
       if (!noRecurse) {
@@ -199,11 +172,12 @@ MoveWindow.prototype = {
       }
       return;
     }
-
+    app = win.get_wm_class();
     // move the window if a location is configured and autoMove is set to true
     let appPath = "locations." + app;
-    if (this._settings.getParameter(appPath)) {
-      if (this._settings.getBoolean(appPath + ".autoMove", false)) {
+
+    if (this._utils.getParameter(appPath, false)) {
+      if (this._utils.getBoolean(appPath + ".autoMove", false)) {
         this._moveToConfiguredLocation(win, app);
       }
     }
@@ -222,29 +196,32 @@ MoveWindow.prototype = {
 
       appName = win.get_wm_class();
     }
+    let config = this._utils.getParameter("locations." + appName, false);
 
-    let config = this._settings.getParameter("locations." + appName, false);
     // no config for appName. maybe we have a config for "all"
     if (!config) {
-      config = this._settings.getParameter("locations.All", false);
+      config = this._utils.getParameter("locations.All", false);
       // no config for "all"
       if (!config) {
         return;
       }
       appName = "All";
     }
+    if (!config.lastPosition) {
+      config.lastPositions = 0;
+    }
+
     let pos = config.positions[config.lastPosition];
     if (!pos) {
       pos = config.positions[0];
       config.lastPosition = 0;
-      this._settings.setParameter("locations." + appName + ".lastPosition", 1);
+      this._utils.setParameter("locations." + appName + ".lastPosition", 1);
     } else {
       config.lastPosition++;
     }
 
-
     if (config.lastPosition >= config.positions.length) {
-      this._settings.setParameter("locations." + appName + ".lastPosition", 0);
+      this._utils.setParameter("locations." + appName + ".lastPosition", 0);
     }
 
     // config may be for 2 screens but currenty only 1 is connected
@@ -260,35 +237,50 @@ MoveWindow.prototype = {
     this._resize(win, x, y, width, height);
   },
 
-  // moving the window and the actual position are not really the same
-  // if the points are < 30 points away asume as equal
+  // On large screens the values used for moving/resizing windows, and the resulting
+  // window.rect are may not be not equal (==)
+  // --> Assume points are equal, if the difference is <= 40px
+  // @return true, if the difference between p1 and p2 is less then 41
   _samePoint: function(p1, p2) {
-    return (Math.abs(p1-p2) <= 20);
+    return (Math.abs(p1-p2) <= 40);
   },
 
   // actual resizing
   _resize: function(win, x, y, width, height) {
 
-    if (height == -1) {
+    if (!win.decorated) {
+      if (height < 0) {
+        height = height * -1;
+      }
+      if (width < 0) {
+        width = width * -1;
+      }
+    }
+
+    if (height < 0) {
       win.maximize(Meta.MaximizeFlags.VERTICAL);
       height = 400; // dont resize to width, -1
     } else {
       win.unmaximize(Meta.MaximizeFlags.VERTICAL);
     }
 
-    if (width == -1) {
+    if (width < 0) {
       win.maximize(Meta.MaximizeFlags.HORIZONTAL);
       width = 400;  // dont resize to height, -1
     } else {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
 
-    // first move the window
     let padding = this._getPadding(win);
     // snap, x, y
-    win.move_frame(true, x - padding.x, y - padding.y);
+    if (win.decorated) {
+      win.move_frame(true, x, y);
+    } else {
+      win.move(true, x, y);
+    }
+
     // snap, width, height, force
-    win.resize(true, width - padding.width, height - padding.height);
+    win.resize(true, width - this._padding, height - padding.height - padding.y);
   },
 
   // the difference between input and outer rect as object.
@@ -298,7 +290,7 @@ MoveWindow.prototype = {
     return {
       x: outer.x - inner.x,
       y: (outer.y - inner.y),
-      width: 2, //(inner.width - outer.width),
+      width: (inner.width - outer.width), // 2
       height: (inner.height - outer.height)
     };
   },
@@ -312,11 +304,11 @@ MoveWindow.prototype = {
   },
 
   _getSideWidth: function() {
-    return this._settings.getNumber(this.SIDE_WIDTH, 50) / 100;
+    return this._utils.getNumber(this._utils.SIDE_WIDTH, 50) / 100;
   },
 
   _getSideHeight: function() {
-    return this._settings.getNumber(this.SIDE_HEIGHT, 50) / 100;
+    return this._utils.getNumber(this._utils.SIDE_HEIGHT, 50) / 100;
   },
 
   /**
@@ -325,21 +317,7 @@ MoveWindow.prototype = {
    **/
   _init: function() {
     // read configuration and init the windowTracker
-    this._settings = new SettingsWindow(_path + "putWindow.json");
-    let buttonPosition = this._settings.getNumber(this.PANEL_BUTTON_POSITION, 0);
-    if (buttonPosition == 1) {
-      this._settingsButton = new SettingButton(this._settings);
-      Main.panel._rightBox.insert_actor(this._settingsButton.actor, 0);
-    } else {
-      this._settingsMenu = new PopupMenu.PopupMenuItem(_("PutWindow Settings"));
-      this._settingsMenu.connect('activate',
-        Lang.bind(this, function() {
-          this._settings.toggle();
-        })
-      );
-      Main.panel._statusArea.userMenu.menu.addMenuItem(this._settingsMenu, 5);
-    }
-
+    this._utils = new Utils.Utils();
     this._windowTracker = Shell.WindowTracker.get_default();
 
     let display = global.screen.get_display();
@@ -351,23 +329,19 @@ MoveWindow.prototype = {
 
     // only tested with 2 screen setup
     for (let i=0; i<numMonitors; i++) {
-      let geom = global.screen.get_monitor_geometry(i),
-        totalHeight = geom.height;
+      let geom = global.screen.get_monitor_geometry(i);
 
       this._screens[i] =  {
-        y: (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
+        y: geom.y, // (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
         x : geom.x,
         geomX: geom.x,
         geomY: geom.y,
         totalWidth: geom.width,
-        totalHeight: totalHeight,
+        totalHeight: geom.height,
         width: geom.width * this._getSideWidth()
       };
 
       this._screens[i].primary = (i==this._primary)
-
-      // the position.y for s, sw and se
-      this._screens[i].sy = (totalHeight - this._screens[i].y + this._topBarHeight) * this._getSideHeight();
     }
 
     // sort by x position. makes it easier to find the correct screen
@@ -376,40 +350,40 @@ MoveWindow.prototype = {
     });
 
     // move to n, e, s an w
-    this._addKeyBinding("move_to_side_n",
+    this._addKeyBinding("put-to-side-n",
       Lang.bind(this, function(){ this._moveFocused("n");})
     );
-    this._addKeyBinding("move_to_side_e",
+    this._addKeyBinding("put-to-side-e",
       Lang.bind(this, function(){ this._moveFocused("e");})
     );
-    this._addKeyBinding("move_to_side_s",
+    this._addKeyBinding("put-to-side-s",
       Lang.bind(this, function(){ this._moveFocused("s");})
     );
-    this._addKeyBinding("move_to_side_w",
+    this._addKeyBinding("put-to-side-w",
       Lang.bind(this, function(){ this._moveFocused("w");})
     );
 
     // move to  nw, se, sw, nw
-    this._addKeyBinding("move_to_corner_ne",
+    this._addKeyBinding("put-to-corner-ne",
       Lang.bind(this, function(){ this._moveFocused("ne");})
     );
-    this._addKeyBinding("move_to_corner_se",
+    this._addKeyBinding("put-to-corner-se",
       Lang.bind(this, function(){ this._moveFocused("se");})
     );
-    this._addKeyBinding("move_to_corner_sw",
+    this._addKeyBinding("put-to-corner-sw",
       Lang.bind(this, function(){ this._moveFocused("sw");})
     );
-    this._addKeyBinding("move_to_corner_nw",
+    this._addKeyBinding("put-to-corner-nw",
       Lang.bind(this, function(){ this._moveFocused("nw");})
     );
 
     // move to center. fix 2 screen setup and resize to 50% 50%
-    this._addKeyBinding("move_to_center",
+    this._addKeyBinding("put-to-center",
       Lang.bind(this, function(){ this._moveFocused("c");})
     );
 
-    this._addKeyBinding("move_to_workspace_1",
-      Lang.bind(this, function(){ this._moveToConfiguredLocation();})
+    this._addKeyBinding("put-to-location",
+      Lang.bind(this, function() { this._moveToConfiguredLocation();} )
     );
   },
 
@@ -424,72 +398,14 @@ MoveWindow.prototype = {
     }
 
     let size = this._bindings.length;
+    // TODO: remove handlers added by keybindings_set_custom_handler
     for(let i = 0; i<size; i++) {
-        this._shellwm.disconnect(this._keyBindingHandlers[this._bindings[i]]);
+      global.display.remove_keybinding(this._bindings[i]);
     }
-
-    // destroy the settingsButton/Menu. user may have changed the config during runtime
-    if (this._settingsButton) {
-      this._settingsButton.actor.get_parent().remove_actor(this._settingsButton.actor);
-      this._settingsButton.destroy();
-      this._settingsButton = null;
-    } else if (this._settingsMenu) {
-      this._settingsMenu.actor.get_parent().remove_actor(this._settingsMenu.actor);
-      this._settingsMenu.destroy();
-      this._settingsMenu = null;
-    }
-
-    this._settings.destroy();
-  }
-}
-
-function SettingButton(settings) {
-  this._init(settings);
-}
-
-SettingButton.prototype = {
-  __proto__: PanelMenu.ButtonBox.prototype,
-
-  _settingsWindow: {},
-
-  _init : function(settings) {
-    PanelMenu.ButtonBox.prototype._init.call(this, {
-       reactive: true,
-       can_focus: true,
-       track_hover: true,
-       style_class: 'put-window-settings-icon'
-    });
-
-    this._settingsWindow = settings;
-    this.setTooltip(_("PutWindow Settings"));
-    this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
-  },
-
-  _onButtonPress: function(actor, event){
-    this._settingsWindow.toggle();
-  },
-
-  setTooltip: function(text) {
-    if (text != null) {
-      this.tooltip = text;
-      this.actor.has_tooltip = true;
-      this.actor.tooltip_text = text;
-    } else {
-      this.actor.has_tooltip = false;
-      this.tooltip = null;
-    }
-  },
-
-  destroy: function() {
-    this.actor.destroy();
   }
 }
 
 function init(meta) {
-  _path = meta.path+"/";
-  let userExtensionLocalePath = meta.path + '/locale';
-  Gettext.bindtextdomain("putWindow", userExtensionLocalePath);
-  Gettext.textdomain("putWindow");
 };
 
 function enable() {

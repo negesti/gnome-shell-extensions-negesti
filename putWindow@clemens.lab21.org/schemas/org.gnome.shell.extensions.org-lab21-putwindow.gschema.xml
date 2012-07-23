@@ -1,0 +1,66 @@
+<schemalist>
+  <schema id="org.gnome.shell.extensions.org-lab21-putwindow" path="/org/gnome/shell/extensions/org-lab21-putwindow/">
+    <key type="i" name="side-width">
+      <default>50</default>
+      <summary>Width to use when moved to side or corner</summary>
+    </key>
+    <key type="i" name="side-height">
+      <default>50</default>
+      <summary>Height to use when moved to side or corner</summary>
+    </key>
+    <key type="i" name="center-width">
+      <default>50</default>
+      <summary>Width to use when moved to center</summary>
+    </key>
+    <key type="i" name="center-height">
+      <default>50</default>
+      <summary>Height to use when moved to center</summary>
+    </key>
+
+    <key type="s" name="locations">
+      <default>"{}"</default>
+      <summary>Height to use when moved to center</summary>
+    </key>
+
+    <key type="as" name="put-to-corner-ne">
+      <default><![CDATA[['<super>KP_9']]]></default>
+      <summary>Move to the top right corner</summary>
+    </key>
+    <key type="as" name="put-to-corner-nw">
+      <default><![CDATA[['<super>KP_7']]]></default>
+      <summary>Move to the top left corner</summary>
+    </key>
+    <key type="as" name="put-to-corner-se">
+      <default><![CDATA[['<super>KP_3']]]></default>
+      <summary>Move to the bottom right corner</summary>
+    </key>
+    <key type="as" name="put-to-corner-sw">
+      <default><![CDATA[['<super>KP_1']]]></default>
+      <summary>Move to the bottom left corner</summary>
+    </key>
+    <key type="as" name="put-to-side-n">
+      <default><![CDATA[['<super>KP_8']]]></default>
+      <summary>Move to the top</summary>
+    </key>
+    <key type="as" name="put-to-side-e">
+      <default><![CDATA[['<super>KP_6']]]></default>
+      <summary>Move to the right side</summary>
+    </key>
+    <key type="as" name="put-to-side-s">
+      <default><![CDATA[['<super>KP_2']]]></default>
+      <summary>Move to bottom</summary>
+    </key>
+    <key type="as" name="put-to-side-w">
+      <default><![CDATA[['<super>KP_4']]]></default>
+      <summary>Move to the left side</summary>
+    </key>
+    <key type="as" name="put-to-center">
+      <default><![CDATA[['<super>KP_5']]]></default>
+      <summary>Move to center/maximize</summary>
+    </key>
+    <key type="as" name="put-to-location">
+      <default><![CDATA[['<super>KP_0']]]></default>
+      <summary>Move to a predifined location</summary>
+    </key>
+  </schema>
+</schemalist>
