@@ -32,13 +32,9 @@ Utils.prototype = {
   _init: function() {
     this.loadSettings();
 
-    //this._settingsObject.connect('changed::center-width', this.loadSettings);
-    //this._settingsObject.connect('changed::center-height', this.loadSettings);
-    //this._settingsObject.connect('changed::side-width', this.loadSettings);
-    //this._settingsObject.connect('changed::side-height', this.loadSettings);
 
-    // saveSettings() triggers the event for all properties -> Only listen to
-    // the last one that's saved (locations)
+    // locations is a json strings stored in the gschema. -> reload it after the user
+    // saved his changes
     this._settingsObject.connect('changed::locations', Lang.bind(this, this.loadSettings));
   },
 
@@ -147,6 +143,14 @@ Utils.prototype = {
 
   setParameter: function(name, value) {
     try {
+      if (name.indexOf("locations") == -1) {
+        if (isNaN(value)) {
+          this._settingsObject.set_string(name, value);
+        } else {
+          this._settingsObject.set_int(name, value);
+        }
+      }
+
       let path = name.split("."),
         conf = this._settings,
         pathLength = path.length - 1;
@@ -161,7 +165,7 @@ Utils.prototype = {
       conf[ path[pathLength] ] = value;
 
     } catch (e) {
-      this.showErrorMessage("Error setting parameter!", "Can not set config parameter " + name);
+      this.showErrorMessage("Error setting parameter!", "Can not set config parameter " + name + " " + e.message);
     }
   },
 
