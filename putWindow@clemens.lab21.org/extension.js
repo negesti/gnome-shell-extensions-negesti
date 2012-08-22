@@ -402,6 +402,7 @@ MoveWindow.prototype = {
     for(let i = 0; i<size; i++) {
       global.display.remove_keybinding(this._bindings[i]);
     }
+    this._utils.destroy()
   }
 }
 

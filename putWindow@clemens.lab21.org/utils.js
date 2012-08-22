@@ -14,6 +14,8 @@ Utils.prototype = {
   _settingsObject: { },
   _settings: "",
 
+  _changeEventListeners: [],
+
   CENTER_WIDTH: "center-width",
   CENTER_HEIGHT: "center-height",
   SIDE_WIDTH: "side-width",
@@ -25,7 +27,7 @@ Utils.prototype = {
       x: 0,
       y: 0,
       width: 50,
-      height: 50
+      height: 100
     }]
   },
 
@@ -35,7 +37,25 @@ Utils.prototype = {
 
     // locations is a json strings stored in the gschema. -> reload it after the user
     // saved his changes
-    this._settingsObject.connect('changed::locations', Lang.bind(this, this.loadSettings));
+    this._changeEventListeners.push({
+      name: "locations",
+      fn:  Lang.bind(this, this.loadSettings)
+    });
+
+    for (let i=0; i < this._changeEventListeners.length; i++) {
+      this._settingsObject.connect(
+        'changed::' + this._changeEventListeners[i].name ,
+        this._changeEventListeners[i].fn
+      );
+    }
+
+  },
+
+  destroy: function() {
+    for (let i=0; i < this._changeEventListeners.length; i++) {
+      this._settingsObject.disconnect(this._changeEventListeners[i].fn);
+    }
+
   },
 
   getSettingsObject: function() {
@@ -78,7 +98,8 @@ Utils.prototype = {
       this._settingsObject.set_int("side-width", this.getNumber(this.SIDE_WIDTH));
       this._settingsObject.set_int("side-height", this.getNumber(this.SIDE_HEIGHT));
       this._settingsObject.set_string("locations", JSON.stringify(this._settings.locations));
-      this.showMessage("Success!", "Changes successfully saved");
+      // sometimes the shell hangs after the gtk messagebox is displayed :(
+      // this.showMessage("Success!", "Changes successfully saved");
     } catch (e) {
       this.showErrorMessage("Error saving settings ", e);
     }
@@ -135,7 +156,6 @@ Utils.prototype = {
       // normal object
       delete conf[ path[pathLength] ];
     } else {
-
       // an array
       conf.pop(path[pathLength]);
     }
