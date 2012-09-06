@@ -86,40 +86,10 @@ The following keys are available:
 
 __Gnome Shell 3.2__
 The keybinding can not be stored in a custom schema. The extension uses de predefined bindings
-in "gnome.desktop.wm.keybindings". Modify them with dconf-editor or using the following "script"
-
-To modify this keybinding you can use dconf-editor or gsettings
-
-                apt-get install dconf-tools (for debian/ubuntu)
-                gsettings set org.gnome.desktop.wm.keybindings KeyName value
-
- * move-to-center
- * move-to-corner-ne
- * move-to-corner-nw
- * move-to-corner-se
- * move-to-corner-sw
- * move-to-side-e
- * move-to-side-n
- * move-to-side-s
- * move-to-side-w
- * move-to-workspace-1 (resize to a configured location)
-
-**KeyName**... as described above (move-to-side-n,...)
-**Value**..... for example "['<Alt>KP_8']" (with  both quotes)
-
-Use this commands to set the bindings to super + numpad numbers:
-
-    gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-1 "['<Super>KP_0']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-center "['<Super>>KP_5']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-corner-ne "['<Super>>KP_9']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-corner-nw "['<Super>>KP_7']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-corner-se "['<Super>>KP_3']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-corner-sw "['<Super>>KP_1']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-side-n "['<Super>>KP_8']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-side-s "['<Super>>KP_2']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-side-e "['<Super>>KP_6']"
-    gsettings set org.gnome.desktop.wm.keybindings move-to-side-w "['<Super>>KP_4']"
-
+/apps/metacity/window_keybindings. Modify ghem with gconf-editor/gconftool/gconftool-2.
+    run gconf-editor /apps/metacity/window_keybindings
+    
+For details how to configure it, please check the wiki.
 
 2 screen setup support
 -------
