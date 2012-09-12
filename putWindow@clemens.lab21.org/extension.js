@@ -248,15 +248,6 @@ MoveWindow.prototype = {
   // actual resizing
   _resize: function(win, x, y, width, height) {
 
-    if (!win.decorated) {
-      if (height < 0) {
-        height = height * -1;
-      }
-      if (width < 0) {
-        width = width * -1;
-      }
-    }
-
     if (height < 0) {
       win.maximize(Meta.MaximizeFlags.VERTICAL);
       height = 400; // dont resize to width, -1
