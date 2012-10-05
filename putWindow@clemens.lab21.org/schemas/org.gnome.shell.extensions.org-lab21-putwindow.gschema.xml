@@ -62,5 +62,13 @@
       <default><![CDATA[['<super>KP_0']]]></default>
       <summary>Move to a predifined location</summary>
     </key>
+    <key type="as" name="put-to-left-screen">
+      <default><![CDATA[['<super>Left']]]></default>
+      <summary>Move to a predifined location</summary>
+    </key>
+    <key type="as" name="put-to-right-screen">
+      <default><![CDATA[['<super>Right']]]></default>
+      <summary>Move to a predifined location</summary>
+    </key>
   </schema>
 </schemalist>

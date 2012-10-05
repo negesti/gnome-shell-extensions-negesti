@@ -61,35 +61,89 @@ MoveWindow.prototype = {
     return s;
   },
 
+    /**
+   * Checks the _screens array, and returns the index of the screen, the
+   * given window (win) is on
+   */
+  _getCurrentScreenIndex: function(win) {
+
+    // left edge is sometimes -1px...
+    let pos = win.get_outer_rect();
+    pos.x = pos.x < 0 ? 0 : pos.x;
+
+    let sl = this._screens.length;
+    for (let i=0; i<sl; i++) {
+      if (i == sl-1) {
+        return i;
+      }
+      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x) {
+        return i;
+      }
+    }
+    return this._primary;
+  },
+
   /**
-   * pass width or height = -1 to maximize in this direction
+   * Move the focused window to the screen on the "direction" side
+   * @param direction left and right is supported
+   */
+  _moveToScreen: function(direction) {
+    let win = global.display.focus_window;
+    let screenIndex = this._getCurrentScreenIndex(win);
+
+    let s = null;
+    let oldScreenX = this._screens[screenIndex].x;
+    let xRatio = 1;
+    let yRatio = 1;
+    // right
+    if (direction == "right" && screenIndex < (this._screens.length - 1)) {
+      s = this._screens[screenIndex + 1];
+      s = this._recalcuteSizes(s);
+
+      xRatio = this._screens[screenIndex].width / this._screens[screenIndex + 1].width;
+      yRatio = this._screens[screenIndex].height / this._screens[screenIndex + 1].height;
+
+      global.log(this._screens[screenIndex].width +"  " + this._screens[screenIndex +1].width  +
+                          (this._screens[screenIndex].width / this._screens[screenIndex +1].width));
+      global.log(this._screens[screenIndex].height +"  " + this._screens[screenIndex +1].height  +
+                          (this._screens[screenIndex].height / this._screens[screenIndex +1].height));
+
+    }
+    if (direction == "left" && screenIndex > 0) {
+      s = this._screens[screenIndex -1];
+      s = this._recalcuteSizes(s);
+
+      global.log(this._screens[screenIndex].width +"  " + this._screens[screenIndex - 1].width  +
+                          (this._screens[screenIndex].width / this._screens[screenIndex - 1].width));
+      global.log(this._screens[screenIndex].height +"  " + this._screens[screenIndex - 1].height  +
+                          (this._screens[screenIndex].height / this._screens[screenIndex - 1].height));
+      xRatio = this._screens[screenIndex].width / this._screens[screenIndex - 1].width;
+      yRatio = this._screens[screenIndex].height / this._screens[screenIndex - 1].height;
+    }
+
+    if (s != null) {
+      let position = win.get_outer_rect();
+      let x = s.x + (position.x - oldScreenX);
+
+      global.log(xRatio + " " + yRatio);
+
+      this._resize(win, x, position.y, position.width, position.height);
+    }
+  },
+
+  /**
+   * move the current focues window into the given direction (n,e,s,w, ne, nw, sw, so, c)
    */
   _moveFocused: function(where) {
     let win = global.display.focus_window;
     if (win==null) {
         return;
     }
-    var pos = win.get_outer_rect();
 
-    let sIndex = this._primary;
-    let sl = this._screens.length;
-
-    // left edge is sometimes -1px...
-    pos.x = pos.x < 0 ? 0 : pos.x;
-    for (let i=0; i<sl; i++) {
-      if (i == sl-1) {
-        sIndex = i;
-        break;
-      }
-      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x) {
-        sIndex = i;
-        break;
-      }
-    }
-
-    let s = this._screens[sIndex];
+    let s = this._screens[this._getCurrentScreenIndex(win)];
     // check if we are on primary screen and if the main panel is visible
     s = this._recalcuteSizes(s);
+    var pos = win.get_outer_rect();
 
     let moveRightX = s.x;
     if (where.indexOf("e") > -1) {
@@ -103,26 +157,24 @@ MoveWindow.prototype = {
 
     if (where=="n") {
       this._resize(win, s.x, s.y, s.totalWidth * -1, s.height);
-    } else if (where == "e") {
-      // fixme. wont move left...
-      if (sIndex < (sl-1) && sameWidth && maxH && pos.x + s.width >= s.totalWidth) {
-        s = this._recalcuteSizes(this._screens[(sIndex+1)]);
-        this._resize(win, s.x, s.y, s.width, s.totalHeight * -1);
-      } else {
-        this._resize(win, moveRightX, s.y, s.width, s.totalHeight * -1); //(s.x + s.width)
-      }
     } else if (where == "s") {
       this._resize(win, s.x, s.sy, s.totalWidth * -1, s.height);
-    } else if (where == "w") {
-      // if we are not on screen[i>0] move window to the left screen
-      let newX = pos.x - s.width;
-      if (sIndex > 0 && sameWidth && maxH && newX < (s.width + 150)) {
-        s = this._screens[(sIndex-1)];
-        moveRightX = s.geomX + s.totalWidth - s.width;
-        this._resize(win, moveRightX, s.y, s.width, s.totalHeight * -1);
-      } else {
-        this._resize(win, s.x, s.y, s.width, s.totalHeight * -1);
+    } else if (where == "e") {
+      let width = s.width;
+      let x = moveRightX;
+      if (sameWidth && this._samePoint(moveRightX, pos.x)) {
+        width = s.width * 1.33;
+        x = moveRightX - (width - s.width);
       }
+
+      this._resize(win, x, s.y, width, s.totalHeight * -1); //(s.x + s.width)
+    }  else if (where == "w") {
+      let width = s.width;
+      if (sameWidth && this._samePoint(s.x, pos.x)) {
+        width = s.width * 1.33;
+      }
+
+      this._resize(win, s.x, s.y, width, s.totalHeight * -1);
     }
 
     if (where == "ne") {
@@ -375,6 +427,14 @@ MoveWindow.prototype = {
 
     this._addKeyBinding("put-to-location",
       Lang.bind(this, function() { this._moveToConfiguredLocation();} )
+    );
+
+    this._addKeyBinding("put-to-left-screen",
+      Lang.bind(this, function() { this._moveToScreen("left");} )
+    );
+
+    this._addKeyBinding("put-to-right-screen",
+      Lang.bind(this, function() { this._moveToScreen("right");} )
     );
   },
 
