@@ -30,7 +30,10 @@ MoveWindow.prototype = {
   _padding: 2,
 
   _primary: 0,
+
   _screens: [],
+  _westWidths: [ 0.5, 0.33, 0.66 ],
+  _eastWidths: [ 0.5, 0.66, 0.33 ],
 
   /**
    * Helper functions to set custom handler for keybindings
@@ -46,7 +49,7 @@ MoveWindow.prototype = {
     );
   },
 
-  _recalcuteSizes: function(s) {
+  _recalculateSizes: function(s) {
 
     let tbHeight = s.primary ? Main.panel.actor.height : 0;
     if (tbHeight == 1) {
@@ -57,6 +60,21 @@ MoveWindow.prototype = {
     s.width = s.totalWidth * this._getSideWidth();
 
     s.sy = (s.totalHeight - s.height) + s.geomY;
+
+    let i = 0;
+    for ( i=0; i< this._westWidths.length; i++) {
+      s.west[i] = {
+        width: s.totalWidth * this._westWidths[i],
+        x: s.x
+      }
+    }
+
+    for ( i=0; i< this._eastWidths.length; i++) {
+      s.east[i] = {
+        width: s.totalWidth * this._eastWidths[i],
+        x: s.geomX + (s.totalWidth * (1 - this._eastWidths[i]))
+      }
+    }
 
     return s;
   },
@@ -98,7 +116,7 @@ MoveWindow.prototype = {
     // right
     if (direction == "right" && screenIndex < (this._screens.length - 1)) {
       s = this._screens[screenIndex + 1];
-      s = this._recalcuteSizes(s);
+      s = this._recalculateSizes(s);
 
       xRatio = this._screens[screenIndex].width / this._screens[screenIndex + 1].width;
       yRatio = this._screens[screenIndex].height / this._screens[screenIndex + 1].height;
@@ -111,7 +129,7 @@ MoveWindow.prototype = {
     }
     if (direction == "left" && screenIndex > 0) {
       s = this._screens[screenIndex -1];
-      s = this._recalcuteSizes(s);
+      s = this._recalculateSizes(s);
 
       global.log(this._screens[screenIndex].width +"  " + this._screens[screenIndex - 1].width  +
                           (this._screens[screenIndex].width / this._screens[screenIndex - 1].width));
@@ -142,13 +160,8 @@ MoveWindow.prototype = {
 
     let s = this._screens[this._getCurrentScreenIndex(win)];
     // check if we are on primary screen and if the main panel is visible
-    s = this._recalcuteSizes(s);
+    s = this._recalculateSizes(s);
     var pos = win.get_outer_rect();
-
-    let moveRightX = s.x;
-    if (where.indexOf("e") > -1) {
-       moveRightX = s.geomX + s.totalWidth - s.width;
-    }
 
     let diff = null,
       sameWidth = this._samePoint(pos.width, s.width);
@@ -161,20 +174,33 @@ MoveWindow.prototype = {
       this._resize(win, s.x, s.sy, s.totalWidth * -1, s.height);
     } else if (where == "e") {
       let width = s.width;
-      let x = moveRightX;
-      if (sameWidth && this._samePoint(moveRightX, pos.x)) {
-        width = s.width * 1.33;
-        x = moveRightX - (width - s.width);
+      let useIndex = 0;
+
+      for ( let i=0; i < s.east.length; i++) {
+        if (this._samePoint(pos.width, s.east[i].width) && this._samePoint(pos.x, s.east[i].x)) {
+          useIndex = i + 1;
+          if (useIndex >= s.east.length) {
+            useIndex = 0;
+          }
+          break;
+        }
       }
 
-      this._resize(win, x, s.y, width, s.totalHeight * -1); //(s.x + s.width)
+      this._resize(win, s.east[useIndex].x, s.y, s.east[useIndex].width, s.totalHeight * -1); //(s.x + s.width)
     }  else if (where == "w") {
-      let width = s.width;
-      if (sameWidth && this._samePoint(s.x, pos.x)) {
-        width = s.width * 1.33;
+       let useIndex = 0;
+
+      for ( let i=0; i < s.west.length; i++) {
+        if (this._samePoint(pos.width, s.west[i].width) && this._samePoint(pos.x, s.west[i].x)) {
+          useIndex = i + 1;
+          if (useIndex >= s.west.length) {
+            useIndex = 0;
+          }
+          break;
+        }
       }
 
-      this._resize(win, s.x, s.y, width, s.totalHeight * -1);
+      this._resize(win, s.west[useIndex].x, s.y, s.west[useIndex].width, s.totalHeight * -1);
     }
 
     if (where == "ne") {
@@ -381,7 +407,9 @@ MoveWindow.prototype = {
         geomY: geom.y,
         totalWidth: geom.width,
         totalHeight: geom.height,
-        width: geom.width * this._getSideWidth()
+        width: geom.width * this._getSideWidth(),
+        east: [],
+        west: []
       };
 
       this._screens[i].primary = (i==this._primary)
