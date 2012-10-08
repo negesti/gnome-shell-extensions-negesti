@@ -110,42 +110,28 @@ MoveWindow.prototype = {
     let screenIndex = this._getCurrentScreenIndex(win);
 
     let s = null;
-    let oldScreenX = this._screens[screenIndex].x;
-    let xRatio = 1;
-    let yRatio = 1;
-    // right
+    let old = {
+      x: this._screens[screenIndex].x,
+      width: this._screens[screenIndex].width,
+      height: this._screens[screenIndex].height
+    };
+
     if (direction == "right" && screenIndex < (this._screens.length - 1)) {
       s = this._screens[screenIndex + 1];
       s = this._recalculateSizes(s);
-
-      xRatio = this._screens[screenIndex].width / this._screens[screenIndex + 1].width;
-      yRatio = this._screens[screenIndex].height / this._screens[screenIndex + 1].height;
-
-      global.log(this._screens[screenIndex].width +"  " + this._screens[screenIndex +1].width  +
-                          (this._screens[screenIndex].width / this._screens[screenIndex +1].width));
-      global.log(this._screens[screenIndex].height +"  " + this._screens[screenIndex +1].height  +
-                          (this._screens[screenIndex].height / this._screens[screenIndex +1].height));
-
     }
     if (direction == "left" && screenIndex > 0) {
       s = this._screens[screenIndex -1];
       s = this._recalculateSizes(s);
-
-      global.log(this._screens[screenIndex].width +"  " + this._screens[screenIndex - 1].width  +
-                          (this._screens[screenIndex].width / this._screens[screenIndex - 1].width));
-      global.log(this._screens[screenIndex].height +"  " + this._screens[screenIndex - 1].height  +
-                          (this._screens[screenIndex].height / this._screens[screenIndex - 1].height));
-      xRatio = this._screens[screenIndex].width / this._screens[screenIndex - 1].width;
-      yRatio = this._screens[screenIndex].height / this._screens[screenIndex - 1].height;
     }
 
     if (s != null) {
       let position = win.get_outer_rect();
-      let x = s.x + (position.x - oldScreenX);
+      let x = s.x + (position.x - old.x);
+      let xRatio = s.width / old.width;
+      let yRatio = s.height / old.height;
 
-      global.log(xRatio + " " + yRatio);
-
-      this._resize(win, x, position.y, position.width, position.height);
+      this._resize(win, (x * xRatio), (position.y * yRatio), (position.width * xRatio), (position.height * yRatio));
     }
   },
 
@@ -204,9 +190,9 @@ MoveWindow.prototype = {
     }
 
     if (where == "ne") {
-      this._resize(win, moveRightX, s.y, s.width, s.height)
+      this._resize(win, s.east[0].x, s.y, s.width, s.height)
     } else if (where == "se") {
-      this._resize(win, moveRightX, s.sy, s.width, s.height)
+      this._resize(win, s.east[0].x, s.sy, s.width, s.height)
     } else if (where == "sw") {
       this._resize(win, s.x, s.sy, s.width, s.height)
     } else if (where == "nw") {
