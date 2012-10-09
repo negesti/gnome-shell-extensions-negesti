@@ -20,6 +20,7 @@ Utils.prototype = {
   CENTER_HEIGHT: "center-height",
   SIDE_WIDTH: "side-width",
   SIDE_HEIGHT: "side-height",
+  ALWAYS_USE_WIDTHS: "always-use-widths",
 
   START_CONFIG: {
     autoMove: false,
@@ -34,9 +35,7 @@ Utils.prototype = {
   _init: function() {
     this.loadSettings();
 
-
-    // locations is a json strings stored in the gschema. -> reload it after the user
-    // saved his changes
+    // locations is a json strings stored in the gschema. -> reload it after the user saved his changes
     this._changeEventListeners.push({
       name: "locations",
       fn:  Lang.bind(this, this.loadSettings)
@@ -75,7 +74,7 @@ Utils.prototype = {
       schemaSource = GioSSS.get_default();
     }
 
-    let schema = schemaSource.lookup(schema, true);
+    schema = schemaSource.lookup(schema, true);
     if (!schema) {
         throw new Error('Schema ' + schema + ' could not be found for extension '
                         + Me.metadata.uuid + '. Please check your installation.');
@@ -105,8 +104,29 @@ Utils.prototype = {
     }
   },
 
+  getWestWidths: function() {
+    return [
+      this.getNumber("left-side-widths-0", 50) / 100,
+      this.getNumber("left-side-widths-1", 34) / 100,
+      this.getNumber("left-side-widths-2", 66) / 100
+    ];
+  },
+
+  getEastWidths: function() {
+    return [
+      this.getNumber("right-side-widths-0", 50) / 100,
+      this.getNumber("right-side-widths-1", 34) / 100,
+      this.getNumber("right-side-widths-2", 66) / 100
+    ];
+  },
+
   getBoolean: function(name, defaultValue) {
-    let ret = this.getParameter(name, defaultValue);
+    let ret = defaultValue;
+    if (name.indexOf("locations") == -1) {
+      ret = this._settingsObject.get_int(name);
+    } else {
+      ret = this.getParameter(name);
+    }
     return ret == "true" || ret == "1";
   },
 

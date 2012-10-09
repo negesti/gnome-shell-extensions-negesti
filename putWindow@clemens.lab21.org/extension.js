@@ -32,8 +32,8 @@ MoveWindow.prototype = {
   _primary: 0,
 
   _screens: [],
-  _westWidths: [ 0.5, 0.33, 0.66 ],
-  _eastWidths: [ 0.5, 0.66, 0.33 ],
+  _westWidths: [ 0.5, 0.34, 0.66 ],
+  _eastWidths: [ 0.5, 0.66, 0.34 ],
 
   /**
    * Helper functions to set custom handler for keybindings
@@ -50,7 +50,6 @@ MoveWindow.prototype = {
   },
 
   _recalculateSizes: function(s) {
-
     let tbHeight = s.primary ? Main.panel.actor.height : 0;
     if (tbHeight == 1) {
       tbHeight = 0;
@@ -58,10 +57,10 @@ MoveWindow.prototype = {
     s.y = s.geomY + tbHeight;
     s.height = s.totalHeight * this._getSideHeight() - Math.floor(tbHeight/2);
     s.width = s.totalWidth * this._getSideWidth();
-
     s.sy = (s.totalHeight - s.height) + s.geomY;
 
     let i = 0;
+    this._westWidths = this._utils.getWestWidths();
     for ( i=0; i< this._westWidths.length; i++) {
       s.west[i] = {
         width: s.totalWidth * this._westWidths[i],
@@ -69,6 +68,7 @@ MoveWindow.prototype = {
       }
     }
 
+    this._eastWidths = this._utils.getEastWidths();
     for ( i=0; i< this._eastWidths.length; i++) {
       s.east[i] = {
         width: s.totalWidth * this._eastWidths[i],
@@ -104,6 +104,7 @@ MoveWindow.prototype = {
   /**
    * Move the focused window to the screen on the "direction" side
    * @param direction left and right is supported
+   * @return true, if it was possible to move the focused window in the given direction
    */
   _moveToScreen: function(direction) {
     let win = global.display.focus_window;
@@ -116,11 +117,12 @@ MoveWindow.prototype = {
       totalHeight: this._screens[screenIndex].totalHeight
     };
 
-    if (direction == "right" && screenIndex < (this._screens.length - 1)) {
+    if ((direction == "right" || direction == "e") && screenIndex < (this._screens.length - 1)) {
       s = this._screens[screenIndex + 1];
       s = this._recalculateSizes(s);
     }
-    if (direction == "left" && screenIndex > 0) {
+
+    if ((direction == "left" || direction == "w") && screenIndex > 0) {
       s = this._screens[screenIndex -1];
       s = this._recalculateSizes(s);
     }
@@ -140,67 +142,94 @@ MoveWindow.prototype = {
         height = -1;
       }
       this._resize(win, (x * xRatio), (position.y * yRatio), width, height);
+      return true;
     }
+    return false;
   },
 
   /**
-   * move the current focues window into the given direction (n,e,s,w, ne, nw, sw, so, c)
+   * Moves win, that is currently on screen[screenIndex] in the given direction.
+   * Depending on ALWAYS_USE_WIDTHS config and screen setup, the window is either
+   * moved to other screen or only resized.
+   *
+   * @param win The window that must be moved
+   * @param screenIndex The screen the window belongs to (this._screens)
+   * @param direction The two available sides e/w (i.e. east/west)
+   */
+  _moveToSide: function(win, screenIndex, direction) {
+
+    let s = this._screens[screenIndex];
+    let pos = win.get_outer_rect();
+    let sizes = direction == "e" ? s.east : s.west;
+
+    let useIndex = 0;
+    for ( let i=0; i < sizes.length; i++) {
+      if (this._samePoint(pos.width, sizes[i].width) && this._samePoint(pos.x, sizes[i].x)) {
+        useIndex = i + 1;
+        if (useIndex >= sizes.length) {
+          useIndex = 0;
+        }
+        break;
+      }
+    }
+
+    let otherDirection = "e";
+    let canMoveScreen = screenIndex > 0;
+    if (direction == "e") {
+      otherDirection = "w";
+      canMoveScreen = screenIndex < (this._screens.length - 1);
+    }
+
+    if (useIndex > 0 && canMoveScreen && !this._utils.getBoolean(this._utils.ALWAYS_USE_WIDTHS)) {
+      // moved in this direction more then once, if a screen exists, move the window there
+      if (useIndex > 1) {
+        // the window was moved here from an other screen, just resize it
+        useIndex = 0;
+      } else {
+        // moving to other screen is possible, move to screen and resize afterwards
+        this._moveToScreen(direction);
+        this._moveFocused(otherDirection);
+        return;
+      }
+    }
+
+    this._resize(win, sizes[useIndex].x, s.y, sizes[useIndex].width, s.totalHeight * -1);
+  },
+
+  /**
+   * move the current focused window into the given direction (n,e,s,w, ne, nw, sw, so, c)
    */
   _moveFocused: function(where) {
     let win = global.display.focus_window;
-    if (win==null) {
+    if (win == null) {
         return;
     }
 
-    let s = this._screens[this._getCurrentScreenIndex(win)];
+    let screenIndex = this._getCurrentScreenIndex(win);
+    let s = this._screens[screenIndex];
     // check if we are on primary screen and if the main panel is visible
     s = this._recalculateSizes(s);
-    var pos = win.get_outer_rect();
+    let pos = win.get_outer_rect();
 
     let diff = null,
       sameWidth = this._samePoint(pos.width, s.width);
 
     let maxH = (pos.height >= s.totalHeight) || this._samePoint(pos.height, s.totalHeight);
 
-    if (where=="n") {
+    if (where == "n") {
       this._resize(win, s.x, s.y, s.totalWidth * -1, s.height);
     } else if (where == "s") {
       this._resize(win, s.x, s.sy, s.totalWidth * -1, s.height);
     } else if (where == "e") {
-      let width = s.width;
-      let useIndex = 0;
-
-      for ( let i=0; i < s.east.length; i++) {
-        if (this._samePoint(pos.width, s.east[i].width) && this._samePoint(pos.x, s.east[i].x)) {
-          useIndex = i + 1;
-          if (useIndex >= s.east.length) {
-            useIndex = 0;
-          }
-          break;
-        }
-      }
-
-      this._resize(win, s.east[useIndex].x, s.y, s.east[useIndex].width, s.totalHeight * -1); //(s.x + s.width)
+      this._moveToSide(win, screenIndex, "e");
     }  else if (where == "w") {
-       let useIndex = 0;
-
-      for ( let i=0; i < s.west.length; i++) {
-        if (this._samePoint(pos.width, s.west[i].width) && this._samePoint(pos.x, s.west[i].x)) {
-          useIndex = i + 1;
-          if (useIndex >= s.west.length) {
-            useIndex = 0;
-          }
-          break;
-        }
-      }
-
-      this._resize(win, s.west[useIndex].x, s.y, s.west[useIndex].width, s.totalHeight * -1);
+      this._moveToSide(win, screenIndex, "w");
     }
 
     if (where == "ne") {
-      this._resize(win, s.east[0].x, s.y, s.width, s.height)
+      this._resize(win, s.x + s.width, s.y, s.width, s.height)
     } else if (where == "se") {
-      this._resize(win, s.east[0].x, s.sy, s.width, s.height)
+      this._resize(win, s.x + s.width, s.sy, s.width, s.height)
     } else if (where == "sw") {
       this._resize(win, s.x, s.sy, s.width, s.height)
     } else if (where == "nw") {
@@ -216,7 +245,7 @@ MoveWindow.prototype = {
         sameHeight = this._samePoint(h, pos.height);
 
       // do not check window.width. until i find get_size_hint(), or min_width..
-      // windows that have a min_width < our width it will not work (evolution for example)
+      // windows that have a min_width < our width will not be maximized (evolution for example)
       if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameHeight) {
         // the window is alread centered -> maximize
         this._resize(win, s.x, s.y, s.totalWidth * -1, s.totalHeight * -1);
@@ -393,20 +422,24 @@ MoveWindow.prototype = {
     // only tested with 2 screen setup
     for (let i=0; i<numMonitors; i++) {
       let geom = global.screen.get_monitor_geometry(i);
+      let primary = (i == this._primary);
+      let tbHeight = primary
+        ? Main.panel.actor.height
+        : 0;
 
       this._screens[i] =  {
-        y: geom.y, // (i==this._primary) ? geom.y + this._topBarHeight : geom.y,
+        primary: primary,
+        y: geom.y,
         x : geom.x,
         geomX: geom.x,
         geomY: geom.y,
         totalWidth: geom.width,
         totalHeight: geom.height,
+        height: geom.height * this._getSideHeight() - Math.floor(tbHeight/2),
         width: geom.width * this._getSideWidth(),
         east: [],
         west: []
       };
-
-      this._screens[i].primary = (i==this._primary)
     }
 
     // sort by x position. makes it easier to find the correct screen
