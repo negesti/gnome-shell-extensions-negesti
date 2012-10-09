@@ -112,8 +112,8 @@ MoveWindow.prototype = {
     let s = null;
     let old = {
       x: this._screens[screenIndex].x,
-      width: this._screens[screenIndex].width,
-      height: this._screens[screenIndex].height
+      totalWidth: this._screens[screenIndex].totalWidth,
+      totalHeight: this._screens[screenIndex].totalHeight
     };
 
     if (direction == "right" && screenIndex < (this._screens.length - 1)) {
@@ -128,10 +128,18 @@ MoveWindow.prototype = {
     if (s != null) {
       let position = win.get_outer_rect();
       let x = s.x + (position.x - old.x);
-      let xRatio = s.width / old.width;
-      let yRatio = s.height / old.height;
+      let xRatio = s.totalWidth / old.totalWidth;
+      let yRatio = s.totalHeight / old.totalHeight;
 
-      this._resize(win, (x * xRatio), (position.y * yRatio), (position.width * xRatio), (position.height * yRatio));
+      let width = position.width * xRatio;
+      if (width >= s.totalWidth) {
+        width = -1;
+      }
+      let height = position.height * yRatio;
+      if (height >= s.totalHeight) {
+        height = -1;
+      }
+      this._resize(win, (x * xRatio), (position.y * yRatio), width, height);
     }
   },
 
