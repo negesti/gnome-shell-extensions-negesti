@@ -2,11 +2,11 @@
   <schema id="org.gnome.shell.extensions.org-lab21-putwindow" path="/org/gnome/shell/extensions/org-lab21-putwindow/">
     <key type="i" name="side-width">
       <default>50</default>
-      <summary>Width to use when moved to side or corner</summary>
+      <summary>Width to use when moved to a corner</summary>
     </key>
     <key type="i" name="side-height">
       <default>50</default>
-      <summary>Height to use when moved to side or corner</summary>
+      <summary>Height to use when moved to a corner</summary>
     </key>
     <key type="i" name="center-width">
       <default>50</default>
@@ -19,7 +19,37 @@
 
     <key type="s" name="locations">
       <default>"{}"</default>
-      <summary>Height to use when moved to center</summary>
+      <summary>Application based configuration</summary>
+    </key>
+
+    <key type="i" name="always-use-widths">
+      <default>0</default>
+      <summary>Use multiple widths even if moveing to other screen is possible</summary>
+    </key>
+    <key type="i" name="left-side-widths-0">
+      <default>50</default>
+      <summary>Width to use when moving to left side once</summary>
+    </key>
+    <key type="i" name="left-side-widths-1">
+      <default>34</default>
+      <summary>Width to use when moving to left side twice</summary>
+    </key>
+    <key type="i" name="left-side-widths-2">
+      <default>66</default>
+      <summary>Width to use when moving to left side three times</summary>
+    </key>
+
+    <key type="i" name="right-side-widths-0">
+      <default>50</default>
+      <summary>Width to use when moving to right side once</summary>
+    </key>
+    <key type="i" name="right-side-widths-1">
+      <default>66</default>
+      <summary>Width to use when moving to right side twice</summary>
+    </key>
+    <key type="i" name="right-side-widths-2">
+      <default>34</default>
+      <summary>Width to use when moving to right side three times</summary>
     </key>
 
     <key type="as" name="put-to-corner-ne">
