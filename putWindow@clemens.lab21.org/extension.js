@@ -32,8 +32,6 @@ MoveWindow.prototype = {
   _primary: 0,
 
   _screens: [],
-  _westWidths: [ 0.5, 0.34, 0.66 ],
-  _eastWidths: [ 0.5, 0.66, 0.34 ],
 
   /**
    * Helper functions to set custom handler for keybindings
@@ -60,19 +58,22 @@ MoveWindow.prototype = {
     s.sy = (s.totalHeight - s.height) + s.geomY;
 
     let i = 0;
-    this._westWidths = this._utils.getWestWidths();
-    for ( i=0; i< this._westWidths.length; i++) {
+    let widths  = this._utils.getWestWidths();
+    s.west = [];
+    for ( i=0; i< widths.length; i++) {
       s.west[i] = {
-        width: s.totalWidth * this._westWidths[i],
+        width: s.totalWidth * widths[i],
         x: s.x
       }
     }
 
-    this._eastWidths = this._utils.getEastWidths();
-    for ( i=0; i< this._eastWidths.length; i++) {
+
+    widths = this._utils.getEastWidths();
+    s.east = [];
+    for ( i=0; i< widths.length; i++) {
       s.east[i] = {
-        width: s.totalWidth * this._eastWidths[i],
-        x: s.geomX + (s.totalWidth * (1 - this._eastWidths[i]))
+        width: s.totalWidth * widths[i],
+        x: s.geomX + (s.totalWidth * (1 - widths[i]))
       }
     }
 
@@ -103,11 +104,15 @@ MoveWindow.prototype = {
 
   /**
    * Move the focused window to the screen on the "direction" side
-   * @param direction left and right is supported
+   * @param direction left, e, right and w are supported
    * @return true, if it was possible to move the focused window in the given direction
    */
   _moveToScreen: function(direction) {
     let win = global.display.focus_window;
+     if (win == null) {
+        return;
+    }
+
     let screenIndex = this._getCurrentScreenIndex(win);
 
     let s = null;

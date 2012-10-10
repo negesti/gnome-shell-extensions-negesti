@@ -105,19 +105,24 @@ Utils.prototype = {
   },
 
   getWestWidths: function() {
-    return [
-      this.getNumber("left-side-widths-0", 50) / 100,
-      this.getNumber("left-side-widths-1", 34) / 100,
-      this.getNumber("left-side-widths-2", 66) / 100
-    ];
+    let ret = this._addToArray([], this.getNumber("left-side-widths-0", 50) / 100);
+    ret = this._addToArray(ret, this.getNumber("left-side-widths-1", 34) / 100);
+    ret = this._addToArray(ret, this.getNumber("left-side-widths-2", 66) / 100);
+    return ret;
   },
 
   getEastWidths: function() {
-    return [
-      this.getNumber("right-side-widths-0", 50) / 100,
-      this.getNumber("right-side-widths-1", 34) / 100,
-      this.getNumber("right-side-widths-2", 66) / 100
-    ];
+    let ret = this._addToArray([], this.getNumber("right-side-widths-0", 50) / 100);
+    ret = this._addToArray(ret, this.getNumber("right-side-widths-1", 66) / 100);
+    ret = this._addToArray(ret, this.getNumber("right-side-widths-2", 34) / 100);
+    return ret;
+  },
+
+  _addToArray: function(array, value) {
+    if (array.indexOf(value) == -1) {
+      array.push(value);
+    }
+    return array;
   },
 
   getBoolean: function(name, defaultValue) {
