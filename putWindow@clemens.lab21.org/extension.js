@@ -110,7 +110,7 @@ MoveWindow.prototype = {
   _moveToScreen: function(direction) {
     let win = global.display.focus_window;
      if (win == null) {
-        return;
+        return false;
     }
 
     let screenIndex = this._getCurrentScreenIndex(win);
