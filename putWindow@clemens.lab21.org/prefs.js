@@ -36,53 +36,87 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.expand = true;
     this._wnckScreen = Wnck.Screen.get_default();
 
-    // width and height when window is centered
-    let expander = new Gtk.Expander();
-    expander.set_label("Main settings");
-    let mainConfig = new Gtk.Grid();
-    mainConfig.width = 4;
-    mainConfig.column_homogeneous = true;
-
-    mainConfig.attach(new Gtk.Label({label: "Center width:", halign: Gtk.Align.START, margin_left:2 }), 0, 0, 1, 1);
-    let scaleCW = createSlider(Utils.CENTER_WIDTH);
-    mainConfig.attach(scaleCW, 1, 0, 3, 1);
-
-    mainConfig.attach(new Gtk.Label({label: "Center height:", halign:Gtk.Align.START, margin_left:2 }), 0, 1, 1, 1);
-    let scaleCH = createSlider(Utils.CENTER_HEIGHT);
-    mainConfig.attach(scaleCH, 1, 1, 3, 1);
-
-    // width and height when window is moved to a side or corner
-    mainConfig.attach(new Gtk.Label({label: "Side width:", halign:Gtk.Align.START, margin_left:2 }), 0, 2, 1, 1);
-    let scaleCoW = createSlider(Utils.SIDE_WIDTH);
-    mainConfig.attach(scaleCoW, 1, 2, 3, 1);
-
-    mainConfig.attach(new Gtk.Label({label: "Side height:", halign:Gtk.Align.START, margin_left:2 }), 0, 3, 1, 1);
-    let scaleCoH = createSlider(Utils.SIDE_HEIGHT);
-    mainConfig.attach(scaleCoH, 1, 3, 3, 1);
-    expander.add(mainConfig);
-    this.attach(expander, 0, 0, 1, 9);
+    let mainConfig = new Gtk.Expander();
+    mainConfig.set_label("Main settings");
+    mainConfig.add(this._generateMainSettings());
+    this.attach(mainConfig, 0, 0, 1, 9);
 
     this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 10, 1, 1);
-
     let keyExpander = new Gtk.Expander();
     keyExpander.set_label("Keyboard Shortcuts");
     keyExpander.add(this._createKeyboardConfig());
     this.attach(keyExpander, 0, 11, 1, 9);
 
     this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 20, 1, 1);
-    this.attach(new PutWindowLocationWidget(this._wnckScreen), 0, 21, 1, 100);
+    let appExpander = new Gtk.Expander();
+    appExpander.set_label("Applications");
+    appExpander.add(new PutWindowLocationWidget(this._wnckScreen));
+    this.attach(appExpander, 0, 21, 1, 10000);
+  },
 
-    let buttonPanel = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL});
-    let img = new Gtk.Image({stock: Gtk.STOCK_SAVE});
+  _generateMainSettings: function() {
+    let ret = new Gtk.Grid();
+    ret.width = 6;
+    ret.column_homogeneous = true;
 
-    let saveButton = new Gtk.Button({label: Gtk.STOCK_SAVE});
-    saveButton.set_use_stock(true);
-    saveButton.connect("button-press-event", function() {
-      Utils.saveSettings();
+    let row = 0;
+
+    ret.attach(new Gtk.Label({label: "<b><u>Center</u></b>", halign: Gtk.Align.START, margin_left: 2, use_markup: true }), 0, row, 2, 1);
+    row++;
+
+    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.END, margin_left: 2 }), 0, row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH), 1, row, 2, 1);
+
+    ret.attach(new Gtk.Label({label: "Height:", halign:Gtk.Align.END, margin_left: 2 }), 3, row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT), 4, row, 2, 1);
+
+    // width and height when window is moved to a side or corner
+    row++;
+    ret.attach(new Gtk.Label({label: "<b><u>Corner</u></b>", halign:Gtk.Align.START, margin_left:2, use_markup: true}), 0, row, 2, 1);
+    row++;
+    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.END, margin_left:2 }), 0, row, 1, 1);
+    ret.attach(createSlider(Utils.SIDE_WIDTH), 1, row, 2, 1);
+
+    ret.attach(new Gtk.Label({label: "Height:", halign:Gtk.Align.END, margin_left:2 }), 3, row, 1, 1);
+    ret.attach(createSlider(Utils.SIDE_HEIGHT), 4, row, 2, 1);
+
+    row++;
+    ret.attach(new Gtk.Label({label: "<b><u>Left side</u></b>", halign:Gtk.Align.START, margin_left: 2, use_markup: true }), 0, row, 2, 1);
+
+    row++;
+    ret.attach(createSlider("left-side-widths-0"), 0, row, 2, 1);
+    ret.attach(createSlider("left-side-widths-1"), 2, row, 2, 1);
+    ret.attach(createSlider("left-side-widths-2"), 4, row, 2, 1);
+
+    row++;
+    ret.attach(new Gtk.Label({label: "<b><u>Right side</u></b>", halign:Gtk.Align.START, margin_left: 2, use_markup: true }), 0, row, 1, 1);
+    row++;
+    ret.attach(createSlider("right-side-widths-0"), 0, row, 2, 1);
+    ret.attach(createSlider("right-side-widths-1"), 2, row, 2, 1);
+    ret.attach(createSlider("right-side-widths-2"), 4, row, 2, 1);
+
+    row++;
+    //ALWAYS_USE_WIDTHS
+    let alwaysTooltip = "Disable this option to move to other screen if possible";
+    let alwaysLabel = new Gtk.Label({
+      label: "<b><u>Always use multiple widths:</u></b>",
+      halign:Gtk.Align.START,
+      margin_left: 2,
+      use_markup: true
     });
+    alwaysLabel.set_tooltip_text(alwaysTooltip);
+    ret.attach(alwaysLabel, 0, row, 2, 1);
 
-    buttonPanel.pack_end(saveButton, false, false, 2);
-    this.attach(buttonPanel, 0, 121, 1, 1);
+    let alwaysSwitch = new Gtk.Switch({ sensitive: true, margin_right: 6, margin_left: 6});
+    alwaysSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_USE_WIDTHS, false));
+    alwaysSwitch.connect("notify::active",
+      function(obj) {
+        Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active());
+      }
+    );
+    alwaysSwitch.set_tooltip_text(alwaysTooltip);
+    ret.attach(alwaysSwitch, 2, row, 1, 1);
+    return ret;
   },
 
   _createKeyboardConfig: function() {
@@ -105,21 +139,21 @@ const PutWindowSettingsWidget = new GObject.Class({
         "put-to-side-s": "Move to bottom",
         "put-to-side-w": "Move to left",
         "put-to-center": "Move to center/maximize",
-        "put-to-location": "Move to configured location"
+        "put-to-location": "Move to configured location",
+        "put-to-left-screen": "Move to the left screen",
+        "put-to-right-screen": "Move to the right screen"
     };
 
     for (name in bindings) {
       let [key, mods] = Gtk.accelerator_parse(Utils.get_strv(name, null)[0]);
       let row = model.insert(10);
       model.set(row, [0, 1, 2, 3], [name, bindings[name], mods, key ]);
-
     }
 
     let treeview = new Gtk.TreeView({
       'expand': true,
       'model': model
     });
-
 
     // Action column
     let cellrend = new Gtk.CellRendererText();
@@ -217,14 +251,13 @@ const PutWindowLocationWidget = new GObject.Class({
       })
     );
 
-    let leftPanel = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
-    leftPanel.pack_start(this.treeView, true, true, 0);
     let toolbar = new Gtk.Toolbar({});
     toolbar.set_icon_size(Gtk.IconSize.MENU);
     toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR)
 
     this._removeAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_REMOVE} );
     this._removeAppButton.set_sensitive(false);
+    this._removeAppButton.set_tooltip_text("Remove an existing application");
 
     this._removeAppButton.connect("clicked",
       Lang.bind(this, function() {
@@ -267,7 +300,8 @@ const PutWindowLocationWidget = new GObject.Class({
       })
     );
 
-    this._addAppButton = new Gtk.ToolButton( {stock_id:Gtk.STOCK_ADD} );
+    this._addAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_ADD} );
+    this._addAppButton.set_tooltip_text("Add a new application (make sure it is runnging)");
     this._addAppButton.connect("clicked",
       Lang.bind(this, function() {
 
@@ -320,8 +354,19 @@ const PutWindowLocationWidget = new GObject.Class({
       })
     );
 
+    this._saveButton = new Gtk.ToolButton({stock_id: Gtk.STOCK_SAVE});
+    //this._saveButton.set_use_stock(true);
+    this._saveButton.set_tooltip_text("'Applications' config is not saved automatically.")
+    this._saveButton.connect("clicked", function() {
+      Utils.saveSettings();
+    });
+
     toolbar.insert(this._removeAppButton, 0);
     toolbar.insert(this._addAppButton, 1);
+    toolbar.insert(this._saveButton, 2);
+
+    let leftPanel = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
+    leftPanel.pack_start(this.treeView, true, true, 0);
     leftPanel.pack_start(toolbar, false, false, 0);
 
     this.add(leftPanel);

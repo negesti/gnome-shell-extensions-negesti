@@ -11,6 +11,10 @@ grid plugin.
 ChangeLog
 -------
 
+__October 9, 2012__
+ * Support multiple widths when moving to left/right side
+ * Added keybindings to move window to left/right screen
+
 __July 13, 2012__
  * Fixed config reload -> no need to reload the shell
 
@@ -88,7 +92,7 @@ __Gnome Shell 3.2__
 The keybinding can not be stored in a custom schema. The extension uses de predefined bindings
 /apps/metacity/window_keybindings. Modify ghem with gconf-editor/gconftool/gconftool-2.
     run gconf-editor /apps/metacity/window_keybindings
-    
+
 For details how to configure it, please check the wiki.
 
 2 screen setup support
