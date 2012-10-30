@@ -60,7 +60,7 @@ MoveWindow.prototype = {
     let i = 0;
     let widths  = this._utils.getWestWidths();
     s.west = [];
-    for ( i=0; i< widths.length; i++) {
+    for ( i=0; i < widths.length; i++) {
       s.west[i] = {
         width: s.totalWidth * widths[i],
         x: s.x
@@ -70,12 +70,32 @@ MoveWindow.prototype = {
 
     widths = this._utils.getEastWidths();
     s.east = [];
-    for ( i=0; i< widths.length; i++) {
+    for ( i=0; i < widths.length; i++) {
       s.east[i] = {
         width: s.totalWidth * widths[i],
         x: s.geomX + (s.totalWidth * (1 - widths[i]))
       }
     }
+
+    let heights = this._utils.getNorthHeights();
+    s.north = [];
+    for ( i=0; i < heights.length; i++) {
+      s.north[i] = {
+        height: s.totalHeight * heights[i] - Math.floor(tbHeight/2),
+        y: 0
+      }
+    }
+
+    heights = this._utils.getSouthHeights();
+    s.south = [];
+    for (i=0; i < heights.length; i++) {
+      let h = s.totalHeight * heights[i] - Math.floor(tbHeight/2);
+      s.south[i] = {
+        height: h,
+        y: (s.totalHeight - h) + s.geomY
+      }
+    }
+
 
     return s;
   },
@@ -152,6 +172,7 @@ MoveWindow.prototype = {
     return false;
   },
 
+
   /**
    * Moves win, that is currently on screen[screenIndex] in the given direction.
    * Depending on ALWAYS_USE_WIDTHS config and screen setup, the window is either
@@ -172,7 +193,7 @@ MoveWindow.prototype = {
       if (this._samePoint(pos.width, sizes[i].width) && this._samePoint(pos.x, sizes[i].x)) {
         useIndex = i + 1;
         if (useIndex >= sizes.length) {
-          useIndex = 0;
+          useIndex =  0;
         }
         break;
       }
@@ -201,8 +222,64 @@ MoveWindow.prototype = {
     this._resize(win, sizes[useIndex].x, s.y, sizes[useIndex].width, s.totalHeight * -1);
   },
 
+  _moveNorthSouth: function(win, screenIndex, direction) {
+    let s = this._screens[screenIndex];
+    let pos = win.get_outer_rect();
+    let sizes = direction == "n" ? s.north : s.south;
+
+    let useIndex = 0;
+    for ( let i=0; i < sizes.length; i++) {
+      if (this._samePoint(pos.height, sizes[i].height) && this._samePoint(pos.y, sizes[i].y)) {
+        useIndex = i + 1;
+        if (useIndex >= sizes.length) {
+          useIndex =  0;
+        }
+        break;
+      }
+    }
+
+    this._resize(win, s.x, sizes[useIndex].y, s.totalWidth * -1, sizes[useIndex].height);
+  },
+
+  _moveToCorner: function(win, screenIndex, direction) {
+    let s = this._screens[screenIndex];
+    let pos = win.get_outer_rect();
+
+    let useWidth = 0;
+    let widths = (direction.indexOf("e") == -1) ? s.west : s.east;
+
+    // TODO -
+    // let addToWidth = this._utils.getBoolean(this._utils.CORNER_CHANGE_WIDTH, false) ? 1 : 0;
+    let addToWidth = this._utils.CORNER_CHANGE_WIDTH ? 1 : 0;
+
+    for (let i=0; i < widths.length; i++) {
+      if (this._samePoint(pos.width, widths[i].width) && this._samePoint(pos.x, widths[i].x)) {
+        useWidth = i + addToWidth;
+        if (useWidth >= widths.length) {
+          useWidth =  0;
+        }
+        break;
+      }
+    }
+
+    let useHeight = 0;
+    let heights = (direction.indexOf("n") == -1) ? s.south : s.north;
+
+    for (let i=0; i < heights.length; i++) {
+      if (this._samePoint(pos.height, heights[i].height) && this._samePoint(pos.y, heights[i].y)) {
+        useHeight = i + 1;
+        if (useHeight >= heights.length) {
+          useHeight =  0;
+        }
+        break;
+      }
+    }
+
+    this._resize(win, widths[useWidth].x, heights[useHeight].y, widths[useWidth].width, heights[useHeight].height);
+  },
+
   /**
-   * move the current focused window into the given direction (n,e,s,w, ne, nw, sw, so, c)
+   * move the current focused window into the given direction (c, n,e,s,w, ne, nw, sw, so)
    */
   _moveFocused: function(where) {
     let win = global.display.focus_window;
@@ -214,35 +291,10 @@ MoveWindow.prototype = {
     let s = this._screens[screenIndex];
     // check if we are on primary screen and if the main panel is visible
     s = this._recalculateSizes(s);
-    let pos = win.get_outer_rect();
 
-    let diff = null,
-      sameWidth = this._samePoint(pos.width, s.width);
-
-    let maxH = (pos.height >= s.totalHeight) || this._samePoint(pos.height, s.totalHeight);
-
-    if (where == "n") {
-      this._resize(win, s.x, s.y, s.totalWidth * -1, s.height);
-    } else if (where == "s") {
-      this._resize(win, s.x, s.sy, s.totalWidth * -1, s.height);
-    } else if (where == "e") {
-      this._moveToSide(win, screenIndex, "e");
-    }  else if (where == "w") {
-      this._moveToSide(win, screenIndex, "w");
-    }
-
-    if (where == "ne") {
-      this._resize(win, s.x + s.width, s.y, s.width, s.height)
-    } else if (where == "se") {
-      this._resize(win, s.x + s.width, s.sy, s.width, s.height)
-    } else if (where == "sw") {
-      this._resize(win, s.x, s.sy, s.width, s.height)
-    } else if (where == "nw") {
-      this._resize(win, s.x, s.y, s.width, s.height)
-    }
-
-    // calculate the center position and check if the window is already there
     if (where == "c") {
+      // calculate the center position and check if the window is already there
+      let pos = win.get_outer_rect();
       let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH, 50) / 100),
         h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT, 50) / 100),
         x = s.x + (s.totalWidth - w) / 2,
@@ -258,6 +310,12 @@ MoveWindow.prototype = {
         // the window is not centered -> resize
         this._resize(win, x, y, w, h);
       }
+    } else if (where == "n" || where == "s") {
+      this._moveNorthSouth(win, screenIndex, where);
+    } else if (where == "e" || where == "w") {
+      this._moveToSide(win, screenIndex, where);
+    } else {
+      this._moveToCorner(win, screenIndex, where);
     }
   },
 
@@ -392,14 +450,6 @@ MoveWindow.prototype = {
     };
   },
 
-  _checkSize: function(p) {
-    if (!p || p < 0 || p > 100) {
-      return 50;
-    }
-
-    return p;
-  },
-
   _getSideWidth: function() {
     return this._utils.getNumber(this._utils.SIDE_WIDTH, 50) / 100;
   },
@@ -443,7 +493,9 @@ MoveWindow.prototype = {
         height: geom.height * this._getSideHeight() - Math.floor(tbHeight/2),
         width: geom.width * this._getSideWidth(),
         east: [],
-        west: []
+        west: [],
+        north: [],
+        south: []
       };
     }
 

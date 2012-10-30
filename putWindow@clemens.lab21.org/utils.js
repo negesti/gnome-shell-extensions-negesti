@@ -10,6 +10,23 @@ function Utils() {
 
 Utils.prototype = {
 
+  ///////////////////////////////////////////////////////////////////////
+  //
+  // TODO: add this to prefs.js, recompile schema
+  //
+  // CORNER_CHANGE_WIDTH ... if false, moving to corner will not change the width of the window
+  // NORTH_HEIGHTS ... height of the window when moving up multiple times
+  // SOUTH_HEIGHTS ... height of the window when moving down multiple times
+  //
+  //  heights may have different length e.g N: [0.5, 0.66, 0.34], S [0.34, 0.66]
+  //
+  ///////////////////////////////////////////////////////////////////////
+  CORNER_CHANGE_WIDTH: false,
+  NORTH_HEIGHTS: [0.5, 0.66, 0.34],
+  SOUTH_HEIGHTS: [0.5, 0.34, 0.66],
+  // ------------------------------------------------------------------------
+
+
   _filename: "",
   _settingsObject: { },
   _settings: "",
@@ -21,6 +38,7 @@ Utils.prototype = {
   SIDE_WIDTH: "side-width",
   SIDE_HEIGHT: "side-height",
   ALWAYS_USE_WIDTHS: "always-use-widths",
+  //CORNER_CHANGE_WIDTH: "corner-change-width",
 
   START_CONFIG: {
     autoMove: false,
@@ -102,6 +120,14 @@ Utils.prototype = {
     } catch (e) {
       this.showErrorMessage("Error saving settings ", e);
     }
+  },
+
+  getNorthHeights: function() {
+    return this.NORTH_HEIGHTS
+  },
+
+  getSouthHeights: function() {
+    return this.SOUTH_HEIGHTS;
   },
 
   getWestWidths: function() {
