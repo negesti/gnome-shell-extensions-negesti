@@ -11,6 +11,14 @@ grid plugin.
 ChangeLog
 -------
 
+__Octover 30, 2012__
+ * Support multiple heights when moving to top/bottom
+ * "move to corner" uses widths and heights defined for sides
+  * atm NO CONFIG UI to define heights (can be modified in utils.js)
+  * CORNER_CHANGE_WIDTH
+   * true... move to corner multiple times will change width and height
+   * false.. width is not changed, if the window is has a "known" width
+
 __October 9, 2012__
  * Support multiple widths when moving to left/right side
  * Added keybindings to move window to left/right screen
