@@ -54,68 +54,131 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.attach(appExpander, 0, 21, 1, 10000);
   },
 
+  _createCornerChangesCombo: function() {
+    this._model = new Gtk.ListStore();
+    this._model.set_column_types([GObject.TYPE_STRING, GObject.TYPE_STRING]);
+
+    let combo = new Gtk.ComboBox({ model: this._model, halign: Gtk.Align.END});
+
+    let currentValue = Utils.getNumber(Utils.CORNER_CHANGE, 0);
+
+    let values = [
+      ["0", "Both"],
+      ["1", "Only height"],
+      ["2", "Only width"]
+    ]
+    let selectMe = null;
+    for (let i=0; i< values.length; i++) {
+      let iter = this._model.append();
+      this._model.set(iter, [0, 1], values[i]);
+      if (values[i][0] == currentValue) {
+        selectMe = iter;
+      }
+    }
+
+    if (selectMe != null) {
+      combo.set_active_iter(selectMe);
+    }
+
+    let renderer = new Gtk.CellRendererText();
+    combo.pack_start(renderer, true);
+    combo.add_attribute(renderer, 'text', 1);
+    combo.connect("changed", Lang.bind(this,
+      function(obj) {
+        let[success, iter] = obj.get_active_iter();
+        if (!success) {
+          return;
+        }
+        Utils.setParameter(Utils.CORNER_CHANGE, this._model.get_value(iter, 0));
+      })
+    );
+    return combo;
+  },
+
+  _addSliders: function(grid, row, labels, configName) {
+    for (let i=0; i < labels.length; i++) {
+      row++;
+      grid.attach(new Gtk.Label({label: labels[i], halign:Gtk.Align.START, margin_left: 15 }), 0, row, 1, 1);
+      grid.attach(createSlider(configName + "-" + i), 1, row, 5, 1);
+    }
+    return row;
+  },
+
   _generateMainSettings: function() {
     let ret = new Gtk.Grid();
     ret.width = 6;
     ret.column_homogeneous = true;
+    this.set_margin_left(5);
+    this.set_margin_right(5);
 
     let row = 0;
 
+    let switchContainer = new Gtk.Box();
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      label: "Always use multiple widths:",
+      tooltip_text:"Disable this option to move to other screen if possible",
+    }), 0, row, 4, 1);
+
+    let alwaysSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    alwaysSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_USE_WIDTHS, false));
+    alwaysSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active()); });
+
+    ret.attach(alwaysSwitch, 5, row, 1, 1);
+
+    row++;
+    ret.attach(new Gtk.Label({
+      label: "Adjust window width and height when moved to corner:",
+      tooltip_text:"Change width and height when moving to corner?",
+      halign: Gtk.Align.START
+    }), 0, row, 4, 1);
+
+    let combo = this._createCornerChangesCombo();
+    ret.attach(combo, 5, row, 1, 1);
+
+    row++;
     ret.attach(new Gtk.Label({label: "<b><u>Center</u></b>", halign: Gtk.Align.START, margin_left: 2, use_markup: true }), 0, row, 2, 1);
     row++;
-
-    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.END, margin_left: 2 }), 0, row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_WIDTH), 1, row, 2, 1);
-
-    ret.attach(new Gtk.Label({label: "Height:", halign:Gtk.Align.END, margin_left: 2 }), 3, row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_HEIGHT), 4, row, 2, 1);
-
-    // width and height when window is moved to a side or corner
+    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.START, margin_left: 10 }), 0, row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH), 1, row, 5, 1);
     row++;
-    ret.attach(new Gtk.Label({label: "<b><u>Corner</u></b>", halign:Gtk.Align.START, margin_left:2, use_markup: true}), 0, row, 2, 1);
+    ret.attach(new Gtk.Label({label: "Height:", halign: Gtk.Align.START, margin_left: 10 }), 0, row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT), 1, row, 5, 1);
     row++;
-    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.END, margin_left:2 }), 0, row, 1, 1);
-    ret.attach(createSlider(Utils.SIDE_WIDTH), 1, row, 2, 1);
 
-    ret.attach(new Gtk.Label({label: "Height:", halign:Gtk.Align.END, margin_left:2 }), 3, row, 1, 1);
-    ret.attach(createSlider(Utils.SIDE_HEIGHT), 4, row, 2, 1);
+    let labels = ["First:", "Second: ", "Third:"];
+    // ------------------------------------- north ----------------------------------------
+    row++;
+    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row, 6, 1);
 
     row++;
-    ret.attach(new Gtk.Label({label: "<b><u>Left side</u></b>", halign:Gtk.Align.START, margin_left: 2, use_markup: true }), 0, row, 2, 1);
+    ret.attach(new Gtk.Label({label: "<b><u>North</u></b>", halign:Gtk.Align.START, margin_left:2, use_markup: true})
 
-    row++;
-    ret.attach(createSlider("left-side-widths-0"), 0, row, 2, 1);
-    ret.attach(createSlider("left-side-widths-1"), 2, row, 2, 1);
-    ret.attach(createSlider("left-side-widths-2"), 4, row, 2, 1);
 
-    row++;
-    ret.attach(new Gtk.Label({label: "<b><u>Right side</u></b>", halign:Gtk.Align.START, margin_left: 2, use_markup: true }), 0, row, 1, 1);
-    row++;
-    ret.attach(createSlider("right-side-widths-0"), 0, row, 2, 1);
-    ret.attach(createSlider("right-side-widths-1"), 2, row, 2, 1);
-    ret.attach(createSlider("right-side-widths-2"), 4, row, 2, 1);
+      , 0, row, 2, 1);
+    row = this._addSliders(ret, row, labels, "north-height");
 
+    // ------------------------------------- south ----------------------------------------
     row++;
-    //ALWAYS_USE_WIDTHS
-    let alwaysTooltip = "Disable this option to move to other screen if possible";
-    let alwaysLabel = new Gtk.Label({
-      label: "<b><u>Always use multiple widths:</u></b>",
-      halign:Gtk.Align.START,
-      margin_left: 2,
-      use_markup: true
-    });
-    alwaysLabel.set_tooltip_text(alwaysTooltip);
-    ret.attach(alwaysLabel, 0, row, 2, 1);
+    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row, 6, 1);
+    row++;
+    ret.attach(new Gtk.Label({label: "<b><u>South:</u></b>", use_markup: true, halign:Gtk.Align.START, margin_left: 2 }), 0, row, 2, 1);
+    row = this._addSliders(ret, row, labels, "south-height");
 
-    let alwaysSwitch = new Gtk.Switch({ sensitive: true, margin_right: 6, margin_left: 6});
-    alwaysSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_USE_WIDTHS, false));
-    alwaysSwitch.connect("notify::active",
-      function(obj) {
-        Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active());
-      }
-    );
-    alwaysSwitch.set_tooltip_text(alwaysTooltip);
-    ret.attach(alwaysSwitch, 2, row, 1, 1);
+    // ------------------------------------- west ----------------------------------------
+    row++;
+    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row, 6, 1);
+    row++;
+    ret.attach(new Gtk.Label({label: "<b><u>West:</u></b>", use_markup: true, halign:Gtk.Align.START, margin_left: 2 }), 0, row, 2, 1);
+    row = this._addSliders(ret, row, labels, "left-side-widths");
+
+    // ------------------------------------- east ----------------------------------------
+    row++;
+    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row, 6, 1);
+    row++;
+    ret.attach(new Gtk.Label({label: "<b><u>East:</u></b>", use_markup: true, halign:Gtk.Align.START, margin_left: 2 }), 0, row, 2, 1);
+    row = this._addSliders(ret, row, labels, "right-side-widths");
+
     return ret;
   },
 

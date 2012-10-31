@@ -1,13 +1,19 @@
 <schemalist>
   <schema id="org.gnome.shell.extensions.org-lab21-putwindow" path="/org/gnome/shell/extensions/org-lab21-putwindow/">
-    <key type="i" name="side-width">
-      <default>50</default>
-      <summary>Width to use when moved to a corner</summary>
+    <key type="s" name="locations">
+      <default>"{}"</default>
+      <summary>Application based configuration</summary>
     </key>
-    <key type="i" name="side-height">
-      <default>50</default>
-      <summary>Height to use when moved to a corner</summary>
+
+    <key type="i" name="corner-changes">
+      <default>0</default>
+      <summary>Change width and height when moving to corner (Always, only height, only width)</summary>
     </key>
+    <key type="i" name="always-use-widths">
+      <default>0</default>
+      <summary>Use multiple widths even if moveing to other screen is possible</summary>
+    </key>
+
     <key type="i" name="center-width">
       <default>50</default>
       <summary>Width to use when moved to center</summary>
@@ -17,15 +23,32 @@
       <summary>Height to use when moved to center</summary>
     </key>
 
-    <key type="s" name="locations">
-      <default>"{}"</default>
-      <summary>Application based configuration</summary>
+    <key type="i" name="north-height-0">
+      <default>50</default>
+      <summary>Height to use when moving north once</summary>
+    </key>
+    <key type="i" name="north-height-1">
+      <default>66</default>
+      <summary>Height to use when moving north twice</summary>
+    </key>
+    <key type="i" name="north-height-2">
+      <default>34</default>
+      <summary>Height to use when moving north times</summary>
     </key>
 
-    <key type="i" name="always-use-widths">
-      <default>0</default>
-      <summary>Use multiple widths even if moveing to other screen is possible</summary>
+    <key type="i" name="south-height-0">
+      <default>50</default>
+      <summary>Height to use when moving south once</summary>
     </key>
+    <key type="i" name="south-height-1">
+      <default>34</default>
+      <summary>Height to use when moving south twice</summary>
+    </key>
+    <key type="i" name="south-height-2">
+      <default>66</default>
+      <summary>Height to use when moving south times</summary>
+    </key>
+
     <key type="i" name="left-side-widths-0">
       <default>50</default>
       <summary>Width to use when moving to left side once</summary>

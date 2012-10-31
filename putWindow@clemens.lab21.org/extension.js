@@ -53,9 +53,6 @@ MoveWindow.prototype = {
       tbHeight = 0;
     }
     s.y = s.geomY + tbHeight;
-    s.height = s.totalHeight * this._getSideHeight() - Math.floor(tbHeight/2);
-    s.width = s.totalWidth * this._getSideWidth();
-    s.sy = (s.totalHeight - s.height) + s.geomY;
 
     let i = 0;
     let widths  = this._utils.getWestWidths();
@@ -244,17 +241,17 @@ MoveWindow.prototype = {
   _moveToCorner: function(win, screenIndex, direction) {
     let s = this._screens[screenIndex];
     let pos = win.get_outer_rect();
+    let sameWidth = false;
+    let sameHeight = false;
 
     let useWidth = 0;
     let widths = (direction.indexOf("e") == -1) ? s.west : s.east;
-
-    // TODO -
-    // let addToWidth = this._utils.getBoolean(this._utils.CORNER_CHANGE_WIDTH, false) ? 1 : 0;
-    let addToWidth = this._utils.CORNER_CHANGE_WIDTH ? 1 : 0;
+    let add = this._utils.changeCornerWidth() ? 1 : 0;
 
     for (let i=0; i < widths.length; i++) {
       if (this._samePoint(pos.width, widths[i].width) && this._samePoint(pos.x, widths[i].x)) {
-        useWidth = i + addToWidth;
+        sameWidth = true;
+        useWidth = i + add;
         if (useWidth >= widths.length) {
           useWidth =  0;
         }
@@ -265,14 +262,22 @@ MoveWindow.prototype = {
     let useHeight = 0;
     let heights = (direction.indexOf("n") == -1) ? s.south : s.north;
 
+    add = this._utils.changeCornerHeight() ? 1 : 0;
     for (let i=0; i < heights.length; i++) {
       if (this._samePoint(pos.height, heights[i].height) && this._samePoint(pos.y, heights[i].y)) {
-        useHeight = i + 1;
+        sameHeight = true;
+        useHeight = i + add;
         if (useHeight >= heights.length) {
           useHeight =  0;
         }
         break;
       }
+    }
+
+    // window was moved to an other corner
+    if (!sameWidth || !sameHeight) {
+      useWidth = 0;
+      useHeight = 0;
     }
 
     this._resize(win, widths[useWidth].x, heights[useHeight].y, widths[useWidth].width, heights[useHeight].height);
@@ -450,14 +455,6 @@ MoveWindow.prototype = {
     };
   },
 
-  _getSideWidth: function() {
-    return this._utils.getNumber(this._utils.SIDE_WIDTH, 50) / 100;
-  },
-
-  _getSideHeight: function() {
-    return this._utils.getNumber(this._utils.SIDE_HEIGHT, 50) / 100;
-  },
-
   /**
    * Get global.screen_width and global.screen_height and
    * bind the keys
@@ -490,8 +487,6 @@ MoveWindow.prototype = {
         geomY: geom.y,
         totalWidth: geom.width,
         totalHeight: geom.height,
-        height: geom.height * this._getSideHeight() - Math.floor(tbHeight/2),
-        width: geom.width * this._getSideWidth(),
         east: [],
         west: [],
         north: [],

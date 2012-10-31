@@ -10,23 +10,6 @@ function Utils() {
 
 Utils.prototype = {
 
-  ///////////////////////////////////////////////////////////////////////
-  //
-  // TODO: add this to prefs.js, recompile schema
-  //
-  // CORNER_CHANGE_WIDTH ... if false, moving to corner will not change the width of the window
-  // NORTH_HEIGHTS ... height of the window when moving up multiple times
-  // SOUTH_HEIGHTS ... height of the window when moving down multiple times
-  //
-  //  heights may have different length e.g N: [0.5, 0.66, 0.34], S [0.34, 0.66]
-  //
-  ///////////////////////////////////////////////////////////////////////
-  CORNER_CHANGE_WIDTH: false,
-  NORTH_HEIGHTS: [0.5, 0.66, 0.34],
-  SOUTH_HEIGHTS: [0.5, 0.34, 0.66],
-  // ------------------------------------------------------------------------
-
-
   _filename: "",
   _settingsObject: { },
   _settings: "",
@@ -35,10 +18,8 @@ Utils.prototype = {
 
   CENTER_WIDTH: "center-width",
   CENTER_HEIGHT: "center-height",
-  SIDE_WIDTH: "side-width",
-  SIDE_HEIGHT: "side-height",
   ALWAYS_USE_WIDTHS: "always-use-widths",
-  //CORNER_CHANGE_WIDTH: "corner-change-width",
+  CORNER_CHANGE: "corner-changes",
 
   START_CONFIG: {
     autoMove: false,
@@ -102,8 +83,6 @@ Utils.prototype = {
     this._settings = {
       centerWidth: this._settingsObject.get_int("center-width"),
       centerHeight: this._settingsObject.get_int("center-height"),
-      sideWidth: this._settingsObject.get_int("side-width"),
-      sideHeight: this._settingsObject.get_int("side-height"),
       locations: JSON.parse(this._settingsObject.get_string("locations"))
     };
   },
@@ -112,8 +91,6 @@ Utils.prototype = {
     try {
       this._settingsObject.set_int("center-width", this.getNumber(this.CENTER_WIDTH));
       this._settingsObject.set_int("center-height", this.getNumber(this.CENTER_HEIGHT));
-      this._settingsObject.set_int("side-width", this.getNumber(this.SIDE_WIDTH));
-      this._settingsObject.set_int("side-height", this.getNumber(this.SIDE_HEIGHT));
       this._settingsObject.set_string("locations", JSON.stringify(this._settings.locations));
       // sometimes the shell hangs after the gtk messagebox is displayed :(
       // this.showMessage("Success!", "Changes successfully saved");
@@ -122,12 +99,27 @@ Utils.prototype = {
     }
   },
 
+  // 0... both, 1... only height, 2... only width
+  changeCornerWidth: function() {
+    return this.getNumber(this.CORNER_CHANGE, 1) != 1;
+  },
+
+  changeCornerHeight: function() {
+    return this.getNumber(this.CORNER_CHANGE, 2) != 2;
+  },
+
   getNorthHeights: function() {
-    return this.NORTH_HEIGHTS
+    let ret = this._addToArray([], this.getNumber("north-height-0", 50) / 100);
+    ret = this._addToArray(ret, this.getNumber("north-height-1", 66) / 100);
+    ret = this._addToArray(ret, this.getNumber("north-height-2", 34) / 100);
+    return ret;
   },
 
   getSouthHeights: function() {
-    return this.SOUTH_HEIGHTS;
+    let ret = this._addToArray([], this.getNumber("south-height-0", 50) / 100);
+    ret = this._addToArray(ret, this.getNumber("south-height-1", 34) / 100);
+    ret = this._addToArray(ret, this.getNumber("south-height-2", 66) / 100);
+    return ret;
   },
 
   getWestWidths: function() {
