@@ -78,21 +78,20 @@ MoveWindow.prototype = {
     s.north = [];
     for ( i=0; i < heights.length; i++) {
       s.north[i] = {
-        height: s.totalHeight * heights[i] - Math.floor(tbHeight/2),
-        y: 0
+        height: s.totalHeight * heights[i] - tbHeight,
+        y: s.y
       }
     }
 
     heights = this._utils.getSouthHeights();
     s.south = [];
     for (i=0; i < heights.length; i++) {
-      let h = s.totalHeight * heights[i] - Math.floor(tbHeight/2);
+      let h = s.totalHeight * heights[i] - tbHeight;
       s.south[i] = {
         height: h,
-        y: (s.totalHeight - h) + s.geomY
+        y: s.totalHeight - h + s.geomY
       }
     }
-
 
     return s;
   },
@@ -261,8 +260,8 @@ MoveWindow.prototype = {
 
     let useHeight = 0;
     let heights = (direction.indexOf("n") == -1) ? s.south : s.north;
-
     add = this._utils.changeCornerHeight() ? 1 : 0;
+
     for (let i=0; i < heights.length; i++) {
       if (this._samePoint(pos.height, heights[i].height) && this._samePoint(pos.y, heights[i].y)) {
         sameHeight = true;
@@ -274,6 +273,16 @@ MoveWindow.prototype = {
       }
     }
 
+    // currently at the east/west and, now moved to corner
+    if (this._utils.changeCornerHeight() && this._samePoint(pos.height, s.totalHeight)) {
+      sameHeight = true;
+      useHeight = 0;
+    }
+    // currently at north/south and now moved to corner
+    if (this._utils.changeCornerWidth() && this._samePoint(pos.width, s.totalWidth)) {
+      sameWidth = true;
+      useWidth = 0;
+    }
     // window was moved to an other corner
     if (!sameWidth || !sameHeight) {
       useWidth = 0;
@@ -432,6 +441,14 @@ MoveWindow.prototype = {
     }
 
     let padding = this._getPadding(win);
+    let dy = padding.height - padding.y / 2;
+    // we are moving north -> substract the whole padding from  height
+    if (y > 50) {
+      y -= dy;
+    } else {
+      dy = padding.height; // 2 * dy;
+    }
+
     // snap, x, y
     if (win.decorated) {
       win.move_frame(true, x, y);
@@ -440,7 +457,7 @@ MoveWindow.prototype = {
     }
 
     // snap, width, height, force
-    win.resize(true, width - this._padding, height - padding.height - padding.y);
+    win.resize(true, width - this._padding, height - dy);
   },
 
   // the difference between input and outer rect as object.
