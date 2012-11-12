@@ -67,6 +67,10 @@ and only if windows was at side_e (or side_w) before. eg.
 ChangeLog
 -------
 
+__Octover 31, 2012__
+ * new the config ui including 3 heights
+ * fix window height if topPanel is visible
+
 __Octover 30, 2012__
  * Support multiple heights when moving to top/bottom
  * "move to corner" uses widths and heights defined for sides
