@@ -569,7 +569,7 @@ MoveWindow.prototype = {
 
     if (this._windowCreatedListener) {
       global.screen.get_display().disconnect(this._windowCreatedListener);
-      this._windowCreatedListener = 0;
+      this._windowCreatedListener = false;
     }
 
     let size = this._bindings.length;

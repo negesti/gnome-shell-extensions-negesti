@@ -41,7 +41,7 @@ Utils.prototype = {
     });
 
     for (let i=0; i < this._changeEventListeners.length; i++) {
-      this._settingsObject.connect(
+      this._changeEventListeners[i].handlerId = this._settingsObject.connect(
         'changed::' + this._changeEventListeners[i].name ,
         this._changeEventListeners[i].fn
       );
@@ -51,7 +51,7 @@ Utils.prototype = {
 
   destroy: function() {
     for (let i=0; i < this._changeEventListeners.length; i++) {
-      this._settingsObject.disconnect(this._changeEventListeners[i].fn);
+      this._settingsObject.disconnect(this._changeEventListeners[i].handlerId);
     }
 
   },
