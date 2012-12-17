@@ -67,6 +67,9 @@ and only if windows was at side_e (or side_w) before. eg.
 ChangeLog
 -------
 
+__December 27, 2012__
+ * Config to change center/maximize to maximize/center
+
 __Octover 31, 2012__
  * new the config ui including 3 heights
  * fix window height if topPanel is visible

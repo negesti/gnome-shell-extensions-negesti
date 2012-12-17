@@ -307,7 +307,6 @@ MoveWindow.prototype = {
     s = this._recalculateSizes(s);
 
     if (where == "c") {
-      // calculate the center position and check if the window is already there
       let pos = win.get_outer_rect();
       let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH, 50) / 100),
         h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT, 50) / 100),
@@ -315,14 +314,22 @@ MoveWindow.prototype = {
         y = s.y + (s.totalHeight - h) / 2,
         sameHeight = this._samePoint(h, pos.height);
 
-      // do not check window.width. until i find get_size_hint(), or min_width..
-      // windows that have a min_width < our width will not be maximized (evolution for example)
-      if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameHeight) {
-        // the window is alread centered -> maximize
-        this._resize(win, s.x, s.y, s.totalWidth * -1, s.totalHeight * -1);
+      if (this._utils.getBoolean(this._utils.REVERSE_MOVE_CENTER, false)) {
+        if (win.maximized_horizontally && win.maximized_vertically) {
+          this._resize(win, x, y, w, h);
+        } else {
+          this._resize(win, s.x, s.y, s.totalWidth * -1, s.totalHeight * -1);
+        }
       } else {
-        // the window is not centered -> resize
-        this._resize(win, x, y, w, h);
+        // do not check window.width. until i find get_size_hint(), or min_width..
+        // windows that have a min_width < our width will not be maximized (evolution for example)
+        if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameHeight) {
+          // the window is alread centered -> maximize
+          this._resize(win, s.x, s.y, s.totalWidth * -1, s.totalHeight * -1);
+        } else {
+          // the window is not centered -> resize
+          this._resize(win, x, y, w, h);
+        }
       }
     } else if (where == "n" || where == "s") {
       this._moveNorthSouth(win, screenIndex, where);
@@ -348,7 +355,7 @@ MoveWindow.prototype = {
           return false;
         }));
       }
-      return;
+      return false;
     }
     app = win.get_wm_class();
     // move the window if a location is configured and autoMove is set to true

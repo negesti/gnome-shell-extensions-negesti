@@ -113,7 +113,6 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     let row = 0;
 
-    let switchContainer = new Gtk.Box();
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       label: "Always use multiple widths:",
@@ -125,8 +124,20 @@ const PutWindowSettingsWidget = new GObject.Class({
     alwaysSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active()); });
 
     ret.attach(alwaysSwitch, 5, row, 1, 1);
-
     row++;
+
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      label: "First maximize then move to center:",
+      tooltip_text: "'Move to center' maximizes the current window, and centers maximized windows",
+    }), 0, row, 4, 1);
+
+    let centerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    centerSwitch.set_active(Utils.getBoolean(Utils.REVERSE_MOVE_CENTER, false));
+    centerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.REVERSE_MOVE_CENTER, obj.get_active()); });
+    ret.attach(centerSwitch, 5, row, 1, 1);
+    row++;
+
     ret.attach(new Gtk.Label({
       label: "Adjust window width and height when moved to corner:",
       tooltip_text:"Change width and height when moving to corner?",

@@ -13,6 +13,10 @@
       <default>0</default>
       <summary>Use multiple widths even if moveing to other screen is possible</summary>
     </key>
+    <key type="i" name="reverse-move-center">
+      <default>0</default>
+      <summary>Instead of center - maximize move to center will maximize - move to center</summary>
+    </key>
 
     <key type="i" name="center-width">
       <default>50</default>
