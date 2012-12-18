@@ -342,7 +342,7 @@ MoveWindow.prototype = {
 
   _moveConfiguredWhenCreated: function(display, win, noResurce) {
     if (!this._windowTracker.is_window_interesting(win)) {
-      return;
+      return false;
     }
 
     let app = this._windowTracker.get_window_app(win);
@@ -364,8 +364,10 @@ MoveWindow.prototype = {
     if (this._utils.getParameter(appPath, false)) {
       if (this._utils.getBoolean(appPath + ".autoMove", false)) {
         this._moveToConfiguredLocation(win, app);
+        return true;
       }
     }
+    return false;
   },
 
   /**
