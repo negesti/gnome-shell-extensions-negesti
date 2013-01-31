@@ -525,6 +525,7 @@ MoveWindow.prototype = {
         return s1.x - s2.x;
     });
 
+    this._bindings = [];
     // move to n, e, s an w
     this._addKeyBinding("put-to-side-n",
       Lang.bind(this, function(){ this._moveFocused("n");})
@@ -582,10 +583,11 @@ MoveWindow.prototype = {
     }
 
     let size = this._bindings.length;
-    // TODO: remove handlers added by keybindings_set_custom_handler
     for(let i = 0; i<size; i++) {
       global.display.remove_keybinding(this._bindings[i]);
     }
+    this._bindings = [];
+
     this._utils.destroy()
   }
 }

@@ -213,6 +213,7 @@ Utils.prototype = {
         } else {
           this._settingsObject.set_int(name, value);
         }
+        return;
       }
 
       let path = name.split("."),
