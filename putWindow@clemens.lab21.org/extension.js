@@ -125,8 +125,8 @@ MoveWindow.prototype = {
    */
   _moveToScreen: function(direction) {
     let win = global.display.focus_window;
-     if (win == null) {
-        return false;
+    if (win == null) {
+      return false;
     }
 
     let screenIndex = this._getCurrentScreenIndex(win);
@@ -150,19 +150,21 @@ MoveWindow.prototype = {
 
     if (s != null) {
       let position = win.get_outer_rect();
-      let x = s.x + (position.x - old.x);
+
       let xRatio = s.totalWidth / old.totalWidth;
-      let yRatio = s.totalHeight / old.totalHeight;
+      let x = s.x + (position.x - old.x) * xRatio;
 
       let width = position.width * xRatio;
       if (width >= s.totalWidth) {
         width = -1;
       }
+
+      let yRatio = s.totalHeight / old.totalHeight;
       let height = position.height * yRatio;
       if (height >= s.totalHeight) {
         height = -1;
       }
-      this._resize(win, (x * xRatio), (position.y * yRatio), width, height);
+      this._resize(win, x, (position.y * yRatio), width, height);
       return true;
     }
     return false;
@@ -298,7 +300,7 @@ MoveWindow.prototype = {
   _moveFocused: function(where) {
     let win = global.display.focus_window;
     if (win == null) {
-        return;
+      return;
     }
 
     let screenIndex = this._getCurrentScreenIndex(win);
@@ -378,7 +380,7 @@ MoveWindow.prototype = {
     if (!win || !appName) {
       win = global.display.focus_window;
       if (win==null) {
-          return;
+        return;
       }
 
       appName = win.get_wm_class();
