@@ -342,7 +342,7 @@ MoveWindow.prototype = {
     }
   },
 
-  _moveConfiguredWhenCreated: function(display, win, noResurce) {
+  _moveConfiguredWhenCreated: function(display, win, noRecurse) {
     if (!this._windowTracker.is_window_interesting(win)) {
       return false;
     }
@@ -483,22 +483,14 @@ MoveWindow.prototype = {
     };
   },
 
-  /**
-   * Get global.screen_width and global.screen_height and
-   * bind the keys
-   **/
-  _init: function() {
-    // read configuration and init the windowTracker
-    this._utils = new Utils.Utils();
-    this._windowTracker = Shell.WindowTracker.get_default();
+  counter: 0,
 
-    let display = global.screen.get_display();
-    this._windowCreatedListener = display.connect_after('window-created', Lang.bind(this, this._moveConfiguredWhenCreated));
-
+  _loadScreenData: function() {
     // get monotor(s) geometry
     this._primary = global.screen.get_primary_monitor();
     let numMonitors = global.screen.get_n_monitors();
 
+    this._screens = [];
     // only tested with 2 screen setup
     for (let i=0; i<numMonitors; i++) {
       let geom = global.screen.get_monitor_geometry(i);
@@ -521,11 +513,29 @@ MoveWindow.prototype = {
         south: []
       };
     }
-
     // sort by x position. makes it easier to find the correct screen
     this._screens.sort(function(s1, s2) {
         return s1.x - s2.x;
     });
+  },
+
+  /**
+   * Get global.screen_width and global.screen_height and
+   * bind the keys
+   **/
+  _init: function() {
+    // read configuration and init the windowTracker
+    this._utils = new Utils.Utils();
+    this._windowTracker = Shell.WindowTracker.get_default();
+
+    this._loadScreenData();
+
+    this._screenListener = global.screen.connect("monitors-changed",
+      Lang.bind(this, this._loadScreenData));
+
+    this._windowCreatedListener = global.screen.get_display().connect_after('window-created',
+      Lang.bind(this, this._moveConfiguredWhenCreated)
+    );
 
     this._bindings = [];
     // move to n, e, s an w
@@ -582,6 +592,11 @@ MoveWindow.prototype = {
     if (this._windowCreatedListener) {
       global.screen.get_display().disconnect(this._windowCreatedListener);
       this._windowCreatedListener = false;
+    }
+
+    if (this._screenListener) {
+      global.screen.disconnect(this._screenListener);
+      this._screenListener = false;
     }
 
     let size = this._bindings.length;
