@@ -133,6 +133,7 @@ MoveWindow.prototype = {
 
     let s = null;
     let old = {
+      primary: this._screens[screenIndex].primary,
       x: this._screens[screenIndex].x,
       totalWidth: this._screens[screenIndex].totalWidth,
       totalHeight: this._screens[screenIndex].totalHeight
@@ -160,11 +161,31 @@ MoveWindow.prototype = {
       }
 
       let yRatio = s.totalHeight / old.totalHeight;
-      let height = position.height * yRatio;
+
+      let height = position.height;
+      // we are moving away from the primary screen and topPanel is visible,
+      // e.g. height was max but is smaller then the totalHeight because of topPanel height
+      if (old.primary) {
+        height += Main.panel.actor.height;
+      }
+
+      height = height * yRatio;
       if (height >= s.totalHeight) {
         height = -1;
       }
-      this._resize(win, x, (position.y * yRatio), width, height);
+
+      let y = position.y;
+      // add/remove the top panel offset to the y position
+      if (old.primary) {
+        y = y - Main.panel.actor.height;
+      } else {
+        y = y + Main.panel.actor.height;
+      }
+      if (y < 0) {
+        y = 0;
+      }
+
+      this._resize(win, x, (y * yRatio), width, height);
       return true;
     }
     return false;
@@ -495,9 +516,6 @@ MoveWindow.prototype = {
     for (let i=0; i<numMonitors; i++) {
       let geom = global.screen.get_monitor_geometry(i);
       let primary = (i == this._primary);
-      let tbHeight = primary
-        ? Main.panel.actor.height
-        : 0;
 
       this._screens[i] =  {
         primary: primary,
