@@ -1,5 +1,6 @@
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
+const Main = imports.ui.main;
 
 
 function MoveFocus(utils) {
@@ -184,9 +185,7 @@ MoveFocus.prototype = {
         }
         index = zeroIndex;
       }
-
-      sortedX[index].window.focus(display.get_current_time());
-      sortedX[index].window.raise();
+      Main.activateWindow(sortedX[index].window);
     } else if (direction == "n" || direction == "s") {
        let index
         , zeroIndex = -1;
@@ -204,9 +203,7 @@ MoveFocus.prototype = {
         }
         index = zeroIndex;
       }
-
-      sortedY[index].window.focus(display.get_current_time())
-      sortedY[index].window.raise();
+      Main.activateWindow(sortedY[index].window);
     }
   }
 };
