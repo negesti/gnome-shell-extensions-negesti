@@ -127,5 +127,26 @@
       <default><![CDATA[['<super>Right']]]></default>
       <summary>Move to a predifined location</summary>
     </key>
+
+    <key type="i" name="move-focus-enabled">
+      <default>1</default>
+      <summary>Enable/Disable the MoveFocus feature</summary>
+    </key>
+    <key type="as" name="move-focus-north">
+      <default><![CDATA[['<super>i']]]></default>
+      <summary>Move to center/maximize</summary>
+    </key>
+    <key type="as" name="move-focus-east">
+      <default><![CDATA[['<super>j']]]></default>
+      <summary>Move to center/maximize</summary>
+    </key>
+    <key type="as" name="move-focus-south">
+      <default><![CDATA[['<super>k']]]></default>
+      <summary>Move to center/maximize</summary>
+    </key>
+    <key type="as" name="move-focus-west">
+      <default><![CDATA[['<super>l']]]></default>
+      <summary>Move to center/maximize</summary>
+    </key>
   </schema>
 </schemalist>

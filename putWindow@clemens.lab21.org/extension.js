@@ -8,6 +8,7 @@ const Shell = imports.gi.Shell;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
+const MoveFocus = Extension.imports.moveFocus;
 
 /**
  * Thanks to:
@@ -600,6 +601,8 @@ MoveWindow.prototype = {
     this._addKeyBinding("put-to-right-screen",
       Lang.bind(this, function() { this._moveToScreen("right");} )
     );
+
+    this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils);
   },
 
   /**
@@ -623,7 +626,10 @@ MoveWindow.prototype = {
     }
     this._bindings = [];
 
-    this._utils.destroy()
+    this._utils.destroy();
+    if (this._moveFocusPlugin) {
+      this._moveFocusPlugin.destroy();
+    }
   }
 }
 

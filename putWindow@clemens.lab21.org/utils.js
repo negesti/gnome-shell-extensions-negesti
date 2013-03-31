@@ -1,4 +1,3 @@
-
 const Lang = imports.lang;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
@@ -21,6 +20,8 @@ Utils.prototype = {
   ALWAYS_USE_WIDTHS: "always-use-widths",
   CORNER_CHANGE: "corner-changes",
   REVERSE_MOVE_CENTER: "reverse-move-center",
+
+  MOVE_FOCUS_ENABLED: "move-focus-enabled",
 
   START_CONFIG: {
     autoMove: false,
@@ -54,7 +55,6 @@ Utils.prototype = {
     for (let i=0; i < this._changeEventListeners.length; i++) {
       this._settingsObject.disconnect(this._changeEventListeners[i].handlerId);
     }
-
   },
 
   getSettingsObject: function() {

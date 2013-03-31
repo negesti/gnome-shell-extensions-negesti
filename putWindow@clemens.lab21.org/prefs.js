@@ -36,22 +36,29 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.expand = true;
     this._wnckScreen = Wnck.Screen.get_default();
 
+    //this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 10, 1, 1);
+    let keyExpander = new Gtk.Expander();
+    keyExpander.set_label("Move Focus");
+    keyExpander.add(this._createMoveFocusConfig());
+    this.attach(keyExpander, 0, 0, 1, 9);
+
+    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 10, 1, 1);
     let mainConfig = new Gtk.Expander();
     mainConfig.set_label("Main settings");
     mainConfig.add(this._generateMainSettings());
-    this.attach(mainConfig, 0, 0, 1, 9);
+    this.attach(mainConfig, 0, 11, 1, 9);
 
-    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 10, 1, 1);
+    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 20, 1, 1);
     let keyExpander = new Gtk.Expander();
     keyExpander.set_label("Keyboard Shortcuts");
     keyExpander.add(this._createKeyboardConfig());
-    this.attach(keyExpander, 0, 11, 1, 9);
+    this.attach(keyExpander, 0, 21, 1, 9);
 
-    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 20, 1, 1);
+    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 30, 1, 1);
     let appExpander = new Gtk.Expander();
     appExpander.set_label("Applications");
     appExpander.add(new PutWindowLocationWidget(this._wnckScreen));
-    this.attach(appExpander, 0, 21, 1, 10000);
+    this.attach(appExpander, 0, 31, 1, 10000);
   },
 
   _createCornerChangesCombo: function() {
@@ -194,16 +201,7 @@ const PutWindowSettingsWidget = new GObject.Class({
   },
 
   _createKeyboardConfig: function() {
-    let model = new Gtk.ListStore();
-
-    model.set_column_types([
-      GObject.TYPE_STRING,
-      GObject.TYPE_STRING,
-      GObject.TYPE_INT,
-      GObject.TYPE_INT
-    ]);
-
-    let bindings = {
+    return this._createBindingList({
         "put-to-corner-ne": "Move to top right corner",
         "put-to-corner-nw": "Move to top left corner",
         "put-to-corner-se": "Move to bottom right corner",
@@ -215,8 +213,54 @@ const PutWindowSettingsWidget = new GObject.Class({
         "put-to-center": "Move to center/maximize",
         "put-to-location": "Move to configured location",
         "put-to-left-screen": "Move to the left screen",
-        "put-to-right-screen": "Move to the right screen"
-    };
+        "put-to-right-screen": "Move to the right screen",
+    });
+  },
+
+  _createMoveFocusConfig: function() {
+
+    let ret = new Gtk.Grid();
+    ret.width = 6;
+    ret.column_homogeneous = true;
+    this.set_margin_left(5);
+    this.set_margin_right(5);
+
+    let row = 0;
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      label: "Move window focus using keyboard:"
+    }), 0, row, 4, 1);
+
+    let enabledSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    enabledSwitch.set_active(Utils.getBoolean(Utils.MOVE_FOCUS_ENABLED, false));
+    enabledSwitch.connect("notify::active", function(obj) {
+      Utils.setParameter(Utils.MOVE_FOCUS_ENABLED, obj.get_active());
+    });
+    ret.attach(enabledSwitch, 5, row, 1, 1);
+    row++;
+
+    let keyBinding = this._createBindingList({
+      "move-focus-north": "Move the window focus up",
+      "move-focus-east": "Move the window focus right",
+      "move-focus-south": "Move the window focus down",
+      "move-focus-west": "Move the window focus left"
+    });
+
+    ret.attach(keyBinding, 0, row, 6, 1);
+
+    return ret;
+  },
+
+  _createBindingList: function(bindings) {
+
+    let model = new Gtk.ListStore();
+
+    model.set_column_types([
+      GObject.TYPE_STRING,
+      GObject.TYPE_STRING,
+      GObject.TYPE_INT,
+      GObject.TYPE_INT
+    ]);
 
     for (name in bindings) {
       let [key, mods] = Gtk.accelerator_parse(Utils.get_strv(name, null)[0]);
@@ -266,6 +310,8 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     return treeview;
   }
+
+
 });
 
 const PutWindowLocationWidget = new GObject.Class({
