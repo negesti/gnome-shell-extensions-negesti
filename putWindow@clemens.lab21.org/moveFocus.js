@@ -141,11 +141,11 @@ MoveFocus.prototype = {
       });
     } // end for windows
 
-    this._focusNearestWindow(display, candidates, direction);
+    this._focusNearestWindow(candidates, direction);
 
   },
 
-  _focusNearestWindow: function(display, candidates, direction) {
+  _focusNearestWindow: function(candidates, direction) {
 
     let length = candidates.length;
 
