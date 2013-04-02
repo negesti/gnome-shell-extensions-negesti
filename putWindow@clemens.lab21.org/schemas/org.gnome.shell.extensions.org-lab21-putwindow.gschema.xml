@@ -137,7 +137,7 @@
       <summary>Move to center/maximize</summary>
     </key>
     <key type="as" name="move-focus-east">
-      <default><![CDATA[['<super>j']]]></default>
+      <default><![CDATA[['<super>l']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
     <key type="as" name="move-focus-south">
@@ -145,7 +145,7 @@
       <summary>Move to center/maximize</summary>
     </key>
     <key type="as" name="move-focus-west">
-      <default><![CDATA[['<super>l']]]></default>
+      <default><![CDATA[['<super>j']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
   </schema>
