@@ -161,20 +161,19 @@ MoveFocus.prototype = {
       if (windows[i].has_focus())
       	continue;
       
-      if (this._isCandidate(win, windows[i],direction))
+      if (this._isCandidate(win, windows[i],direction)){
       	candidates.push({
       		window: windows[i],
       		index: i,
       		dist: this._getDistance(win, windows[i])
       	});
-      
+      }
     } // end for windows
 		
 		
 		if (candidates.length == 0)
 			return;
 		
-		// TODO sort array
 		candidates.sort(function(a, b){
 			return a.dist - b.dist;
 		});
