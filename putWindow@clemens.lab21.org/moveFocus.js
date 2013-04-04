@@ -1,6 +1,6 @@
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
-const Main = imports.ui.main;
+
 
 
 function MoveFocus(utils) {
@@ -84,22 +84,58 @@ MoveFocus.prototype = {
     this._bindings = [];
   },
 
-  _getDistanceX: function(focus, pos, direction) {
-    // if we want to move to the east, calculate the
-    // the distance between focus(x+width) and other.x
-    if (direction.indexOf("e") != -1) {
-      return pos.x - focus.x;
-    }
-
-    return focus.x - pos.x;
+	_getDistance: function(focusWin, candidateWin){
+	
+		let focus = this._getCenter(focusWin.get_outer_rect());
+  	let candidate = this._getCenter(candidateWin.get_outer_rect());
+		
+		let dx = focus.x - candidate.x;
+		let dy = focus.y - candidate.y;
+		
+		return Math.sqrt(dx * dx + dy *dy);
+	
+	},
+  
+  _getCenter: function(rect){
+  	return {x: rect.x - rect.width / 2, y: rect.y + rect.height / 2};
   },
-
-  _getDistanceY: function(focus, pos, direction) {
-    if (direction.indexOf("s") != -1) {
-      return pos.y - focus.y;
-    }
-
-    return focus.y - pos.y;
+  
+  _isCandidate: function(focusWin, candidateWin, direction){
+  	
+  	let focus = this._getCenter(focusWin.get_outer_rect());
+  	let candidate = this._getCenter(candidateWin.get_outer_rect());
+  	
+		switch (direction){
+			case "n":
+				if (focus.y < candidate.y)
+					return false;
+				if (Math.abs(focus.y - candidate.y) < Math.abs(focus.x - candidate.x))
+					return false;
+				return true;
+			case "e":
+				if (focus.x > candidate.x)
+					return false;
+				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x))
+					return false;
+				return true;
+			case "s":
+				if (focus.y > candidate.y)
+					return false;
+				if (Math.abs(focus.y - candidate.y) < Math.abs(focus.x - candidate.x))
+					return false;
+				return true;
+			case "w":
+				if (focus.x < candidate.x)
+					return false;
+				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x))
+					return false;
+				return true;
+			default:
+				// in case of doubt: mumble
+				return true;
+		}
+		
+  	
   },
 
   _moveFocus: function(direction) {
@@ -108,102 +144,42 @@ MoveFocus.prototype = {
       return;
     }
 
-    let focusWindow = win.get_outer_rect();
-
     let screen = global.screen;
     let display = screen.get_display();
     let windows = display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace());
 
     // only one windows --> already focused
     let winLength = windows.length;
-    if (winLength == 1) {
+    if (winLength == 1)
       return;
-    }
+
 
     let candidates = [];
-    let foundMe = false;
+
     for (let i=0; i < windows.length; i++) {
-      let pos = windows[i].get_outer_rect();
-
-      // the focusWindow is in the windows[], skip it
-      if (!foundMe && pos.x == focusWindow.x && pos.y == focusWindow.y &&
-        pos.width == focusWindow.width && pos.height == focusWindow.height) {
-        foundMe = true;
-        continue;
+      
+      if (windows[i].has_focus())
+      	continue;
+      
+      if (this._isCandidate(win, windows[i],direction)){
+      	candidates.push({
+      		window: windows[i],
+      		index: i,
+      		dist: this._getDistance(win, windows[i])
+      	});
       }
-
-      candidates.push({
-        window: windows[i],
-        index: i,
-        rect: pos,
-        distX: this._getDistanceX(focusWindow, pos, direction),
-        distY: this._getDistanceY(focusWindow, pos, direction)
-      });
     } // end for windows
-
-    this._focusNearestWindow(candidates, direction);
+		
+		
+		if (candidates.length == 0)
+			return;
+		
+		candidates.sort(function(a, b){
+			return a.dist - b.dist;
+		});
+		
+		candidates[0].window.activate(global.get_current_time());
 
   },
 
-  _focusNearestWindow: function(candidates, direction) {
-
-    let length = candidates.length;
-
-    let sortedX = candidates.slice().sort(function(a, b) {
-      let ret = a.distX - b.distX;
-      if (ret != 0) {
-        return ret;
-      }
-      return a.distY - b.distY;
-    });
-
-    let sortedY = candidates.sort(function(a, b) {
-      let ret = a.distY - b.distY;
-      if (ret != 0) {
-        return ret;
-      }
-      return a.distX - b.distX;
-    });
-
-    if (direction == "e" || direction == "w") {
-
-      // the sorted array may contain windows with -distx (wrong direction)
-      let index
-        , zeroIndex = -1;
-
-      for (index =0; index < sortedX.length; index++) {
-        if (sortedX[index].distX == 0) {
-          zeroIndex = index;
-        }
-        if (sortedX[index].distX > 0) {
-          break;
-        }
-      }
-      if (index >= length) {
-        if (zeroIndex == -1) {
-          return;
-        }
-        index = zeroIndex;
-      }
-      Main.activateWindow(sortedX[index].window);
-    } else if (direction == "n" || direction == "s") {
-       let index
-        , zeroIndex = -1;
-      for (index =0; index < sortedY.length; index++) {
-        if (sortedY[index].distY == 0) {
-          zeroIndex = index;
-        }
-        if (sortedY[index].distY > 0) {
-          break;
-        }
-      }
-      if (index >= length) {
-        if (zeroIndex == -1) {
-          return;
-        }
-        index = zeroIndex;
-      }
-      Main.activateWindow(sortedY[index].window);
-    }
-  }
 };
