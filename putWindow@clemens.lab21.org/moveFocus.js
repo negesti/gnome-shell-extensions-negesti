@@ -121,16 +121,12 @@ MoveFocus.prototype = {
     }
 
     let candidates = [];
-    let foundMe = false;
+
     for (let i=0; i < windows.length; i++) {
       let pos = windows[i].get_outer_rect();
-
-      // the focusWindow is in the windows[], skip it
-      if (!foundMe && pos.x == focusWindow.x && pos.y == focusWindow.y &&
-        pos.width == focusWindow.width && pos.height == focusWindow.height) {
-        foundMe = true;
-        continue;
-      }
+      
+      if (windows[i].has_focus())
+      	continue;
 
       candidates.push({
         window: windows[i],
