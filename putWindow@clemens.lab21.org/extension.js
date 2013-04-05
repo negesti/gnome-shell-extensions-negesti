@@ -60,6 +60,8 @@ MoveWindow.prototype = {
     }
     s.y = s.geomY + tbHeight;
 
+    tbHeight = tbHeight / 2;
+
     let i = 0;
     let widths  = this._utils.getWestWidths();
     s.west = [];
@@ -94,8 +96,8 @@ MoveWindow.prototype = {
     for (i=0; i < heights.length; i++) {
       let h = s.totalHeight * heights[i] - tbHeight;
       s.south[i] = {
-        height: h,
-        y: s.totalHeight - h + s.geomY
+        height: Math.floor(h),
+        y: s.totalHeight - Math.ceil(h) + s.geomY
       }
     }
 
@@ -463,7 +465,6 @@ MoveWindow.prototype = {
 
   // actual resizing
   _resize: function(win, x, y, width, height) {
-
     if (height < 0) {
       win.maximize(Meta.MaximizeFlags.VERTICAL);
       height = 400; // dont resize to width, -1
@@ -478,21 +479,15 @@ MoveWindow.prototype = {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
 
-    let padding = this._getPadding(win);
-    let dy = padding.height - padding.y / 2;
-    // we are moving north -> substract the whole padding from  height
-    if (y > 50) {
-      y -= dy;
-    } else {
-      dy = padding.height; // 2 * dy;
-    }
-
     // snap, x, y
     if (win.decorated) {
       win.move_frame(true, x, y);
     } else {
       win.move(true, x, y);
     }
+
+    let padding = this._getPadding(win);
+    let dy = padding.height + padding.y * 2;
 
     // snap, width, height, force
     win.resize(true, width - this._padding, height - dy);
