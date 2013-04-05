@@ -49,7 +49,7 @@ MoveWindow.prototype = {
   },
 
   _recalculateSizes: function(s) {
-    let tbHeight = s.primary ? Main.panel.actor.height : 0;
+    let tbHeight = (Main.panel.actor.is_visible && s.primary) ? Main.panel.actor.height : 0;
     if (tbHeight == 1) {
       tbHeight = 0;
     }
