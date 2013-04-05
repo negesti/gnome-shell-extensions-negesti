@@ -48,9 +48,14 @@ MoveWindow.prototype = {
     );
   },
 
+  _getTopPanelHeight: function() {
+    return Main.panel.actor.y + Main.panel.actor.height;
+  },
+
   _recalculateSizes: function(s) {
-    let tbHeight = s.primary ? Main.panel.actor.height : 0;
-    if (tbHeight == 1) {
+
+    let tbHeight = s.primary ? this._getTopPanelHeight() : 0;
+    if (Math.abs(tbHeight) <= 2) {
       tbHeight = 0;
     }
     s.y = s.geomY + tbHeight;
@@ -167,7 +172,7 @@ MoveWindow.prototype = {
       // we are moving away from the primary screen and topPanel is visible,
       // e.g. height was max but is smaller then the totalHeight because of topPanel height
       if (old.primary) {
-        height += Main.panel.actor.height;
+        height += this._getTopPanelHeight();
       }
 
       height = height * yRatio;
@@ -178,9 +183,9 @@ MoveWindow.prototype = {
       let y = position.y;
       // add/remove the top panel offset to the y position
       if (old.primary) {
-        y = y - Main.panel.actor.height;
+        y = y - this._getTopPanelHeight();
       } else {
-        y = y + Main.panel.actor.height;
+        y = y + this._getTopPanelHeight();
       }
       if (y < 0) {
         y = 0;
