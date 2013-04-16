@@ -48,12 +48,19 @@ MoveWindow.prototype = {
     );
   },
 
+  _getTopPanelHeight: function() {
+    return Main.panel.actor.y + Main.panel.actor.height;
+  },
+
   _recalculateSizes: function(s) {
-    let tbHeight = (Main.panel.actor.is_visible && s.primary) ? Main.panel.actor.height : 0;
-    if (tbHeight == 1) {
+
+    let tbHeight = s.primary ? this._getTopPanelHeight() : 0;
+    if (Math.abs(tbHeight) <= 2) {
       tbHeight = 0;
     }
     s.y = s.geomY + tbHeight;
+
+    tbHeight = tbHeight / 2;
 
     let i = 0;
     let widths  = this._utils.getWestWidths();
