@@ -42,12 +42,26 @@ MoveWindow.prototype = {
   _addKeyBinding: function(key, handler) {
     this._bindings.push(key);
 
-    global.display.add_keybinding(
-      key,
-      this._utils.getSettingsObject(),
-      Meta.KeyBindingFlags.NONE,
-      handler
-    );
+    if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
+      Main.wm.addKeybinding(key,
+        this._settings, Meta.KeyBindingFlags.NONE,
+        Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
+        handler
+      );
+    } else if (Main.wm.addKeybinding && Main.KeybindingMode) { // introduced in 3.7.2
+      Main.wm.addKeybinding(key,
+        this._settings, Meta.KeyBindingFlags.NONE,
+        Main.KeybindingMode.NORMAL | Main.KeybindingMode.MESSAGE_TRAY,
+        handler
+      );
+    } else {
+      global.display.add_keybinding(
+        key,
+        this._utils.getSettingsObject(),
+        Meta.KeyBindingFlags.NONE,
+        handler
+      );
+    }
   },
 
   _getTopPanelHeight: function() {
@@ -499,7 +513,7 @@ MoveWindow.prototype = {
     let outer = win.get_outer_rect();
     let inner = win.get_rect();
     return {
-      width: (outer.width - inner.width), 
+      width: (outer.width - inner.width),
       height: (outer.height - inner.height)
     };
   },
@@ -620,8 +634,13 @@ MoveWindow.prototype = {
     }
 
     let size = this._bindings.length;
+
     for(let i = 0; i<size; i++) {
-      global.display.remove_keybinding(this._bindings[i]);
+      if (Main.wm.removeKeybinding) {// introduced in 3.7.2
+        Main.wm.removeKeybinding(this._bindings[i]);
+      } else {
+        global.display.remove_keybinding(this._bindings[i]);
+      }
     }
     this._bindings = [];
 
