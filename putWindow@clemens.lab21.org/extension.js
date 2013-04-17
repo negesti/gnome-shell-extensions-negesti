@@ -481,13 +481,6 @@ MoveWindow.prototype = {
     }
 
     let padding = this._getPadding(win);
-    let dy = padding.height - padding.y / 2;
-    // we are moving north -> substract the whole padding from  height
-    if (y > 50) {
-      y -= dy;
-    } else {
-      dy = padding.height; // 2 * dy;
-    }
 
     // snap, x, y
     if (win.decorated) {
@@ -497,18 +490,19 @@ MoveWindow.prototype = {
     }
 
     // snap, width, height, force
-    win.resize(true, width - this._padding, height - dy);
+    win.resize(true, width - padding.width, height - padding.height);
   },
 
-  // the difference between input and outer rect as object.
+  // the difference between input and outer rect as object.  
   _getPadding: function(win) {
-    let outer = win.get_outer_rect(),
-      inner = win.get_input_rect();
+    let outer = win.get_outer_rect();
+    let input = win.get_input_rect();
+    let inner = win.get_rect();
     return {
-      x: outer.x - inner.x,
-      y: (outer.y - inner.y),
-      width: (inner.width - outer.width), // 2
-      height: (inner.height - outer.height)
+      x: outer.x - input.x,
+      y: (outer.y - input.y),
+      width: (outer.width - inner.width), // 2
+      height: (outer.height - inner.height)
     };
   },
 
