@@ -96,8 +96,8 @@ MoveWindow.prototype = {
     for (i=0; i < heights.length; i++) {
       let h = s.totalHeight * heights[i] - tbHeight;
       s.south[i] = {
-        height: Math.floor(h),
-        y: s.totalHeight - Math.ceil(h) + s.geomY
+        height: h,
+        y: s.totalHeight - h + s.geomY
       }
     }
 
@@ -174,7 +174,7 @@ MoveWindow.prototype = {
       // we are moving away from the primary screen and topPanel is visible,
       // e.g. height was max but is smaller then the totalHeight because of topPanel height
       if (old.primary) {
-        height += this._getTopPanelHeight();
+        height += Main.panel.actor.height;
       }
 
       height = height * yRatio;
@@ -185,9 +185,9 @@ MoveWindow.prototype = {
       let y = position.y;
       // add/remove the top panel offset to the y position
       if (old.primary) {
-        y = y - this._getTopPanelHeight();
+        y = y - Main.panel.actor.height;
       } else {
-        y = y + this._getTopPanelHeight();
+        y = y + Main.panel.actor.height;
       }
       if (y < 0) {
         y = 0;
@@ -465,6 +465,7 @@ MoveWindow.prototype = {
 
   // actual resizing
   _resize: function(win, x, y, width, height) {
+
     if (height < 0) {
       win.maximize(Meta.MaximizeFlags.VERTICAL);
       height = 400; // dont resize to width, -1
@@ -479,15 +480,21 @@ MoveWindow.prototype = {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
 
+    let padding = this._getPadding(win);
+    let dy = padding.height - padding.y / 2;
+    // we are moving north -> substract the whole padding from  height
+    if (y > 50) {
+      y -= dy;
+    } else {
+      dy = padding.height; // 2 * dy;
+    }
+
     // snap, x, y
     if (win.decorated) {
       win.move_frame(true, x, y);
     } else {
       win.move(true, x, y);
     }
-
-    let padding = this._getPadding(win);
-    let dy = padding.height + padding.y * 2;
 
     // snap, width, height, force
     win.resize(true, width - this._padding, height - dy);
