@@ -15,6 +15,8 @@ const MoveFocus = Extension.imports.moveFocus;
  * gcampax for auto-move-window extension and
  * vibou_ for gtile and his getInner/OuterPadding that is used in nearly every
  *        extension that moves windows around
+ * 73 for fixing overlapping windows issue and the idea and help for the
+ *    "Move Focus" feature.
  *
  * Believe in the force! Read the source!
  **/
@@ -480,8 +482,6 @@ MoveWindow.prototype = {
       win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
     }
 
-    let padding = this._getPadding(win);
-
     // snap, x, y
     if (win.decorated) {
       win.move_frame(true, x, y);
@@ -489,19 +489,17 @@ MoveWindow.prototype = {
       win.move(true, x, y);
     }
 
+    let padding = this._getPadding(win);
     // snap, width, height, force
     win.resize(true, width - padding.width, height - padding.height);
   },
 
-  // the difference between input and outer rect as object.  
+  // the difference between input and outer rect as object.
   _getPadding: function(win) {
     let outer = win.get_outer_rect();
-    let input = win.get_input_rect();
     let inner = win.get_rect();
     return {
-      x: outer.x - input.x,
-      y: (outer.y - input.y),
-      width: (outer.width - inner.width), // 2
+      width: (outer.width - inner.width), 
       height: (outer.height - inner.height)
     };
   },

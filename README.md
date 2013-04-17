@@ -14,6 +14,10 @@ Configuration
 The extension can be configured using the gnome prefs tool.
  * East/West widths, North/South heights  
  * Keybindings
+ * Change width and height when moving to corner (Always, only height, only width)
+ * Use multiple widths even if moving to other screen is possible
+ * Move focus using the keyboard
+  * move-focus-north/east/south/west using super + i/l/k/j (default)
  * Application based config (hit the save button)
 
 
@@ -66,6 +70,11 @@ and only if windows was at side_e (or side_w) before. eg.
 
 ChangeLog
 -------
+
+__April 17, 2013__
+ * "Move Focus" using the keyboard 
+ * Fix for overlapping windows
+ * Contributors: @73
 
 __December 27, 2012__
  * Config to change center/maximize to maximize/center
