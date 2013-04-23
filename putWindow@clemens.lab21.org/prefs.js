@@ -253,7 +253,7 @@ const PutWindowSettingsWidget = new GObject.Class({
 
   _createBindingList: function(bindings) {
 
-    let model = new Gtk.ListStore();
+    let name, model = new Gtk.ListStore();
 
     model.set_column_types([
       GObject.TYPE_STRING,
