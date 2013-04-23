@@ -50,7 +50,7 @@ MoveWindow.prototype = {
       );
     } else if (Main.wm.addKeybinding && Main.KeybindingMode) { // introduced in 3.7.2
       Main.wm.addKeybinding(key,
-        this._utils.getSettingsObjecti(), Meta.KeyBindingFlags.NONE,
+        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
         Main.KeybindingMode.NORMAL | Main.KeybindingMode.MESSAGE_TRAY,
         handler
       );
