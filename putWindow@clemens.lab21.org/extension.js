@@ -44,13 +44,13 @@ MoveWindow.prototype = {
 
     if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
       Main.wm.addKeybinding(key,
-        this._settings, Meta.KeyBindingFlags.NONE,
+        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
         Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
         handler
       );
     } else if (Main.wm.addKeybinding && Main.KeybindingMode) { // introduced in 3.7.2
       Main.wm.addKeybinding(key,
-        this._settings, Meta.KeyBindingFlags.NONE,
+        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
         Main.KeybindingMode.NORMAL | Main.KeybindingMode.MESSAGE_TRAY,
         handler
       );

@@ -101,6 +101,8 @@ MoveFocus.prototype = {
   },
   
   _isCandidate: function(focusWin, candidateWin, direction){
+  
+  	let diff = 20;
   	
   	let focus = this._getCenter(focusWin.get_outer_rect());
   	let candidate = this._getCenter(candidateWin.get_outer_rect());
@@ -109,25 +111,25 @@ MoveFocus.prototype = {
 			case "n":
 				if (focus.y < candidate.y)
 					return false;
-				if (Math.abs(focus.y - candidate.y) < Math.abs(focus.x - candidate.x))
+				if (Math.abs(focus.y - candidate.y)+diff < Math.abs(focus.x - candidate.x))
 					return false;
 				return true;
 			case "e":
 				if (focus.x > candidate.x)
 					return false;
-				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x))
+				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+diff)
 					return false;
 				return true;
 			case "s":
 				if (focus.y > candidate.y)
 					return false;
-				if (Math.abs(focus.y - candidate.y) < Math.abs(focus.x - candidate.x))
+				if (Math.abs(focus.y - candidate.y)+diff < Math.abs(focus.x - candidate.x))
 					return false;
 				return true;
 			case "w":
 				if (focus.x < candidate.x)
 					return false;
-				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x))
+				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+diff)
 					return false;
 				return true;
 			default:
