@@ -80,51 +80,51 @@
     </key>
 
     <key type="as" name="put-to-corner-ne">
-      <default><![CDATA[['<super>KP_9']]]></default>
+      <default><![CDATA[['<Super>KP_9']]]></default>
       <summary>Move to the top right corner</summary>
     </key>
     <key type="as" name="put-to-corner-nw">
-      <default><![CDATA[['<super>KP_7']]]></default>
+      <default><![CDATA[['<Super>KP_7']]]></default>
       <summary>Move to the top left corner</summary>
     </key>
     <key type="as" name="put-to-corner-se">
-      <default><![CDATA[['<super>KP_3']]]></default>
+      <default><![CDATA[['<Super>KP_3']]]></default>
       <summary>Move to the bottom right corner</summary>
     </key>
     <key type="as" name="put-to-corner-sw">
-      <default><![CDATA[['<super>KP_1']]]></default>
+      <default><![CDATA[['<Super>KP_1']]]></default>
       <summary>Move to the bottom left corner</summary>
     </key>
     <key type="as" name="put-to-side-n">
-      <default><![CDATA[['<super>KP_8']]]></default>
+      <default><![CDATA[['<Super>KP_8']]]></default>
       <summary>Move to the top</summary>
     </key>
     <key type="as" name="put-to-side-e">
-      <default><![CDATA[['<super>KP_6']]]></default>
+      <default><![CDATA[['<Super>KP_6']]]></default>
       <summary>Move to the right side</summary>
     </key>
     <key type="as" name="put-to-side-s">
-      <default><![CDATA[['<super>KP_2']]]></default>
+      <default><![CDATA[['<Super>KP_2']]]></default>
       <summary>Move to bottom</summary>
     </key>
     <key type="as" name="put-to-side-w">
-      <default><![CDATA[['<super>KP_4']]]></default>
+      <default><![CDATA[['<Super>KP_4']]]></default>
       <summary>Move to the left side</summary>
     </key>
     <key type="as" name="put-to-center">
-      <default><![CDATA[['<super>KP_5']]]></default>
+      <default><![CDATA[['<Super>KP_5']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
     <key type="as" name="put-to-location">
-      <default><![CDATA[['<super>KP_0']]]></default>
+      <default><![CDATA[['<Super>KP_0']]]></default>
       <summary>Move to a predifined location</summary>
     </key>
     <key type="as" name="put-to-left-screen">
-      <default><![CDATA[['<super>Left']]]></default>
+      <default><![CDATA[['<Super>Left']]]></default>
       <summary>Move to a predifined location</summary>
     </key>
     <key type="as" name="put-to-right-screen">
-      <default><![CDATA[['<super>Right']]]></default>
+      <default><![CDATA[['<Super>Right']]]></default>
       <summary>Move to a predifined location</summary>
     </key>
 
@@ -133,19 +133,19 @@
       <summary>Enable/Disable the MoveFocus feature</summary>
     </key>
     <key type="as" name="move-focus-north">
-      <default><![CDATA[['<super>i']]]></default>
+      <default><![CDATA[['<Super>i']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
     <key type="as" name="move-focus-east">
-      <default><![CDATA[['<super>l']]]></default>
+      <default><![CDATA[['<Super>l']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
     <key type="as" name="move-focus-south">
-      <default><![CDATA[['<super>k']]]></default>
+      <default><![CDATA[['<Super>k']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
     <key type="as" name="move-focus-west">
-      <default><![CDATA[['<super>j']]]></default>
+      <default><![CDATA[['<Super>j']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
   </schema>
