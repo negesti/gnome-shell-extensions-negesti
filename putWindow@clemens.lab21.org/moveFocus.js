@@ -44,13 +44,26 @@ MoveFocus.prototype = {
    */
   _addKeyBinding: function(key, handler) {
     this._bindings.push(key);
-
-    global.display.add_keybinding(
-      key,
-      this._utils.getSettingsObject(),
-      Meta.KeyBindingFlags.NONE,
-      handler
-    );
+    if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
+      Main.wm.addKeybinding(key,
+        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
+        Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
+        handler
+      );
+    } else if (Main.wm.addKeybinding && Main.KeybindingMode) { // introduced in 3.7.2
+      Main.wm.addKeybinding(key,
+        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
+        Main.KeybindingMode.NORMAL | Main.KeybindingMode.MESSAGE_TRAY,
+        handler
+      );
+    } else {
+      global.display.add_keybinding(
+        key,
+        this._utils.getSettingsObject(),
+        Meta.KeyBindingFlags.NONE,
+        handler
+      );
+    }
   },
 
   destroy: function() {
@@ -77,24 +90,29 @@ MoveFocus.prototype = {
   },
 
   _disable: function() {
+  	
     let size = this._bindings.length;
+
     for(let i = 0; i<size; i++) {
-      global.display.remove_keybinding(this._bindings[i]);
+      if (Main.wm.removeKeybinding) {// introduced in 3.7.2
+        Main.wm.removeKeybinding(this._bindings[i]);
+      } else {
+        global.display.remove_keybinding(this._bindings[i]);
+      }
     }
     this._bindings = [];
   },
 
-	_getDistance: function(focusWin, candidateWin){
-	
-		let focus = this._getCenter(focusWin.get_outer_rect());
-  	let candidate = this._getCenter(candidateWin.get_outer_rect());
+  _getDistance: function(focusWin, candidateWin){
+    let focus = this._getCenter(focusWin.get_outer_rect());
+    let candidate = this._getCenter(candidateWin.get_outer_rect());
 		
-		let dx = focus.x - candidate.x;
-		let dy = focus.y - candidate.y;
-		
-		return Math.sqrt(dx * dx + dy *dy);
+    let dx = focus.x - candidate.x;
+    let dy = focus.y - candidate.y;
+
+    return Math.sqrt(dx * dx + dy *dy);
 	
-	},
+  },
   
   _getCenter: function(rect){
   	return {x: rect.x - rect.width / 2, y: rect.y + rect.height / 2};
