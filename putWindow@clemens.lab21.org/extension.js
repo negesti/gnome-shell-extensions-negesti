@@ -1,4 +1,3 @@
-const Gettext = imports.gettext;
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;

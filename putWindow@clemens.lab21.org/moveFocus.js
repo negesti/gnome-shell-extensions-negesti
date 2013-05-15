@@ -1,7 +1,7 @@
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
-
-
+const Main = imports.ui.main;
+const Shell = imports.gi.Shell;
 
 function MoveFocus(utils) {
   this._init(utils);
@@ -90,7 +90,7 @@ MoveFocus.prototype = {
   },
 
   _disable: function() {
-  	
+
     let size = this._bindings.length;
 
     for(let i = 0; i<size; i++) {
@@ -106,25 +106,25 @@ MoveFocus.prototype = {
   _getDistance: function(focusWin, candidateWin){
     let focus = this._getCenter(focusWin.get_outer_rect());
     let candidate = this._getCenter(candidateWin.get_outer_rect());
-		
+
     let dx = focus.x - candidate.x;
     let dy = focus.y - candidate.y;
 
     return Math.sqrt(dx * dx + dy *dy);
-	
+
   },
-  
+
   _getCenter: function(rect){
   	return {x: rect.x - rect.width / 2, y: rect.y + rect.height / 2};
   },
-  
+
   _isCandidate: function(focusWin, candidateWin, direction){
-  
+
   	let diff = 20;
-  	
+
   	let focus = this._getCenter(focusWin.get_outer_rect());
   	let candidate = this._getCenter(candidateWin.get_outer_rect());
-  	
+
 		switch (direction){
 			case "n":
 				if (focus.y < candidate.y)
@@ -154,8 +154,8 @@ MoveFocus.prototype = {
 				// in case of doubt: mumble
 				return true;
 		}
-		
-  	
+
+
   },
 
   _moveFocus: function(direction) {
@@ -177,10 +177,10 @@ MoveFocus.prototype = {
     let candidates = [];
 
     for (let i=0; i < windows.length; i++) {
-      
+
       if (windows[i].has_focus())
       	continue;
-      
+
       if (this._isCandidate(win, windows[i],direction)){
       	candidates.push({
       		window: windows[i],
@@ -189,15 +189,15 @@ MoveFocus.prototype = {
       	});
       }
     } // end for windows
-		
-		
+
+
 		if (candidates.length == 0)
 			return;
-		
+
 		candidates.sort(function(a, b){
 			return a.dist - b.dist;
 		});
-		
+
 		candidates[0].window.activate(global.get_current_time());
 
   },
