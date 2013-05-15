@@ -231,6 +231,16 @@ MoveWindow.prototype = {
     let pos = win.get_outer_rect();
     let sizes = direction == "e" ? s.east : s.west;
 
+    if (win.maximized_horizontally && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
+      // currently at the left side (WEST)
+      if (pos.y == s.y) {
+        this._moveToCorner(win, screenIndex, "n" + direction, false, true);
+      } else {
+        this._moveToCorner(win, screenIndex, "s" + direction, false, true);
+      }
+      return;
+    }
+
     let useIndex = 0;
     for ( let i=0; i < sizes.length; i++) {
       if (this._samePoint(pos.width, sizes[i].width) && this._samePoint(pos.x, sizes[i].x)) {
@@ -270,6 +280,16 @@ MoveWindow.prototype = {
     let pos = win.get_outer_rect();
     let sizes = direction == "n" ? s.north : s.south;
 
+    if ( win.maximized_vertically && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
+      // currently at the left side (WEST)
+      if (pos.x == s.x) {
+        this._moveToCorner(win, screenIndex, "w" + direction, true, false);
+      } else {
+        this._moveToCorner(win, screenIndex, "e" + direction, true, false);
+      }
+      return;
+    }
+
     let useIndex = 0;
     for ( let i=0; i < sizes.length; i++) {
       if (this._samePoint(pos.height, sizes[i].height) && this._samePoint(pos.y, sizes[i].y)) {
@@ -284,7 +304,15 @@ MoveWindow.prototype = {
     this._resize(win, s.x, sizes[useIndex].y, s.totalWidth * -1, sizes[useIndex].height);
   },
 
-  _moveToCorner: function(win, screenIndex, direction) {
+  _moveToCorner: function(win, screenIndex, direction, keepWidth, keepHeight) {
+
+    if (typeof keepWidth == "undefined") {
+      keepWidth = false;
+    }
+    if (typeof keepHeight == "undefined") {
+      keepHeight = false;
+    }
+
     let s = this._screens[screenIndex];
     let pos = win.get_outer_rect();
     let sameWidth = false;
@@ -293,6 +321,9 @@ MoveWindow.prototype = {
     let useWidth = 0;
     let widths = (direction.indexOf("e") == -1) ? s.west : s.east;
     let add = this._utils.changeCornerWidth() ? 1 : 0;
+    if (keepWidth) {
+      add = 0;
+    }
 
     for (let i=0; i < widths.length; i++) {
       if (this._samePoint(pos.width, widths[i].width) && this._samePoint(pos.x, widths[i].x)) {
@@ -308,6 +339,9 @@ MoveWindow.prototype = {
     let useHeight = 0;
     let heights = (direction.indexOf("n") == -1) ? s.south : s.north;
     add = this._utils.changeCornerHeight() ? 1 : 0;
+    if (keepHeight) {
+      add = 0;
+    }
 
     for (let i=0; i < heights.length; i++) {
       if (this._samePoint(pos.height, heights[i].height) && this._samePoint(pos.y, heights[i].y)) {
@@ -321,20 +355,22 @@ MoveWindow.prototype = {
     }
 
     // currently at the east/west and, now moved to corner
-    if (this._utils.changeCornerHeight() && this._samePoint(pos.height, s.totalHeight)) {
+    if (!keepHeight && this._utils.changeCornerHeight() && this._samePoint(pos.height, s.totalHeight)) {
       sameHeight = true;
       useHeight = 0;
     }
+
     // currently at north/south and now moved to corner
-    if (this._utils.changeCornerWidth() && this._samePoint(pos.width, s.totalWidth)) {
+    if (!keepWidth && this._utils.changeCornerWidth() && this._samePoint(pos.width, s.totalWidth)) {
       sameWidth = true;
       useWidth = 0;
     }
     // window was moved to an other corner
-    if (!sameWidth || !sameHeight) {
+    if ((!keepHeight && !keepWidth) && (!sameWidth || !sameHeight)) {
       useWidth = 0;
       useHeight = 0;
     }
+
 
     this._resize(win, widths[useWidth].x, heights[useHeight].y, widths[useWidth].width, heights[useHeight].height);
   },
