@@ -17,6 +17,10 @@
       <default>0</default>
       <summary>Instead of center - maximize move to center will maximize - move to center</summary>
     </key>
+    <key type="i" name="intelligent-corner-movement">
+      <default>0</default>
+      <summary>Moving from E to S moves to SE not S</summary>
+    </key>
 
     <key type="i" name="center-width">
       <default>50</default>

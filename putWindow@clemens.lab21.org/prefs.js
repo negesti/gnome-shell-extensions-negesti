@@ -146,6 +146,19 @@ const PutWindowSettingsWidget = new GObject.Class({
     row++;
 
     ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      label: "Intelligent corner movement:",
+      tooltip_text: "Quite difficult to describe. Enable it and move a window from S to E, ",
+    }), 0, row, 4, 1);
+
+
+    let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.INTELLIGENT_CORNER_MOVEMENT, false));
+    intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.INTELLIGENT_CORNER_MOVEMENT, obj.get_active()); });
+    ret.attach(intelligenCornerSwitch, 5, row, 1, 1);
+    row++;
+
+    ret.attach(new Gtk.Label({
       label: "Adjust window width and height when moved to corner:",
       tooltip_text:"Change width and height when moving to corner?",
       halign: Gtk.Align.START

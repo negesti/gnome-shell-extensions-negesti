@@ -23,6 +23,8 @@ Utils.prototype = {
 
   MOVE_FOCUS_ENABLED: "move-focus-enabled",
 
+  INTELLIGENT_CORNER_MOVEMENT: "intelligent-corner-movement",
+
   START_CONFIG: {
     autoMove: false,
     positions: [{
