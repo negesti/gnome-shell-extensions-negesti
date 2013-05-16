@@ -125,30 +125,58 @@ MoveFocus.prototype = {
   	let focus = this._getCenter(focusWin.get_outer_rect());
   	let candidate = this._getCenter(candidateWin.get_outer_rect());
 
+		// a window is candidate if:
+		// 1. the center of the candidate window is further in the direction you want
+		//	to change to then the center of the focused window
+		// 2. the endge of the candidate window is further in the direction you want
+		//	to change to then the edge of the focused window
+		// 3. the center of the candidate ist in a 90-ish° angle to the direction
+		//	you want to change to from the center of the focussed window 
+
 		switch (direction){
 			case "n":
-				if (focus.y < candidate.y)
+				if (focus.y <= candidate.y){
 					return false;
-				if (Math.abs(focus.y - candidate.y)+diff < Math.abs(focus.x - candidate.x))
+				}
+				if (focusWin.get_outer_rect().y <= candidateWin.get_outer_rect().y){
 					return false;
+				}
+				if (Math.abs(focus.y - candidate.y)+diff < Math.abs(focus.x - candidate.x)){
+					return false;
+				}
 				return true;
 			case "e":
-				if (focus.x > candidate.x)
+				if (focus.x >= candidate.x){
 					return false;
-				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+diff)
+				}
+				if (focusWin.get_outer_rect().x + focusWin.get_outer_rect().width >= candidateWin.get_outer_rect().x + candidateWin.get_outer_rect().width){
 					return false;
+				}
+				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+diff){
+					return false;
+				}
 				return true;
 			case "s":
-				if (focus.y > candidate.y)
+				if (focus.y >= candidate.y){
 					return false;
-				if (Math.abs(focus.y - candidate.y)+diff < Math.abs(focus.x - candidate.x))
+				}
+				if (focusWin.get_outer_rect().y + focusWin.get_outer_rect().height >= candidateWin.get_outer_rect().y + candidateWin.get_outer_rect().height){
 					return false;
+				}
+				if (Math.abs(focus.y - candidate.y)+diff < Math.abs(focus.x - candidate.x)){
+					return false;
+				}
 				return true;
 			case "w":
-				if (focus.x < candidate.x)
+				if (focus.x <= candidate.x){
 					return false;
-				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+diff)
+				}
+				if (focusWin.get_outer_rect().x <= candidateWin.get_outer_rect().x){
 					return false;
+				}
+				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+diff){
+					return false;
+				}
 				return true;
 			default:
 				// in case of doubt: mumble
