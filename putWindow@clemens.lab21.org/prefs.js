@@ -73,7 +73,10 @@ const PutWindowSettingsWidget = new GObject.Class({
       ["0", "Both"],
       ["1", "Only height"],
       ["2", "Only width"],
-      ["3", "Keep size on first move"]
+      ["3", "Never change size"],
+      ["4", "Nothing on first move, both on second"],
+      ["5", "Nothing on first move, Only height on second"],
+      ["6", "Nothing on first move, Only width on second"]
     ]
     let selectMe = null;
     for (let i=0; i< values.length; i++) {
@@ -160,13 +163,13 @@ const PutWindowSettingsWidget = new GObject.Class({
     row++;
 
     ret.attach(new Gtk.Label({
-      label: "Adjust window width and height when moved to corner:",
-      tooltip_text:"Change width and height when moving to corner?",
+      label: "Moving to corner:",
+      tooltip_text:"Adjust window width and height when moved to corner?",
       halign: Gtk.Align.START
     }), 0, row, 4, 1);
 
     let combo = this._createCornerChangesCombo();
-    ret.attach(combo, 5, row, 1, 1);
+    ret.attach(combo, 3, row, 3, 1);
 
     row++;
     ret.attach(new Gtk.Label({label: "<b><u>Center</u></b>", halign: Gtk.Align.START, margin_left: 2, use_markup: true }), 0, row, 2, 1);

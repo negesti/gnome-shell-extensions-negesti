@@ -312,6 +312,11 @@ MoveWindow.prototype = {
     let sameWidth = false;
     let sameHeight = false;
 
+    if (this._utils.changeCornerNever()) {
+      this._moveToCornerKeepSize(win, screenIndex, direction);
+      return;
+    }
+
     let useWidth = 0;
     let widths = (direction.indexOf("e") == -1) ? s.west : s.east;
     let add = this._utils.changeCornerWidth() ? 1 : 0;
@@ -359,18 +364,50 @@ MoveWindow.prototype = {
       sameWidth = true;
       useWidth = 0;
     }
-    // window was moved to an other corner
-    if ((!keepHeight && !keepWidth) && (!sameWidth || !sameHeight)) {
-      useWidth = 0;
-      useHeight = 0;
-    }
 
-    if (useWidth == 0 && useHeight == 0 && this._utils.changeNothingOnFirstTime()) {
-      this._moveToCornerKeepSize(win, screenIndex, direction);
+
+    // no special handling for first time move
+    if (!this._utils.changeCornerFirstTime()) {
+      // window was moved to an other corner
+      if ((!keepHeight && !keepWidth) && (!sameWidth || !sameHeight)) {
+        useWidth = 0;
+        useHeight = 0;
+      }
+
+      this._resize(win, widths[useWidth].x, heights[useHeight].y, widths[useWidth].width, heights[useHeight].height);
       return;
     }
 
-    this._resize(win, widths[useWidth].x, heights[useHeight].y, widths[useWidth].width, heights[useHeight].height);
+    // moveToCornerKeepSize returns true, if the window must be moved (not already in the given corner)
+    if (this._moveToCornerKeepSize(win, screenIndex, direction)) {
+      return;
+    }
+
+    let x, y, width, height;
+    if (this._utils.changeCornerWidth()) {
+      x = widths[useWidth].x;
+      width = widths[useWidth].width;
+    } else {
+      width = pos.width;
+      if (direction.indexOf("w") == -1) {
+        x = s.x + (s.totalWidth - pos.width);
+      } else {
+        x = s.x;
+      }
+    }
+
+    if (this._utils.changeCornerHeight()) {
+      y = heights[useHeight].y;
+      height = heights[useHeight].height;
+    } else {
+      height = pos.height;
+      if (direction.indexOf("s") == -1) {
+        y = s.y;
+      } else {
+        y = (s.totalHeight - pos.height);
+      }
+    }
+    this._resize(win, x, y, width, height);
   },
 
   _moveToCornerKeepSize: function(win, screenIndex, direction) {
@@ -380,15 +417,20 @@ MoveWindow.prototype = {
     let x,y;
 
     if (direction.indexOf("s") == -1) {
-      y = screenIndex == s.primary ? this._getTopPanelHeight() : 0;
+      y = s.y;
     } else {
-      y = s.totalHeight - pos.height;
+      y = (s.totalHeight - pos.height);
     }
 
-    if (direction.indexOf("w") > -1) {
-      x = 0;
+    if (direction.indexOf("w") == -1) {
+      x = s.x + (s.totalWidth - pos.width);
     } else {
-      x = s.totalWidth - pos.width;
+      x = s.x;
+    }
+
+    // window is already in the given corner
+    if (this._samePoint(pos.x, x) && this._samePoint(pos.y, y)) {
+      return false;
     }
 
     if (win.decorated) {
@@ -396,7 +438,7 @@ MoveWindow.prototype = {
     } else {
       win.move(true, x, y);
     }
-
+    return true;
   },
 
   /**
