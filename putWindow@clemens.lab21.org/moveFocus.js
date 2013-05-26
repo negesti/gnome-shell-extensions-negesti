@@ -115,7 +115,7 @@ MoveFocus.prototype = {
   },
 
   _getCenter: function(rect){
-  	return {x: rect.x - rect.width / 2, y: rect.y + rect.height / 2};
+  	return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
   },
 
   _isCandidate: function(focusWin, candidateWin, direction){
