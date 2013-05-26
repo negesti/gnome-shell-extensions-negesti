@@ -72,7 +72,8 @@ const PutWindowSettingsWidget = new GObject.Class({
     let values = [
       ["0", "Both"],
       ["1", "Only height"],
-      ["2", "Only width"]
+      ["2", "Only width"],
+      ["3", "Keep size on first move"]
     ]
     let selectMe = null;
     for (let i=0; i< values.length; i++) {

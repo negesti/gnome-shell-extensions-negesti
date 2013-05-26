@@ -370,8 +370,38 @@ MoveWindow.prototype = {
       useHeight = 0;
     }
 
+    if (useWidth == 0 && useHeight == 0 && this._utils.changeNothingOnFirstTime()) {
+      this._moveToCornerKeepSize(win, screenIndex, direction);
+      return;
+    }
 
     this._resize(win, widths[useWidth].x, heights[useHeight].y, widths[useWidth].width, heights[useHeight].height);
+  },
+
+  _moveToCornerKeepSize: function(win, screenIndex, direction) {
+    let s = this._screens[screenIndex];
+    let pos = win.get_outer_rect();
+
+    let x,y;
+
+    if (direction.indexOf("s") == -1) {
+      y = screenIndex == s.primary ? this._getTopPanelHeight() : 0;
+    } else {
+      y = s.totalHeight - pos.height;
+    }
+
+    if (direction.indexOf("w") > -1) {
+      x = 0;
+    } else {
+      x = s.totalWidth - pos.width;
+    }
+
+    if (win.decorated) {
+      win.move_frame(true, x, y);
+    } else {
+      win.move(true, x, y);
+    }
+
   },
 
   /**

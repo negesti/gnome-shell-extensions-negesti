@@ -102,13 +102,17 @@ Utils.prototype = {
     }
   },
 
-  // 0... both, 1... only height, 2... only width
+  // 0... both, 1... only height, 2... only width, 3... nothing on first move, second height, 4... nothing on first move, second width
   changeCornerWidth: function() {
     return this.getNumber(this.CORNER_CHANGE, 1) != 1;
   },
 
   changeCornerHeight: function() {
     return this.getNumber(this.CORNER_CHANGE, 2) != 2;
+  },
+
+  changeNothingOnFirstTime: function() {
+    return this.getNumber(this.CORNER_CHANGE, 0) == 3;
   },
 
   getNorthHeights: function() {
@@ -177,9 +181,8 @@ Utils.prototype = {
       let path = name.split("."),
       value = this._settings[path[0]],
       pathLength = path.length;
-
       for (let i=1; i < pathLength; i++) {
-          value = value[path[i]];
+        value = value[path[i]];
       }
 
       return value;
