@@ -42,15 +42,10 @@ MoveWindow.prototype = {
     this._bindings.push(key);
 
     if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
+      // Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
       Main.wm.addKeybinding(key,
         this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
-        Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
-        handler
-      );
-    } else if (Main.wm.addKeybinding && Main.KeybindingMode) { // introduced in 3.7.2
-      Main.wm.addKeybinding(key,
-        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
-        Main.KeybindingMode.NORMAL | Main.KeybindingMode.MESSAGE_TRAY,
+        Shell.KeyBindingMode.NORMAL,
         handler
       );
     } else {

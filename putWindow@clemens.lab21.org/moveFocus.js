@@ -44,16 +44,11 @@ MoveFocus.prototype = {
    */
   _addKeyBinding: function(key, handler) {
     this._bindings.push(key);
+    // Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
     if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
       Main.wm.addKeybinding(key,
         this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
-        Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
-        handler
-      );
-    } else if (Main.wm.addKeybinding && Main.KeybindingMode) { // introduced in 3.7.2
-      Main.wm.addKeybinding(key,
-        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
-        Main.KeybindingMode.NORMAL | Main.KeybindingMode.MESSAGE_TRAY,
+        Shell.KeyBindingMode.NORMAL,
         handler
       );
     } else {
@@ -131,7 +126,7 @@ MoveFocus.prototype = {
 		// 2. the endge of the candidate window is further in the direction you want
 		//	to change to then the edge of the focused window
 		// 3. the center of the candidate ist in a 90-ish° angle to the direction
-		//	you want to change to from the center of the focussed window 
+		//	you want to change to from the center of the focussed window
 
 		switch (direction){
 			case "n":
