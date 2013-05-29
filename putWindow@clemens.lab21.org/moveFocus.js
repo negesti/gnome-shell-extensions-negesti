@@ -82,6 +82,9 @@ MoveFocus.prototype = {
     this._addKeyBinding("move-focus-west",
       Lang.bind(this, function() { this._moveFocus("w"); })
     );
+    this._addKeyBinding("move-focus-cycle",
+      Lang.bind(this, function() { this._cycle(); })
+    );
   },
 
   _disable: function() {
@@ -178,6 +181,10 @@ MoveFocus.prototype = {
 				return true;
 		}
 
+
+  },
+
+  _cycle: function() {
 
   },
 

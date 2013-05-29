@@ -136,6 +136,10 @@
       <default>1</default>
       <summary>Enable/Disable the MoveFocus feature</summary>
     </key>
+    <key type="as" name="move-focus-cycle">
+      <default><![CDATA[['<Super>o']]]></default>
+      <summary>Cycle through windows at the same postition</summary>
+    </key>
     <key type="as" name="move-focus-north">
       <default><![CDATA[['<Super>i']]]></default>
       <summary>Move to center/maximize</summary>
