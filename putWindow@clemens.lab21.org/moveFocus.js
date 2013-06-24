@@ -185,7 +185,19 @@ MoveFocus.prototype = {
   },
 
   _cycle: function() {
-
+		let focusWin = global.display.focus_window;
+		let screen = global.screen;
+    let display = screen.get_display();
+    let allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace()));
+		focusWin.lower();
+		let focusRect = focusWin.get_outer_rect();
+		for (let i=(allWin.length-1); i>=0; i--){
+			if (allWin[i]==focusWin) continue;
+			if (focusRect.overlap(allWin[i].get_outer_rect())){
+				allWin[i].activate(global.get_current_time());
+				break;
+			}
+		}
   },
 
   _moveFocus: function(direction) {
