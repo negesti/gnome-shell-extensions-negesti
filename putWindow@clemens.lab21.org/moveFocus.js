@@ -180,8 +180,6 @@ MoveFocus.prototype = {
 				// in case of doubt: mumble
 				return true;
 		}
-
-
   },
 
   _cycle: function() {

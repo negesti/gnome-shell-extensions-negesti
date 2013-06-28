@@ -261,7 +261,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       "move-focus-east": "Move the window focus right",
       "move-focus-south": "Move the window focus down",
       "move-focus-west": "Move the window focus left",
-      "move-focus-cycle": "Cycle through windows at the same postition"
+      "move-focus-cycle": "Push window to background"
     });
 
     ret.attach(keyBinding, 0, row, 6, 1);
