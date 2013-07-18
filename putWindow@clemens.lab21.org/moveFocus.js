@@ -9,6 +9,9 @@ function MoveFocus(utils) {
 
 MoveFocus.prototype = {
 
+	_angle_correction: 20,
+  _distance_correction: 10,
+
   _bindings: [],
   _settingsChangedListener: {},
 
@@ -118,8 +121,6 @@ MoveFocus.prototype = {
 
   _isCandidate: function(focusWin, candidateWin, direction){
 
-  	let diff = 20;
-
   	let focus = this._getCenter(focusWin.get_outer_rect());
   	let candidate = this._getCenter(candidateWin.get_outer_rect());
 
@@ -136,10 +137,10 @@ MoveFocus.prototype = {
 				if (focus.y <= candidate.y){
 					return false;
 				}
-				if (focusWin.get_outer_rect().y <= candidateWin.get_outer_rect().y){
+				if (focusWin.get_outer_rect().y <= candidateWin.get_outer_rect().y + this._distance_correction){
 					return false;
 				}
-				if (Math.abs(focus.y - candidate.y)+diff < Math.abs(focus.x - candidate.x)){
+				if (Math.abs(focus.y - candidate.y)+this._angle_correction < Math.abs(focus.x - candidate.x)){
 					return false;
 				}
 				return true;
@@ -147,10 +148,10 @@ MoveFocus.prototype = {
 				if (focus.x >= candidate.x){
 					return false;
 				}
-				if (focusWin.get_outer_rect().x + focusWin.get_outer_rect().width >= candidateWin.get_outer_rect().x + candidateWin.get_outer_rect().width){
+				if (focusWin.get_outer_rect().x + focusWin.get_outer_rect().width + this._distance_correction >= candidateWin.get_outer_rect().x + candidateWin.get_outer_rect().width){
 					return false;
 				}
-				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+diff){
+				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+this._angle_correction){
 					return false;
 				}
 				return true;
@@ -158,21 +159,21 @@ MoveFocus.prototype = {
 				if (focus.y >= candidate.y){
 					return false;
 				}
-				if (focusWin.get_outer_rect().y + focusWin.get_outer_rect().height >= candidateWin.get_outer_rect().y + candidateWin.get_outer_rect().height){
+				if (focusWin.get_outer_rect().y + focusWin.get_outer_rect().height + this._distance_correction >= candidateWin.get_outer_rect().y + candidateWin.get_outer_rect().height){
 					return false;
 				}
-				if (Math.abs(focus.y - candidate.y)+diff < Math.abs(focus.x - candidate.x)){
+				if (Math.abs(focus.y - candidate.y)+this._angle_correction < Math.abs(focus.x - candidate.x)){
 					return false;
 				}
 				return true;
 			case "w":
-				if (focus.x <= candidate.x){
+				if (focus.x <= candidate.x + this._distance_correction){
 					return false;
 				}
 				if (focusWin.get_outer_rect().x <= candidateWin.get_outer_rect().x){
 					return false;
 				}
-				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+diff){
+				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+this._angle_correction){
 					return false;
 				}
 				return true;
@@ -216,7 +217,7 @@ MoveFocus.prototype = {
 
     let candidates = [];
 
-    for (let i=0; i < windows.length; i++) {
+    for (let i=0; i<windows.length; i++){
 
       if (windows[i].has_focus())
       	continue;
@@ -234,8 +235,16 @@ MoveFocus.prototype = {
 		if (candidates.length == 0)
 			return;
 
+		var distance_correction = this._distance_correction;
+		
 		candidates.sort(function(a, b){
-			return a.dist - b.dist;
+			global.log(a.window.get_title()+" "+b.window.get_title());
+			global.log(a.dist+" "+b.dist);
+			global.log(distance_correction);
+			// if the difference between distances is within the distance correction
+			// value we will make our decision based on recend usage
+			return (Math.abs(a.dist-b.dist) <= distance_correction) ? -1 : a.dist - b.dist;
+
 		});
 
 		candidates[0].window.activate(global.get_current_time());
