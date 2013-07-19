@@ -36,29 +36,19 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.expand = true;
     this._wnckScreen = Wnck.Screen.get_default();
 
-    //this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 10, 1, 1);
-    let keyExpander = new Gtk.Expander();
-    keyExpander.set_label("Move Focus");
-    keyExpander.add(this._createMoveFocusConfig());
-    this.attach(keyExpander, 0, 0, 1, 9);
+    let tabView = this._generateMainSettings();
 
-    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 10, 1, 1);
-    let mainConfig = new Gtk.Expander();
-    mainConfig.set_label("Main settings");
-    mainConfig.add(this._generateMainSettings());
-    this.attach(mainConfig, 0, 11, 1, 9);
 
-    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 20, 1, 1);
-    let keyExpander = new Gtk.Expander();
-    keyExpander.set_label("Keyboard Shortcuts");
-    keyExpander.add(this._createKeyboardConfig());
-    this.attach(keyExpander, 0, 21, 1, 9);
+    tabView.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>Move Focus</b>",
+         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
 
-    this.attach(new Gtk.Separator( { orientation: Gtk.Orientation.HORIZONTAL } ), 0, 30, 1, 1);
-    let appExpander = new Gtk.Expander();
-    appExpander.set_label("Applications");
-    appExpander.add(new PutWindowLocationWidget(this._wnckScreen));
-    this.attach(appExpander, 0, 31, 1, 10000);
+    tabView.append_page(this._createKeyboardConfig(), new Gtk.Label({label: "<b>Keyboard Shortcuts</b>",
+         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+
+    tabView.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>Applications</b>",
+         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+
+    this.add(tabView);
   },
 
   _createCornerChangesCombo: function() {
@@ -116,6 +106,9 @@ const PutWindowSettingsWidget = new GObject.Class({
   },
 
   _generateMainSettings: function() {
+
+    var tabView = new Gtk.Notebook({ hexpand: true});
+
     let ret = new Gtk.Grid();
     ret.width = 6;
     ret.column_homogeneous = true;
@@ -124,8 +117,12 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     let row = 0;
 
+    ret.attach(new Gtk.Label({label: "<b>Main</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
+    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
+
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
+      margin_left: 10,
       label: "Always use multiple widths:",
       tooltip_text:"Disable this option to move to other screen if possible",
     }), 0, row, 4, 1);
@@ -134,11 +131,11 @@ const PutWindowSettingsWidget = new GObject.Class({
     alwaysSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_USE_WIDTHS, false));
     alwaysSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active()); });
 
-    ret.attach(alwaysSwitch, 5, row, 1, 1);
-    row++;
+    ret.attach(alwaysSwitch, 5, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
+      margin_left: 10,
       label: "First maximize then move to center:",
       tooltip_text: "'Move to center' maximizes the current window, and centers maximized windows",
     }), 0, row, 4, 1);
@@ -146,75 +143,86 @@ const PutWindowSettingsWidget = new GObject.Class({
     let centerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
     centerSwitch.set_active(Utils.getBoolean(Utils.REVERSE_MOVE_CENTER, false));
     centerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.REVERSE_MOVE_CENTER, obj.get_active()); });
-    ret.attach(centerSwitch, 5, row, 1, 1);
-    row++;
+    ret.attach(centerSwitch, 5, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
+      margin_left: 10,
       label: "Intelligent corner movement:",
       tooltip_text: "Quite difficult to describe. Enable it and move a window from S to E, ",
     }), 0, row, 4, 1);
 
-
     let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
     intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.INTELLIGENT_CORNER_MOVEMENT, false));
     intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.INTELLIGENT_CORNER_MOVEMENT, obj.get_active()); });
-    ret.attach(intelligenCornerSwitch, 5, row, 1, 1);
-    row++;
+    ret.attach(intelligenCornerSwitch, 5, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       label: "Moving to corner:",
+      margin_left: 10,
       tooltip_text:"Adjust window width and height when moved to corner?",
       halign: Gtk.Align.START
     }), 0, row, 4, 1);
 
     let combo = this._createCornerChangesCombo();
-    ret.attach(combo, 3, row, 3, 1);
+    ret.attach(combo, 3, row++, 3, 1);
 
-    row++;
-    ret.attach(new Gtk.Label({label: "<b><u>Center</u></b>", halign: Gtk.Align.START, margin_left: 2, use_markup: true }), 0, row, 2, 1);
-    row++;
-    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.START, margin_left: 10 }), 0, row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_WIDTH), 1, row, 5, 1);
-    row++;
-    ret.attach(new Gtk.Label({label: "Height:", halign: Gtk.Align.START, margin_left: 10 }), 0, row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_HEIGHT), 1, row, 5, 1);
-    row++;
+    // ------------------------------------- center ----------------------------------------
+    ret.attach(new Gtk.Label({label: "<b>Center</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
+    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      margin_left: 10,
+      label: "Keep width when moving north/south:",
+      tooltip_text: "Don't change width when moving window from center to north or south.",
+    }), 0, row, 4, 1);
+
+    let keepWidthSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    keepWidthSwitch.set_active(Utils.getBoolean(Utils.CENTER_KEEP_WIDTH, false));
+    keepWidthSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.CENTER_KEEP_WIDTH, obj.get_active()); });
+    ret.attach(keepWidthSwitch, 5, row++, 1, 1);
+
+    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH), 1, row++, 5, 1);
+    ret.attach(new Gtk.Label({label: "Height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT), 1, row++, 5, 1);
+
+    tabView.append_page(ret, new Gtk.Label({label: "<b>Main</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+
 
     let labels = ["First:", "Second: ", "Third:"];
+
     // ------------------------------------- north ----------------------------------------
+    let positions = new Gtk.Grid();
+    positions.column_homogeneous = true;
+    row = 0;
+    positions.attach(new Gtk.Label({label: "<b>North</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
+    positions.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
+    row = this._addSliders(positions, row, labels, "north-height");
     row++;
-    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row, 6, 1);
-
-    row++;
-    ret.attach(new Gtk.Label({label: "<b><u>North</u></b>", halign:Gtk.Align.START, margin_left:2, use_markup: true})
-
-
-      , 0, row, 2, 1);
-    row = this._addSliders(ret, row, labels, "north-height");
 
     // ------------------------------------- south ----------------------------------------
+    positions.attach(new Gtk.Label({label: "<b>South</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
+    positions.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
+    row = this._addSliders(positions, row, labels, "south-height");
     row++;
-    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row, 6, 1);
-    row++;
-    ret.attach(new Gtk.Label({label: "<b><u>South:</u></b>", use_markup: true, halign:Gtk.Align.START, margin_left: 2 }), 0, row, 2, 1);
-    row = this._addSliders(ret, row, labels, "south-height");
+
 
     // ------------------------------------- west ----------------------------------------
+    positions.attach(new Gtk.Label({label: "<b>East</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
+    positions.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
+    row = this._addSliders(positions, row, labels, "left-side-widths");
     row++;
-    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row, 6, 1);
-    row++;
-    ret.attach(new Gtk.Label({label: "<b><u>West:</u></b>", use_markup: true, halign:Gtk.Align.START, margin_left: 2 }), 0, row, 2, 1);
-    row = this._addSliders(ret, row, labels, "left-side-widths");
 
     // ------------------------------------- east ----------------------------------------
-    row++;
-    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row, 6, 1);
-    row++;
-    ret.attach(new Gtk.Label({label: "<b><u>East:</u></b>", use_markup: true, halign:Gtk.Align.START, margin_left: 2 }), 0, row, 2, 1);
-    row = this._addSliders(ret, row, labels, "right-side-widths");
+    positions.attach(new Gtk.Label({label: "<b>West</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
+    positions.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
+    this._addSliders(positions, row, labels, "right-side-widths");
+    tabView.append_page(positions, new Gtk.Label({label: "<b>Positions</b>", halign:Gtk.Align.START, margin_left:2, use_markup: true}));
 
-    return ret;
+
+
+    return tabView;
   },
 
   _createKeyboardConfig: function() {
@@ -243,8 +251,13 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.set_margin_right(5);
 
     let row = 0;
+
+    ret.attach(new Gtk.Label({label: "<b>Main</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
+    ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
+
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
+      margin_left: 4,
       label: "Move window focus using keyboard:"
     }), 0, row, 4, 1);
 

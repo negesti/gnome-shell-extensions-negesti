@@ -295,7 +295,7 @@ MoveWindow.prototype = {
       }
     }
 
-    if (this._isCenterWidth(screenIndex, pos)) {
+    if (this._utils.getBoolean(this._utils.CENTER_KEEP_WIDTH, false) && this._isCenterWidth(screenIndex, pos)) {
       this._resize(win, pos.x, sizes[useIndex].y, pos.width, sizes[useIndex].height);
       return;
     }

@@ -30,6 +30,10 @@
       <default>50</default>
       <summary>Height to use when moved to center</summary>
     </key>
+    <key type="i" name="center-keep-width">
+      <default>0</default>
+      <summary>Keep width when moving from center to south or north</summary>
+    </key>
 
     <key type="i" name="north-height-0">
       <default>50</default>

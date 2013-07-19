@@ -17,6 +17,7 @@ Utils.prototype = {
 
   CENTER_WIDTH: "center-width",
   CENTER_HEIGHT: "center-height",
+  CENTER_KEEP_WIDTH: "center-keep-width",
   ALWAYS_USE_WIDTHS: "always-use-widths",
   CORNER_CHANGE: "corner-changes",
   REVERSE_MOVE_CENTER: "reverse-move-center",
