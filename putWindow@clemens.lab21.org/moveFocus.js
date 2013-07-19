@@ -236,11 +236,13 @@ MoveFocus.prototype = {
 			return;
 
 		var distance_correction = this._distance_correction;
-		
-		candidates.sort(function(a, b){
-			global.log(a.window.get_title()+" "+b.window.get_title());
-			global.log(a.dist+" "+b.dist);
-			global.log(distance_correction);
+
+		candidates.sort(function(a, b) {
+      /*
+		   global.log(a.window.get_title()+" "+b.window.get_title());
+			 global.log(a.dist+" "+b.dist);
+			 global.log(distance_correction);
+      */
 			// if the difference between distances is within the distance correction
 			// value we will make our decision based on recend usage
 			return (Math.abs(a.dist-b.dist) <= distance_correction) ? -1 : a.dist - b.dist;

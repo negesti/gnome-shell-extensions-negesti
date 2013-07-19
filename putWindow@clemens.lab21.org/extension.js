@@ -295,7 +295,23 @@ MoveWindow.prototype = {
       }
     }
 
+    if (this._isCenterWidth(screenIndex, pos)) {
+      this._resize(win, pos.x, sizes[useIndex].y, pos.width, sizes[useIndex].height);
+      return;
+    }
+
     this._resize(win, s.x, sizes[useIndex].y, s.totalWidth * -1, sizes[useIndex].height);
+  },
+
+  _isCenterWidth: function(screenIndex, pos) {
+
+    let s = this._screens[screenIndex];
+    let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH, 50) / 100),
+      h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT, 50) / 100),
+      x = s.x + (s.totalWidth - w) / 2,
+      y = s.y + (s.totalHeight - h) / 2;
+
+    return this._samePoint(w, pos.width) && this._samePoint(x, pos.x);
   },
 
   _moveToCorner: function(win, screenIndex, direction, keepWidth, keepHeight) {
