@@ -71,6 +71,19 @@ and only if windows was at side_e (or side_w) before. eg.
 ChangeLog
 -------
 
+__July 20, 2013__
+ * Settings are now organized in tabs
+ * New feature 'intelligent corner movement'
+ * New config option to keep window width when moving from center to north/south
+ * additional options for "move to corner". When moving to a corner you have the choice to change:
+  * both
+  * only height
+  * only width
+  * never change size
+  * Nothing on first move, both on second
+  * Nothing on first move, only height on second
+  * Nothing on first move, only width on second
+
 __April 17, 2013__
  * "Move Focus" using the keyboard 
  * Fix for overlapping windows
