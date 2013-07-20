@@ -112,17 +112,17 @@ Utils.prototype = {
   // ["6", "Nothing on first move, Only width on second"]["4", "Keep size on first move"],
   changeCornerHeight: function() {
     let val = this.getNumber(this.CORNER_CHANGE, 1);
-    return val == 1 || val == 4 || val == 5;
+    return val == 0 || val == 1 || val == 4 || val == 5;
   },
 
   changeCornerWidth: function() {
     let val = this.getNumber(this.CORNER_CHANGE, 2);
-    return val == 2 || val == 4 || val == 6;
+    return val == 0 || val == 2 || val == 4 || val == 6;
   },
 
   changeCornerFirstTime: function() {
     let val = this.getNumber(this.CORNER_CHANGE, 0);
-    return val == 4 || val == 5 || val == 6;
+    return val == 0 || val == 4 || val == 5 || val == 6;
   },
 
   changeCornerNever: function() {

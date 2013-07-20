@@ -228,9 +228,9 @@ MoveWindow.prototype = {
     if (win.maximized_horizontally && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
       // currently at the left side (WEST)
       if (pos.y == s.y) {
-        this._moveToCorner(win, screenIndex, "n" + direction, false, true);
+        this._moveToCorner(win, screenIndex, "n" + direction, false, true, true);
       } else {
-        this._moveToCorner(win, screenIndex, "s" + direction, false, true);
+        this._moveToCorner(win, screenIndex, "s" + direction, false, true, true);
       }
       return;
     }
@@ -277,9 +277,9 @@ MoveWindow.prototype = {
     if ( win.maximized_vertically && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
       // currently at the left side (WEST)
       if (pos.x == s.x) {
-        this._moveToCorner(win, screenIndex, "w" + direction, true, false);
+        this._moveToCorner(win, screenIndex, "w" + direction, true, false, true);
       } else {
-        this._moveToCorner(win, screenIndex, "e" + direction, true, false);
+        this._moveToCorner(win, screenIndex, "e" + direction, true, false, true);
       }
       return;
     }
@@ -314,14 +314,11 @@ MoveWindow.prototype = {
     return this._samePoint(w, pos.width) && this._samePoint(x, pos.x);
   },
 
-  _moveToCorner: function(win, screenIndex, direction, keepWidth, keepHeight) {
+  _moveToCorner: function(win, screenIndex, direction, keepWidth, keepHeight, ignoreCornerSettings) {
 
-    if (typeof keepWidth == "undefined") {
-      keepWidth = false;
-    }
-    if (typeof keepHeight == "undefined") {
-      keepHeight = false;
-    }
+    ignoreCornerSettings = ignoreCornerSettings || false;
+    keepWidth = keepWidth || false;
+    keepHeight = keepHeight || false;
 
     let s = this._screens[screenIndex];
     let pos = win.get_outer_rect();
@@ -383,7 +380,7 @@ MoveWindow.prototype = {
 
 
     // no special handling for first time move
-    if (!this._utils.changeCornerFirstTime()) {
+    if (ignoreCornerSettings || !this._utils.changeCornerFirstTime()) {
       // window was moved to an other corner
       if ((!keepHeight && !keepWidth) && (!sameWidth || !sameHeight)) {
         useWidth = 0;
