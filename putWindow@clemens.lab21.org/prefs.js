@@ -262,7 +262,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     let description = new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 4,
-      label: "'Move Focus' allows you to select the focused window using the keyboard and to push the current focused window into background."
+      label: "'Move Focus' allows you to chnage the focus based on the relative location of the current focussed window using the keyboard and to push the currently focused window into the background to get the focus to the windows below."
     });
     description.set_line_wrap(true);
     ret.attach(description, 0, row++, 5, 1);
@@ -288,7 +288,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       "move-focus-east": "Move the window focus right",
       "move-focus-south": "Move the window focus down",
       "move-focus-west": "Move the window focus left",
-      "move-focus-cycle": "Push window to background"
+      "move-focus-cycle": "Push focussed window to the background"
     });
     ret.attach(keyBinding, 0, row, 5, 1);
 
