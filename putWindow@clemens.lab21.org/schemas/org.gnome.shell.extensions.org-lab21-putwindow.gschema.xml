@@ -1,13 +1,27 @@
 <schemalist>
   <schema id="org.gnome.shell.extensions.org-lab21-putwindow" path="/org/gnome/shell/extensions/org-lab21-putwindow/">
-    <key type="i" name="side-width">
-      <default>50</default>
-      <summary>Width to use when moved to side or corner</summary>
+    <key type="s" name="locations">
+      <default>"{}"</default>
+      <summary>Application based configuration</summary>
     </key>
-    <key type="i" name="side-height">
-      <default>50</default>
-      <summary>Height to use when moved to side or corner</summary>
+
+    <key type="i" name="corner-changes">
+      <default>0</default>
+      <summary>Change width and height when moving to corner (Always, only height, only width)</summary>
     </key>
+    <key type="i" name="always-use-widths">
+      <default>0</default>
+      <summary>Use multiple widths even if moveing to other screen is possible</summary>
+    </key>
+    <key type="i" name="reverse-move-center">
+      <default>0</default>
+      <summary>Instead of center - maximize move to center will maximize - move to center</summary>
+    </key>
+    <key type="i" name="intelligent-corner-movement">
+      <default>0</default>
+      <summary>Moving from E to S moves to SE not S</summary>
+    </key>
+
     <key type="i" name="center-width">
       <default>50</default>
       <summary>Width to use when moved to center</summary>
@@ -16,51 +30,135 @@
       <default>50</default>
       <summary>Height to use when moved to center</summary>
     </key>
+    <key type="i" name="center-keep-width">
+      <default>0</default>
+      <summary>Keep width when moving from center to south or north</summary>
+    </key>
 
-    <key type="s" name="locations">
-      <default>"{}"</default>
-      <summary>Height to use when moved to center</summary>
+    <key type="i" name="north-height-0">
+      <default>50</default>
+      <summary>Height to use when moving north once</summary>
+    </key>
+    <key type="i" name="north-height-1">
+      <default>66</default>
+      <summary>Height to use when moving north twice</summary>
+    </key>
+    <key type="i" name="north-height-2">
+      <default>34</default>
+      <summary>Height to use when moving north times</summary>
+    </key>
+
+    <key type="i" name="south-height-0">
+      <default>50</default>
+      <summary>Height to use when moving south once</summary>
+    </key>
+    <key type="i" name="south-height-1">
+      <default>34</default>
+      <summary>Height to use when moving south twice</summary>
+    </key>
+    <key type="i" name="south-height-2">
+      <default>66</default>
+      <summary>Height to use when moving south times</summary>
+    </key>
+
+    <key type="i" name="left-side-widths-0">
+      <default>50</default>
+      <summary>Width to use when moving to left side once</summary>
+    </key>
+    <key type="i" name="left-side-widths-1">
+      <default>34</default>
+      <summary>Width to use when moving to left side twice</summary>
+    </key>
+    <key type="i" name="left-side-widths-2">
+      <default>66</default>
+      <summary>Width to use when moving to left side three times</summary>
+    </key>
+
+    <key type="i" name="right-side-widths-0">
+      <default>50</default>
+      <summary>Width to use when moving to right side once</summary>
+    </key>
+    <key type="i" name="right-side-widths-1">
+      <default>66</default>
+      <summary>Width to use when moving to right side twice</summary>
+    </key>
+    <key type="i" name="right-side-widths-2">
+      <default>34</default>
+      <summary>Width to use when moving to right side three times</summary>
     </key>
 
     <key type="as" name="put-to-corner-ne">
-      <default><![CDATA[['<super>KP_9']]]></default>
+      <default><![CDATA[['<Super>KP_9']]]></default>
       <summary>Move to the top right corner</summary>
     </key>
     <key type="as" name="put-to-corner-nw">
-      <default><![CDATA[['<super>KP_7']]]></default>
+      <default><![CDATA[['<Super>KP_7']]]></default>
       <summary>Move to the top left corner</summary>
     </key>
     <key type="as" name="put-to-corner-se">
-      <default><![CDATA[['<super>KP_3']]]></default>
+      <default><![CDATA[['<Super>KP_3']]]></default>
       <summary>Move to the bottom right corner</summary>
     </key>
     <key type="as" name="put-to-corner-sw">
-      <default><![CDATA[['<super>KP_1']]]></default>
+      <default><![CDATA[['<Super>KP_1']]]></default>
       <summary>Move to the bottom left corner</summary>
     </key>
     <key type="as" name="put-to-side-n">
-      <default><![CDATA[['<super>KP_8']]]></default>
+      <default><![CDATA[['<Super>KP_8']]]></default>
       <summary>Move to the top</summary>
     </key>
     <key type="as" name="put-to-side-e">
-      <default><![CDATA[['<super>KP_6']]]></default>
+      <default><![CDATA[['<Super>KP_6']]]></default>
       <summary>Move to the right side</summary>
     </key>
     <key type="as" name="put-to-side-s">
-      <default><![CDATA[['<super>KP_2']]]></default>
+      <default><![CDATA[['<Super>KP_2']]]></default>
       <summary>Move to bottom</summary>
     </key>
     <key type="as" name="put-to-side-w">
-      <default><![CDATA[['<super>KP_4']]]></default>
+      <default><![CDATA[['<Super>KP_4']]]></default>
       <summary>Move to the left side</summary>
     </key>
     <key type="as" name="put-to-center">
-      <default><![CDATA[['<super>KP_5']]]></default>
+      <default><![CDATA[['<Super>KP_5']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
     <key type="as" name="put-to-location">
-      <default><![CDATA[['<super>KP_0']]]></default>
+      <default><![CDATA[['<Super>KP_0']]]></default>
       <summary>Move to a predifined location</summary>
+    </key>
+    <key type="as" name="put-to-left-screen">
+      <default><![CDATA[['<Super>Left']]]></default>
+      <summary>Move to a predifined location</summary>
+    </key>
+    <key type="as" name="put-to-right-screen">
+      <default><![CDATA[['<Super>Right']]]></default>
+      <summary>Move to a predifined location</summary>
+    </key>
+
+    <key type="i" name="move-focus-enabled">
+      <default>1</default>
+      <summary>Enable/Disable the MoveFocus feature</summary>
+    </key>
+    <key type="as" name="move-focus-cycle">
+      <default><![CDATA[['<Super>o']]]></default>
+      <summary>Cycle through windows at the same postition</summary>
+    </key>
+    <key type="as" name="move-focus-north">
+      <default><![CDATA[['<Super>i']]]></default>
+      <summary>Move to center/maximize</summary>
+    </key>
+    <key type="as" name="move-focus-east">
+      <default><![CDATA[['<Super>l']]]></default>
+      <summary>Move to center/maximize</summary>
+    </key>
+    <key type="as" name="move-focus-south">
+      <default><![CDATA[['<Super>k']]]></default>
+      <summary>Move to center/maximize</summary>
+    </key>
+    <key type="as" name="move-focus-west">
+      <default><![CDATA[['<Super>j']]]></default>
+      <summary>Move to center/maximize</summary>
     </key>
   </schema>
 </schemalist>

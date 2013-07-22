@@ -1,4 +1,3 @@
-
 const Lang = imports.lang;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
@@ -14,10 +13,18 @@ Utils.prototype = {
   _settingsObject: { },
   _settings: "",
 
+  _changeEventListeners: [],
+
   CENTER_WIDTH: "center-width",
   CENTER_HEIGHT: "center-height",
-  SIDE_WIDTH: "side-width",
-  SIDE_HEIGHT: "side-height",
+  CENTER_KEEP_WIDTH: "center-keep-width",
+  ALWAYS_USE_WIDTHS: "always-use-widths",
+  CORNER_CHANGE: "corner-changes",
+  REVERSE_MOVE_CENTER: "reverse-move-center",
+
+  MOVE_FOCUS_ENABLED: "move-focus-enabled",
+
+  INTELLIGENT_CORNER_MOVEMENT: "intelligent-corner-movement",
 
   START_CONFIG: {
     autoMove: false,
@@ -25,21 +32,32 @@ Utils.prototype = {
       x: 0,
       y: 0,
       width: 50,
-      height: 50
+      height: 100
     }]
   },
 
   _init: function() {
     this.loadSettings();
 
-    //this._settingsObject.connect('changed::center-width', this.loadSettings);
-    //this._settingsObject.connect('changed::center-height', this.loadSettings);
-    //this._settingsObject.connect('changed::side-width', this.loadSettings);
-    //this._settingsObject.connect('changed::side-height', this.loadSettings);
+    // locations is a json strings stored in the gschema. -> reload it after the user saved his changes
+    this._changeEventListeners.push({
+      name: "locations",
+      fn:  Lang.bind(this, this.loadSettings)
+    });
 
-    // saveSettings() triggers the event for all properties -> Only listen to
-    // the last one that's saved (locations)
-    this._settingsObject.connect('changed::locations', Lang.bind(this, this.loadSettings));
+    for (let i=0; i < this._changeEventListeners.length; i++) {
+      this._changeEventListeners[i].handlerId = this._settingsObject.connect(
+        'changed::' + this._changeEventListeners[i].name ,
+        this._changeEventListeners[i].fn
+      );
+    }
+
+  },
+
+  destroy: function() {
+    for (let i=0; i < this._changeEventListeners.length; i++) {
+      this._settingsObject.disconnect(this._changeEventListeners[i].handlerId);
+    }
   },
 
   getSettingsObject: function() {
@@ -59,7 +77,7 @@ Utils.prototype = {
       schemaSource = GioSSS.get_default();
     }
 
-    let schema = schemaSource.lookup(schema, true);
+    schema = schemaSource.lookup(schema, true);
     if (!schema) {
         throw new Error('Schema ' + schema + ' could not be found for extension '
                         + Me.metadata.uuid + '. Please check your installation.');
@@ -69,8 +87,6 @@ Utils.prototype = {
     this._settings = {
       centerWidth: this._settingsObject.get_int("center-width"),
       centerHeight: this._settingsObject.get_int("center-height"),
-      sideWidth: this._settingsObject.get_int("side-width"),
-      sideHeight: this._settingsObject.get_int("side-height"),
       locations: JSON.parse(this._settingsObject.get_string("locations"))
     };
   },
@@ -79,17 +95,82 @@ Utils.prototype = {
     try {
       this._settingsObject.set_int("center-width", this.getNumber(this.CENTER_WIDTH));
       this._settingsObject.set_int("center-height", this.getNumber(this.CENTER_HEIGHT));
-      this._settingsObject.set_int("side-width", this.getNumber(this.SIDE_WIDTH));
-      this._settingsObject.set_int("side-height", this.getNumber(this.SIDE_HEIGHT));
       this._settingsObject.set_string("locations", JSON.stringify(this._settings.locations));
-      this.showMessage("Success!", "Changes successfully saved");
+      // sometimes the shell hangs after the gtk messagebox is displayed :(
+      // this.showMessage("Success!", "Changes successfully saved");
     } catch (e) {
       this.showErrorMessage("Error saving settings ", e);
     }
   },
 
+  // ["0", "Both"],
+  // ["1", "Only height"],
+  // ["2", "Only width"],
+  // ["3", "Never change size"]
+  // ["4", "Nothing on first move, both on second"],
+  // ["5", "Nothing on first move, Only height on second"],
+  // ["6", "Nothing on first move, Only width on second"]["4", "Keep size on first move"],
+  changeCornerHeight: function() {
+    let val = this.getNumber(this.CORNER_CHANGE, 1);
+    return val == 0 || val == 1 || val == 4 || val == 5;
+  },
+
+  changeCornerWidth: function() {
+    let val = this.getNumber(this.CORNER_CHANGE, 2);
+    return val == 0 || val == 2 || val == 4 || val == 6;
+  },
+
+  changeCornerFirstTime: function() {
+    let val = this.getNumber(this.CORNER_CHANGE, 0);
+    return val == 0 || val == 4 || val == 5 || val == 6;
+  },
+
+  changeCornerNever: function() {
+    return this.getNumber(this.CORNER_CHANGE, 0) == 3;
+  },
+
+  getNorthHeights: function() {
+    let ret = this._addToArray([], this.getNumber("north-height-0", 50) / 100);
+    ret = this._addToArray(ret, this.getNumber("north-height-1", 66) / 100);
+    ret = this._addToArray(ret, this.getNumber("north-height-2", 34) / 100);
+    return ret;
+  },
+
+  getSouthHeights: function() {
+    let ret = this._addToArray([], this.getNumber("south-height-0", 50) / 100);
+    ret = this._addToArray(ret, this.getNumber("south-height-1", 34) / 100);
+    ret = this._addToArray(ret, this.getNumber("south-height-2", 66) / 100);
+    return ret;
+  },
+
+  getWestWidths: function() {
+    let ret = this._addToArray([], this.getNumber("left-side-widths-0", 50) / 100);
+    ret = this._addToArray(ret, this.getNumber("left-side-widths-1", 34) / 100);
+    ret = this._addToArray(ret, this.getNumber("left-side-widths-2", 66) / 100);
+    return ret;
+  },
+
+  getEastWidths: function() {
+    let ret = this._addToArray([], this.getNumber("right-side-widths-0", 50) / 100);
+    ret = this._addToArray(ret, this.getNumber("right-side-widths-1", 66) / 100);
+    ret = this._addToArray(ret, this.getNumber("right-side-widths-2", 34) / 100);
+    return ret;
+  },
+
+  _addToArray: function(array, value) {
+    if (array.indexOf(value) == -1) {
+      array.push(value);
+    }
+    return array;
+  },
+
   getBoolean: function(name, defaultValue) {
-    let ret = this.getParameter(name, defaultValue);
+    let ret = defaultValue;
+    if (name.indexOf("locations") == -1) {
+      ret = this._settingsObject.get_int(name);
+    } else {
+      ret = this.getParameter(name);
+    }
     return ret == "true" || ret == "1";
   },
 
@@ -114,9 +195,8 @@ Utils.prototype = {
       let path = name.split("."),
       value = this._settings[path[0]],
       pathLength = path.length;
-
       for (let i=1; i < pathLength; i++) {
-          value = value[path[i]];
+        value = value[path[i]];
       }
 
       return value;
@@ -139,7 +219,6 @@ Utils.prototype = {
       // normal object
       delete conf[ path[pathLength] ];
     } else {
-
       // an array
       conf.pop(path[pathLength]);
     }
@@ -147,6 +226,15 @@ Utils.prototype = {
 
   setParameter: function(name, value) {
     try {
+      if (name.indexOf("locations") == -1) {
+        if (isNaN(value)) {
+          this._settingsObject.set_string(name, value);
+        } else {
+          this._settingsObject.set_int(name, value);
+        }
+        return;
+      }
+
       let path = name.split("."),
         conf = this._settings,
         pathLength = path.length - 1;
@@ -161,7 +249,7 @@ Utils.prototype = {
       conf[ path[pathLength] ] = value;
 
     } catch (e) {
-      this.showErrorMessage("Error setting parameter!", "Can not set config parameter " + name);
+      this.showErrorMessage("Error setting parameter!", "Can not set config parameter " + name + " " + e.message);
     }
   },
 
