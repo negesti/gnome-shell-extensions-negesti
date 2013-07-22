@@ -28,32 +28,28 @@ let createSlider = function(configName) {
 const PutWindowSettingsWidget = new GObject.Class({
   Name: 'PutWindow.Prefs.PutWindowSettingsWidget',
   GTypeName: 'PutWindowSettingsWidget',
-  Extends: Gtk.Grid,
+  Extends: Gtk.Notebook,
 
   _init : function(params) {
     this.parent(params);
     this.orientation = Gtk.Orientation.VERTICAL;
-    this.expand = true;
+    this.hexpand = true;
     this._wnckScreen = Wnck.Screen.get_default();
 
-    let tabView = new Gtk.Notebook({ hexpand: true});
-
-    tabView.append_page(this._generateMainSettings(), new Gtk.Label({label: "<b>Main</b>",
+    this.append_page(this._generateMainSettings(), new Gtk.Label({label: "<b>Main</b>",
         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
 
-    tabView.append_page(this._createPositionSettings(), new Gtk.Label({label: "<b>Width &amp; Height</b>",
+    this.append_page(this._createPositionSettings(), new Gtk.Label({label: "<b>Width &amp; Height</b>",
         halign:Gtk.Align.START, margin_left:2, use_markup: true}));
 
-    tabView.append_page(this._createKeyboardConfig(), new Gtk.Label({label: "<b>Keyboard Shortcuts</b>",
+    this.append_page(this._createKeyboardConfig(), new Gtk.Label({label: "<b>Keyboard Shortcuts</b>",
          halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
 
-    tabView.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>Move Focus</b>",
+    this.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>Move Focus</b>",
          halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
 
-    tabView.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>Applications</b>",
+    this.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>Applications</b>",
          halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
-
-    this.add(tabView);
   },
 
   _createCornerChangesCombo: function() {
