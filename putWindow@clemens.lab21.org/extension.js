@@ -203,7 +203,18 @@ MoveWindow.prototype = {
         y = 0;
       }
 
+      let wasMaximized = false;
+      if (win.maximized_horizontally && win.maximized_vertically) {
+        win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
+        wasMaximized = true;
+        // the width is set to -1 if the window is maximized
+        width = s.totalWidth;
+      }
+
       this._resize(win, x, (y * yRatio), width, height);
+      if (wasMaximized) {
+         win.maximize(Meta.MaximizeFlags.HORIZONTAL);
+      }
       return true;
     }
     return false;
