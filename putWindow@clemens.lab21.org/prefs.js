@@ -195,7 +195,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       halign: Gtk.Align.START,
       margin_top: 4,
       margin_left: 4,
-      label: "You can define up to tree sizes that will be used when you move a window to the same direction " +
+      label: "You can define up to three sizes that will be used when you move a window to the same direction " +
              "multiple times. Equal values are ignored."
     });
     description.set_line_wrap(true);
