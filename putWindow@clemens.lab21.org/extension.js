@@ -186,6 +186,9 @@ MoveWindow.prototype = {
       let xRatio = s.totalWidth / old.totalWidth;
       let x = s.x + (position.x - old.x) * xRatio;
       let width = position.width * xRatio;
+      if (width >= s.totalWidth) {
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
+      }
 
       let yRatio = s.totalHeight / old.totalHeight;
       let height = position.height;
@@ -195,6 +198,9 @@ MoveWindow.prototype = {
         height += Main.panel.actor.height;
       }
       height = height * yRatio;
+      if (height >= s.totalHeight) {
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
+      }
 
       let y = position.y;
       // add/remove the top panel offset to the y position
