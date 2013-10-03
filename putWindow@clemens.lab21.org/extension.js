@@ -203,17 +203,28 @@ MoveWindow.prototype = {
         y = 0;
       }
 
-      let wasMaximized = false;
-      if (win.maximized_horizontally && win.maximized_vertically) {
+      let wasMaximizedHorizontal = false;
+      if (win.maximized_horizontally) {
         win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
-        wasMaximized = true;
+        wasMaximizedHorizontal = true;
         // the width is set to -1 if the window is maximized
         width = s.totalWidth;
       }
 
+      let wasMaximizedVertical = false;
+      if (win.maximized_vertically) {
+        win.unmaximize(Meta.MaximizeFlags.VERTICAL);
+        wasMaximizedVertical = true;
+        // the width is set to -1 if the window is maximized
+        height = s.totalHeight;
+      }
+
       this._resize(win, x, (y * yRatio), width, height);
-      if (wasMaximized) {
+      if (wasMaximizedHorizontal) {
          win.maximize(Meta.MaximizeFlags.HORIZONTAL);
+      }
+      if (wasMaximizedVertical) {
+        win.maximize(Meta.MaximizeFlags.VERTICAL);
       }
       return true;
     }
