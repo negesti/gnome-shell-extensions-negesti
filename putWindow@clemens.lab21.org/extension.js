@@ -168,6 +168,19 @@ MoveWindow.prototype = {
     }
 
     if (s != null) {
+      let wasMaximizeFlags = 0;
+      if (win.maximized_horizontally) {
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
+      }
+
+      if (win.maximized_vertically) {
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
+      }
+
+      if (wasMaximizeFlags != 0) {
+        win.unmaximize(wasMaximizeFlags);
+      }
+
       let position = win.get_outer_rect();
 
       let xRatio = s.totalWidth / old.totalWidth;
@@ -175,7 +188,7 @@ MoveWindow.prototype = {
 
       let width = position.width * xRatio;
       if (width >= s.totalWidth) {
-        width = -1;
+        //width = -1;
       }
 
       let yRatio = s.totalHeight / old.totalHeight;
@@ -189,7 +202,7 @@ MoveWindow.prototype = {
 
       height = height * yRatio;
       if (height >= s.totalHeight) {
-        height = -1;
+        //height = -1;
       }
 
       let y = position.y;
@@ -203,28 +216,10 @@ MoveWindow.prototype = {
         y = 0;
       }
 
-      let wasMaximizedHorizontal = false;
-      if (win.maximized_horizontally) {
-        win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
-        wasMaximizedHorizontal = true;
-        // the width is set to -1 if the window is maximized
-        width = s.totalWidth;
-      }
-
-      let wasMaximizedVertical = false;
-      if (win.maximized_vertically) {
-        win.unmaximize(Meta.MaximizeFlags.VERTICAL);
-        wasMaximizedVertical = true;
-        // the width is set to -1 if the window is maximized
-        height = s.totalHeight;
-      }
-
       this._resize(win, x, (y * yRatio), width, height);
-      if (wasMaximizedHorizontal) {
-         win.maximize(Meta.MaximizeFlags.HORIZONTAL);
-      }
-      if (wasMaximizedVertical) {
-        win.maximize(Meta.MaximizeFlags.VERTICAL);
+
+      if (wasMaximizeFlags != 0) {
+        win.maximize(wasMaximizeFlags);
       }
       return true;
     }
