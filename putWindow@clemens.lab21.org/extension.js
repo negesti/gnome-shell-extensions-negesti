@@ -188,7 +188,7 @@ MoveWindow.prototype = {
 
       let width = position.width * xRatio;
       if (width >= s.totalWidth) {
-        //width = -1;
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
       }
 
       let yRatio = s.totalHeight / old.totalHeight;
@@ -202,7 +202,7 @@ MoveWindow.prototype = {
 
       height = height * yRatio;
       if (height >= s.totalHeight) {
-        //height = -1;
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
       }
 
       let y = position.y;
