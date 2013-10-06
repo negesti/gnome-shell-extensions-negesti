@@ -71,6 +71,11 @@ and only if windows was at side_e (or side_w) before. eg.
 ChangeLog
 -------
 
+__October 6, 2013__
+ * Conributed by  @krlmlr 
+  * Fixed #37 Moving maximized window to other display
+  * General improvement for "move to other display"
+
 __July 20, 2013__
  * Settings are now organized in tabs
  * New feature 'intelligent corner movement'
