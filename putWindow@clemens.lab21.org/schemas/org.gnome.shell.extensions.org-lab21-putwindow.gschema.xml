@@ -128,11 +128,11 @@
       <summary>Move to a predifined location</summary>
     </key>
     <key type="as" name="put-to-left-screen">
-      <default><![CDATA[['<Super>Left']]]></default>
+      <default><![CDATA[['<Super><Shift>Left']]]></default>
       <summary>Move to a predifined location</summary>
     </key>
     <key type="as" name="put-to-right-screen">
-      <default><![CDATA[['<Super>Right']]]></default>
+      <default><![CDATA[['<Super><Shift>Right']]]></default>
       <summary>Move to a predifined location</summary>
     </key>
 
