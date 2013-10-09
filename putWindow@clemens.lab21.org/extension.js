@@ -168,52 +168,61 @@ MoveWindow.prototype = {
     }
 
     if (s != null) {
+      let wasMaximizeFlags = 0;
+      if (win.maximized_horizontally) {
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
+      }
+
+      if (win.maximized_vertically) {
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
+      }
+
+      if (wasMaximizeFlags != 0) {
+        win.unmaximize(wasMaximizeFlags);
+      }
+
       let position = win.get_outer_rect();
 
       let xRatio = s.totalWidth / old.totalWidth;
       let x = s.x + (position.x - old.x) * xRatio;
-
       let width = position.width * xRatio;
       if (width >= s.totalWidth) {
-        width = -1;
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
       }
 
       let yRatio = s.totalHeight / old.totalHeight;
-
       let height = position.height;
       // we are moving away from the primary screen and topPanel is visible,
       // e.g. height was max but is smaller then the totalHeight because of topPanel height
       if (old.primary) {
         height += Main.panel.actor.height;
       }
+      height *= yRatio;
+      if (s.primary) {
+        height -= Main.panel.actor.height;
+      }
 
-      height = height * yRatio;
       if (height >= s.totalHeight) {
-        height = -1;
+        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
       }
 
       let y = position.y;
       // add/remove the top panel offset to the y position
       if (old.primary) {
-        y = y - Main.panel.actor.height;
-      } else {
-        y = y + Main.panel.actor.height;
+        y -= Main.panel.actor.height;
+      }
+      y *= yRatio;
+      if (s.primary) {
+        y += Main.panel.actor.height;
       }
       if (y < 0) {
         y = 0;
       }
 
-      let wasMaximized = false;
-      if (win.maximized_horizontally && win.maximized_vertically) {
-        win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
-        wasMaximized = true;
-        // the width is set to -1 if the window is maximized
-        width = s.totalWidth;
-      }
+      this._resize(win, x, y, width, height);
 
-      this._resize(win, x, (y * yRatio), width, height);
-      if (wasMaximized) {
-         win.maximize(Meta.MaximizeFlags.HORIZONTAL);
+      if (wasMaximizeFlags != 0) {
+        win.maximize(wasMaximizeFlags);
       }
       return true;
     }
@@ -607,19 +616,27 @@ MoveWindow.prototype = {
 
   // actual resizing
   _resize: function(win, x, y, width, height) {
-
+    let maximizeFlags = 0;
+    let unMaximizeFlags = 0;
     if (height < 0) {
-      win.maximize(Meta.MaximizeFlags.VERTICAL);
+      maximizeFlags = maximizeFlags | Meta.MaximizeFlags.VERTICAL;
       height = 400; // dont resize to width, -1
     } else {
-      win.unmaximize(Meta.MaximizeFlags.VERTICAL);
+      unMaximizeFlags = unMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
     }
 
     if (width < 0) {
-      win.maximize(Meta.MaximizeFlags.HORIZONTAL);
+      maximizeFlags = maximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
       width = 400;  // dont resize to height, -1
     } else {
-      win.unmaximize(Meta.MaximizeFlags.HORIZONTAL);
+      unMaximizeFlags = unMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
+    }
+
+    if (maximizeFlags != 0) {
+      win.maximize(maximizeFlags);
+    }
+    if (unMaximizeFlags != 0) {
+      win.unmaximize(unMaximizeFlags)
     }
 
     // snap, x, y
