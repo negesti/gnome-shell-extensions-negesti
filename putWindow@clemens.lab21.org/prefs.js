@@ -153,6 +153,30 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      margin_left: 10,
+      label: "Keep width when moving north/south:",
+      tooltip_text: "Windows will not change there width when moved north or south",
+    }), 0, row, 4, 1);
+
+    let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_WIDTH, false));
+    intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_WIDTH, obj.get_active()); });
+    ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
+
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      margin_left: 10,
+      label: "Keep height when moving east/west:",
+      tooltip_text: "Windows will not change there height when moved east or west",
+    }), 0, row, 4, 1);
+
+    let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_HEIGHT, false));
+    intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_HEIGHT, obj.get_active()); });
+    ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
+
+    ret.attach(new Gtk.Label({
       label: "Moving to corner:",
       margin_left: 10,
       tooltip_text:"Adjust window width and height when moved to corner?",

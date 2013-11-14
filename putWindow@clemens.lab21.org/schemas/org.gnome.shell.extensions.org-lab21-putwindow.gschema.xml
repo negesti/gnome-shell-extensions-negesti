@@ -22,6 +22,16 @@
       <summary>Moving from E to S moves to SE not S</summary>
     </key>
 
+    <key type="i" name="always-keep-width">
+      <default>0</default>
+      <summary>Keep width when moving a window to south or north</summary>
+    </key>
+
+    <key type="i" name="always-keep-height">
+      <default>0</default>
+      <summary>Keep width when moving a window to the east or west</summary>
+    </key>
+
     <key type="i" name="center-width">
       <default>50</default>
       <summary>Width to use when moved to center</summary>

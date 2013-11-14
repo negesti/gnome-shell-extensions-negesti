@@ -286,7 +286,11 @@ MoveWindow.prototype = {
       }
     }
 
-    this._resize(win, sizes[useIndex].x, s.y, sizes[useIndex].width, s.totalHeight * -1);
+    if (this._utils.getBoolean(this._utils.ALWAYS_KEEP_HEIGHT, false)) {
+      this._resize(win, sizes[useIndex].x, pos.y, sizes[useIndex].width, pos.height);
+    } else {
+      this._resize(win, sizes[useIndex].x, s.y, sizes[useIndex].width, s.totalHeight * -1);
+    }
   },
 
   _moveNorthSouth: function(win, screenIndex, direction) {
@@ -320,7 +324,11 @@ MoveWindow.prototype = {
       return;
     }
 
-    this._resize(win, s.x, sizes[useIndex].y, s.totalWidth * -1, sizes[useIndex].height);
+    if (this._utils.getBoolean(this._utils.ALWAYS_KEEP_WIDTH, false)) {
+      this._resize(win, pos.x, sizes[useIndex].y, pos.width, sizes[useIndex].height);
+    } else {
+      this._resize(win, s.x, sizes[useIndex].y, s.totalWidth * -1, sizes[useIndex].height);
+    }
   },
 
   _isCenterWidth: function(screenIndex, pos) {

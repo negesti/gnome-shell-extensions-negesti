@@ -22,6 +22,9 @@ Utils.prototype = {
   CORNER_CHANGE: "corner-changes",
   REVERSE_MOVE_CENTER: "reverse-move-center",
 
+  ALWAYS_KEEP_WIDTH: "always-keep-width",
+  ALWAYS_KEEP_HEIGHT: "always-keep-height",
+
   MOVE_FOCUS_ENABLED: "move-focus-enabled",
 
   INTELLIGENT_CORNER_MOVEMENT: "intelligent-corner-movement",
