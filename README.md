@@ -20,6 +20,14 @@ The extension can be configured using the gnome prefs tool.
   * move-focus-north/east/south/west using super + i/l/k/j (default)
  * Application based config (hit the save button)
 
+Wnck
+-----
+For application base configuration the extension requires the wnck library: 
+
+Suse: `sudo zypper in libwnck-devel`
+Arch: `pacman -S libwnck3`
+Fedora: `sudo yum install libwnck3` (should be installed on F19)
+Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
 Keybindings
 -----------
