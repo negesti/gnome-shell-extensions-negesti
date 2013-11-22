@@ -22,12 +22,13 @@ The extension can be configured using the gnome prefs tool.
 
 Wnck
 -----
-For application base configuration the extension requires the wnck library: 
+For application base configuration the extension requires the wnck library. If wnck is not installed, you can not open
+the preferences window
 
-Suse: `sudo zypper in libwnck-devel`
-Arch: `pacman -S libwnck3`
-Fedora: `sudo yum install libwnck3` (should be installed on F19)
-Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
+* Suse: `sudo zypper in libwnck-devel`
+* Arch: `pacman -S libwnck3`
+* Fedora: `sudo yum install libwnck3` (should be installed on F19)
+* Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
 Keybindings
 -----------
