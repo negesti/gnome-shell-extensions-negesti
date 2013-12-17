@@ -553,7 +553,11 @@ MoveWindow.prototype = {
 
     if (this._utils.getParameter(appPath, false)) {
       if (this._utils.getBoolean(appPath + ".autoMove", false)) {
-        this._moveToConfiguredLocation(win, app);
+	win.connect("focus", 
+	  Lang.bind(this, function() {
+            this._moveToConfiguredLocation(win, app);
+          })	
+	);
         return true;
       }
     }
@@ -647,7 +651,7 @@ MoveWindow.prototype = {
       win.unmaximize(unMaximizeFlags)
     }
 
-    // snap, x, y
+    // user_operation, x, y
     if (win.decorated) {
       win.move_frame(true, x, y);
     } else {
@@ -655,8 +659,8 @@ MoveWindow.prototype = {
     }
 
     let padding = this._getPadding(win);
-    // snap, width, height, force
-    win.resize(true, width - padding.width, height - padding.height);
+    // user_operation, width, height, force
+    win.resize(true, width - padding.width, height - padding.height); 
   },
 
   // the difference between input and outer rect as object.
