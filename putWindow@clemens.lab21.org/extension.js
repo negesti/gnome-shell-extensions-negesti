@@ -35,6 +35,8 @@ MoveWindow.prototype = {
 
   _screens: [],
 
+  focusListener: null,
+
   /**
    * Helper functions to set custom handler for keybindings
    */
@@ -544,7 +546,7 @@ MoveWindow.prototype = {
           this._moveConfiguredWhenCreated(display, win, true);
           return false;
         }));
-      }
+      d}
       return false;
     }
     app = win.get_wm_class();
@@ -553,11 +555,11 @@ MoveWindow.prototype = {
 
     if (this._utils.getParameter(appPath, false)) {
       if (this._utils.getBoolean(appPath + ".autoMove", false)) {
-	win.connect("focus", 
-	  Lang.bind(this, function() {
+      	this.focusListener = win.connect("focus",
+      	  Lang.bind(this, function() {
             this._moveToConfiguredLocation(win, app);
-          })	
-	);
+          })
+      	);
         return true;
       }
     }
@@ -577,6 +579,12 @@ MoveWindow.prototype = {
 
       appName = win.get_wm_class();
     }
+
+    if (this.focusListener != null) {
+      win.disconnect(this.focusListener);
+      this.focusListener = null;
+    }
+
     let config = this._utils.getParameter("locations." + appName, false);
 
     // no config for appName. maybe we have a config for "all"
@@ -660,7 +668,7 @@ MoveWindow.prototype = {
 
     let padding = this._getPadding(win);
     // user_operation, width, height, force
-    win.resize(true, width - padding.width, height - padding.height); 
+    win.resize(true, width - padding.width, height - padding.height);
   },
 
   // the difference between input and outer rect as object.
