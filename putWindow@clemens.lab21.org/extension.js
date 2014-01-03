@@ -546,7 +546,7 @@ MoveWindow.prototype = {
           this._moveConfiguredWhenCreated(display, win, true);
           return false;
         }));
-      d}
+      }
       return false;
     }
     app = win.get_wm_class();
