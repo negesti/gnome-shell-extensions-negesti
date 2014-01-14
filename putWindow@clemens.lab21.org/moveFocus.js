@@ -22,7 +22,7 @@ MoveFocus.prototype = {
     this._settingsChangedListener = {
       name: this._utils.MOVE_FOCUS_ENABLED,
       fn: Lang.bind(this, function() {
-        var enabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ENABLED, false);
+        let enabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ENABLED, false);
         if (enabled) {
           this._enable();
         } else {
@@ -36,7 +36,7 @@ MoveFocus.prototype = {
       this._settingsChangedListener.fn
     );
 
-    var enabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ENABLED, false);
+    let enabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ENABLED, false);
     if (enabled) {
       this._enable();
     }
@@ -85,6 +85,13 @@ MoveFocus.prototype = {
     this._addKeyBinding("move-focus-west",
       Lang.bind(this, function() { this._moveFocus("w"); })
     );
+    this._addKeyBinding("move-focus-left-screen",
+      Lang.bind(this, function() { this._moveFocusToScreen("l"); })
+    );
+    this._addKeyBinding("move-focus-right-screen",
+      Lang.bind(this, function() { this._moveFocusToScreen("r"); })
+    );
+
     this._addKeyBinding("move-focus-cycle",
       Lang.bind(this, function() { this._cycle(); })
     );
@@ -199,28 +206,63 @@ MoveFocus.prototype = {
 		}
   },
 
+  _moveFocusToScreen: function(direction) {
+    let focusWindow = global.display.focus_window;
+    if (focusWindow == null) {
+      return;
+    }
+
+    let windows = this._getWindowList();
+
+    let winLength = windows.length;
+    if (winLength == 1) {
+      return;
+    }
+
+    let currentScreenIndex = global.screen.get_monitor_index_for_rect(focusWindow.get_outer_rect());
+    let currentScreen = global.screen.get_monitor_geometry(currentScreenIndex);
+    // we can not move left
+    if (direction == "l" && currentScreen.x == 0) {
+      return;
+    }
+
+    let candidates = [];
+
+    for (let i=0; i < windows.length; i++) {
+      let windowScreen = global.screen.get_monitor_index_for_rect(windows[i].get_outer_rect());
+      if (currentScreenIndex != windowScreen) {
+        candidates.push({
+          window: windows[i],
+          index: i,
+          dist: this._getDistance(focusWindow, windows[i])
+        });
+      }
+    }
+
+    this._focusNearesCandidate(candidates);
+  },
+
   _moveFocus: function(direction) {
     let win = global.display.focus_window;
     if (win == null) {
       return;
     }
 
-    let screen = global.screen;
-    let display = screen.get_display();
-    let windows = display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace());
+    let windows = this._getWindowList();
 
     // only one windows --> already focused
     let winLength = windows.length;
-    if (winLength == 1)
+    if (winLength == 1) {
       return;
-
+    }
 
     let candidates = [];
 
     for (let i=0; i<windows.length; i++){
 
-      if (windows[i].has_focus())
-      	continue;
+      if (windows[i].has_focus()) {
+        continue;
+      }
 
       if (this._isCandidate(win, windows[i],direction)){
       	candidates.push({
@@ -230,27 +272,32 @@ MoveFocus.prototype = {
       	});
       }
     } // end for windows
-
-
-		if (candidates.length == 0)
-			return;
-
-		var distance_correction = this._distance_correction;
-
-		candidates.sort(function(a, b) {
-      /*
-		   global.log(a.window.get_title()+" "+b.window.get_title());
-			 global.log(a.dist+" "+b.dist);
-			 global.log(distance_correction);
-      */
-			// if the difference between distances is within the distance correction
-			// value we will make our decision based on recend usage
-			return (Math.abs(a.dist-b.dist) <= distance_correction) ? -1 : a.dist - b.dist;
-
-		});
-
-		candidates[0].window.activate(global.get_current_time());
-
+    this._focusNearesCandidate(candidates);
   },
 
+  _getWindowList: function() {
+    let display = global.screen.get_display();
+    return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen, global.screen.get_active_workspace());
+  },
+
+  _focusNearesCandidate: function(candidates) {
+    if (candidates.length == 0)
+      return;
+
+    let distance_correction = this._distance_correction;
+
+    candidates.sort(function(a, b) {
+      /*
+       global.log(a.window.get_title()+" "+b.window.get_title());
+       global.log(a.dist+" "+b.dist);
+       global.log(distance_correction);
+      */
+      // if the difference between distances is within the distance correction
+      // value we will make our decision based on recend usage
+      return (Math.abs(a.dist-b.dist) <= distance_correction) ? -1 : a.dist - b.dist;
+
+    });
+
+    candidates[0].window.activate(global.get_current_time());
+  }
 };

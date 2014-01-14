@@ -156,19 +156,27 @@
     </key>
     <key type="as" name="move-focus-north">
       <default><![CDATA[['<Super>i']]]></default>
-      <summary>Move to center/maximize</summary>
+      <summary>Focus the window that's north of the current</summary>
     </key>
     <key type="as" name="move-focus-east">
       <default><![CDATA[['<Super>l']]]></default>
-      <summary>Move to center/maximize</summary>
+      <summary>Focus the window that's east of the current</summary>
     </key>
     <key type="as" name="move-focus-south">
       <default><![CDATA[['<Super>k']]]></default>
-      <summary>Move to center/maximize</summary>
+      <summary>Focus the window that's south of the current</summary>
     </key>
     <key type="as" name="move-focus-west">
       <default><![CDATA[['<Super>j']]]></default>
-      <summary>Move to center/maximize</summary>
+      <summary>Focus the window that's west of the current</summary>
+    </key>
+    <key type="as" name="move-focus-left-screen">
+      <default><![CDATA[['<Shift><Super>Left']]]></default>
+      <summary>Left the focus to the left screen</summary>
+    </key>
+    <key type="as" name="move-focus-right-screen">
+      <default><![CDATA[['<Shift><Super>Right']]]></default>
+      <summary>Move the focus to the right screen</summary>
     </key>
   </schema>
 </schemalist>
