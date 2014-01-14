@@ -61,6 +61,13 @@ MoveWindow.prototype = {
   },
 
   _getTopPanelHeight: function() {
+
+    // 0 means hidden, 255 is visible
+    let opacity = Main.panel.actor.get_paint_opacity();
+    if (opacity == 0) {
+      return 0;
+    }
+
     return Main.panel.actor.y + Main.panel.actor.height;
   },
 
