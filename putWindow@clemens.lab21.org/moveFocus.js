@@ -197,8 +197,10 @@ MoveFocus.prototype = {
     let allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace()));
 		focusWin.lower();
 		let focusRect = focusWin.get_outer_rect();
-		for (let i=(allWin.length-1); i>=0; i--){
-			if (allWin[i]==focusWin) continue;
+		for (let i=(allWin.length-1); i>=0; i--) {
+      if (allWin[i] == focusWin || allWin[i].is_hidden()) {
+        continue;
+      }
 			if (focusRect.overlap(allWin[i].get_outer_rect())){
 				allWin[i].activate(global.get_current_time());
 				break;
@@ -229,6 +231,9 @@ MoveFocus.prototype = {
     let candidates = [];
 
     for (let i=0; i < windows.length; i++) {
+      if (windows[i].is_hidden()) {
+        continue;
+      }
       let windowScreen = global.screen.get_monitor_index_for_rect(windows[i].get_outer_rect());
       if (currentScreenIndex != windowScreen) {
         candidates.push({
@@ -265,6 +270,9 @@ MoveFocus.prototype = {
       }
 
       if (this._isCandidate(win, windows[i],direction)){
+        if (windows[i].is_hidden()) {
+          continue;
+        }
       	candidates.push({
       		window: windows[i],
       		index: i,
