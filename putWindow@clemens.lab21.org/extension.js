@@ -134,14 +134,18 @@ MoveWindow.prototype = {
     pos.x = pos.x < 0 ? 0 : pos.x;
 
     let sl = this._screens.length;
-    for (let i=0; i<sl; i++) {
+    for (let i=0; i < sl; i++) {
       if (i == sl-1) {
         return i;
       }
-      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x) {
+
+      if (!this._verticalScreenSetup && this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x ) {
+        return i;
+      } else if (this._verticalScreenSetup && this._screens[i].y <= pos.y && this._screens[(i+1)].y > pos.y ) {
         return i;
       }
     }
+
     return this._primary;
   },
 
@@ -162,6 +166,7 @@ MoveWindow.prototype = {
     let old = {
       primary: this._screens[screenIndex].primary,
       x: this._screens[screenIndex].x,
+      y: this._screens[screenIndex].y,
       totalWidth: this._screens[screenIndex].totalWidth,
       totalHeight: this._screens[screenIndex].totalHeight
     };
@@ -172,7 +177,7 @@ MoveWindow.prototype = {
     }
 
     if ((direction == "left" || direction == "w") && screenIndex > 0) {
-      s = this._screens[screenIndex -1];
+      s = this._screens[screenIndex - 1];
       s = this._recalculateSizes(s);
     }
 
@@ -200,29 +205,29 @@ MoveWindow.prototype = {
       }
 
       let yRatio = s.totalHeight / old.totalHeight;
+
       let height = position.height;
       // we are moving away from the primary screen and topPanel is visible,
       // e.g. height was max but is smaller then the totalHeight because of topPanel height
       if (old.primary) {
-        height += Main.panel.actor.height;
+        height += this._getTopPanelHeight();
       }
       height *= yRatio;
       if (s.primary) {
-        height -= Main.panel.actor.height;
+        height -= this._getTopPanelHeight();
       }
 
       if (height >= s.totalHeight) {
         wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
       }
 
-      let y = position.y;
+      let y = s.y + (position.y - old.y) * yRatio;
       // add/remove the top panel offset to the y position
       if (old.primary) {
-        y -= Main.panel.actor.height;
+        y -= this._getTopPanelHeight();
       }
-      y *= yRatio;
       if (s.primary) {
-        y += Main.panel.actor.height;
+        y += this._getTopPanelHeight();
       }
       if (y < 0) {
         y = 0;
@@ -697,9 +702,13 @@ MoveWindow.prototype = {
 
     this._screens = [];
     // only tested with 2 screen setup
+    let sumX = 0,sumY = 0;
+
     for (let i=0; i<numMonitors; i++) {
       let geom = global.screen.get_monitor_geometry(i);
       let primary = (i == this._primary);
+      sumX += geom.x;
+      sumY += geom.y;
 
       this._screens[i] =  {
         primary: primary,
@@ -715,6 +724,9 @@ MoveWindow.prototype = {
         south: []
       };
     }
+
+    this._verticalScreenSetup = sumX < sumY;
+
     // sort by x position. makes it easier to find the correct screen
     this._screens.sort(function(s1, s2) {
         return s1.x - s2.x;

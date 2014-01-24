@@ -118,7 +118,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "Always use multiple widths:",
+      label: "Always use multiple widths/heights:",
       tooltip_text:"Disable this option to move to other screen if possible",
     }), 0, row, 4, 1);
 
