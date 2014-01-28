@@ -139,9 +139,9 @@ MoveWindow.prototype = {
         return i;
       }
 
-      if (!this._verticalScreenSetup && this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x ) {
+      if (!this._isVerticalScreenSetup && this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x ) {
         return i;
-      } else if (this._verticalScreenSetup && this._screens[i].y <= pos.y && this._screens[(i+1)].y > pos.y ) {
+      } else if (this._isVerticalScreenSetup && this._screens[i].y <= pos.y && this._screens[(i+1)].y > pos.y ) {
         return i;
       }
     }
@@ -170,7 +170,6 @@ MoveWindow.prototype = {
       totalWidth: this._screens[screenIndex].totalWidth,
       totalHeight: this._screens[screenIndex].totalHeight
     };
-
     if ((direction == "right" || direction == "e") && screenIndex < (this._screens.length - 1)) {
       s = this._screens[screenIndex + 1];
       s = this._recalculateSizes(s);
@@ -284,7 +283,7 @@ MoveWindow.prototype = {
     let canMoveScreen = screenIndex > 0;
     if (direction == "e") {
       otherDirection = "w";
-      canMoveScreen = screenIndex < (this._screens.length - 1);
+      canMoveScreen = !this._isVerticalScreenSetup && screenIndex < (this._screens.length - 1);
     }
 
     if (useIndex > 0 && canMoveScreen && !this._utils.getBoolean(this._utils.ALWAYS_USE_WIDTHS)) {
@@ -330,6 +329,25 @@ MoveWindow.prototype = {
           useIndex =  0;
         }
         break;
+      }
+    }
+
+    let canMoveScreen = screenIndex > 0;
+    let screenMoveDirection = direction == "s" ? "e" : "w";
+    if (direction == "s") {
+      canMoveScreen = this._isVerticalScreenSetup && screenIndex < (this._screens.length - 1);
+    }
+
+    if (useIndex > 0 && canMoveScreen && !this._utils.getBoolean(this._utils.ALWAYS_USE_WIDTHS)) {
+      // moved in this direction more then once, if a screen exists, move the window there
+      if (useIndex > 1) {
+        // the window was moved here from an other screen, just resize it
+        useIndex = 0;
+      } else {
+        // moving to other screen is possible, move to screen and resize afterwards
+        this._moveToScreen(screenMoveDirection);
+        this._moveFocused(direction == "s" ? "n" : "s");
+        return;
       }
     }
 
@@ -725,7 +743,7 @@ MoveWindow.prototype = {
       };
     }
 
-    this._verticalScreenSetup = sumX < sumY;
+    this._isVerticalScreenSetup = sumX < sumY;
 
     // sort by x position. makes it easier to find the correct screen
     this._screens.sort(function(s1, s2) {
