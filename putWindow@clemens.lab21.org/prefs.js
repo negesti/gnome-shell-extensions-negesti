@@ -177,6 +177,17 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
+      label: "Never change window size:",
+      margin_left: 10,
+      tooltip_text:"Never change the size of a window?",
+      halign: Gtk.Align.START
+    }), 0, row, 4, 1);
+    let neverChangeSizeSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    neverChangeSizeSwitch.set_active(Utils.getBoolean(Utils.NEVER_CHANGE_SIZE, false));
+    neverChangeSizeSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.NEVER_CHANGE_SIZE, obj.get_active()); });
+    ret.attach(neverChangeSizeSwitch, 4, row++, 1, 1);
+
+    ret.attach(new Gtk.Label({
       label: "Moving to corner:",
       margin_left: 10,
       tooltip_text:"Adjust window width and height when moved to corner?",
