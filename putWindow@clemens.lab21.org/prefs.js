@@ -34,22 +34,23 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.parent(params);
     this.orientation = Gtk.Orientation.VERTICAL;
     this.hexpand = true;
+    this.tab_pos = Gtk.PositionType.LEFT;
     this._wnckScreen = Wnck.Screen.get_default();
 
     this.append_page(this._generateMainSettings(), new Gtk.Label({label: "<b>Main</b>",
-        halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+        halign:Gtk.Align.START, margin_top: 0, use_markup: true}));
 
     this.append_page(this._createPositionSettings(), new Gtk.Label({label: "<b>Width &amp; Height</b>",
-        halign:Gtk.Align.START, margin_left:2, use_markup: true}));
+        halign:Gtk.Align.START, use_markup: true}));
 
     this.append_page(this._createKeyboardConfig(), new Gtk.Label({label: "<b>Keyboard Shortcuts</b>",
-         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+         halign:Gtk.Align.START, use_markup: true}));
 
     this.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>Move Focus</b>",
-         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+         halign:Gtk.Align.START, use_markup: true}));
 
     this.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>Applications</b>",
-         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+         halign:Gtk.Align.START, use_markup: true}));
   },
 
   _createCornerChangesCombo: function() {
