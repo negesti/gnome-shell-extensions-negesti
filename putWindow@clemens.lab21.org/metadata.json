@@ -1,5 +1,5 @@
 {
-  "shell-version": ["3.4", "3.5.2", "3.6", "3.8", "3.10"],
+  "shell-version": ["3.4", "3.5.2", "3.6", "3.8", "3.10", "3.12"],
   "uuid": "putWindow@clemens.lab21.org",
   "name": "Put Windows",
   "description": "Fully customizable replacement for the old compiz put plugin. \n * Move windows to left/right side, bottom/top, center or corner \n * Move window to other screen \n * Select focused window using the keyboard \n * Application based window placement",
