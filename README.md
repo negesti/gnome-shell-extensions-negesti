@@ -10,10 +10,10 @@ grid plugin.
 
 Contributors
 -------------
-@krlmr - Move to other display
-@73 - Move focus 
-@Anthony25 - gnome-shell 3.12 support
-@airtonix - gnome-shell 3.5 support
+ * krlmr - Move to other display
+ * 73 - Move focus 
+ * Anthony25 - gnome-shell 3.12 support
+ * airtonix - gnome-shell 3.5 support
 
 Configuration
 -------------
