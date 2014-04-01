@@ -483,31 +483,6 @@ MoveWindow.prototype = {
     this._resize(win, x, y, width, height);
   },
 
-  _moveFocusedKeepSize: function(direction, win, screen, screenIndex) {
-
-    if (direction.length > 1) {
-      this._moveToCornerKeepSize(win, screenIndex, direction);
-    }
-
-    pos = win.get_outer_rect();
-
-    let y = pos.y;
-    if (direction == "n") {
-      y = this._getTopPanelHeight()
-    } else if (direction == "s") {
-      y = screen.totalHeight - pos.height;
-    }
-
-    let x = pos.x;
-    if (direction == "e") {
-      x = (screen.x + screen.totalWidth) - pos.width;
-    } else if (direction == "w") {
-      x = screen.x;
-    }
-
-    this._resize(win, x, y, pos.width, pos.height);
-  },
-
   _moveToCornerKeepSize: function(win, screenIndex, direction) {
     let s = this._screens[screenIndex];
     let pos = win.get_outer_rect();
@@ -578,15 +553,7 @@ MoveWindow.prototype = {
           this._resize(win, x, y, w, h);
         }
       }
-      return;
-    }
-
-    if (this._utils.neverChangeSize()) {
-      this._moveFocusedKeepSize(where, win, s, screenIndex);
-      return;
-    }
-
-    if (where == "n" || where == "s") {
+    } else if (where == "n" || where == "s") {
       this._moveNorthSouth(win, screenIndex, where);
     } else if (where == "e" || where == "w") {
       this._moveToSide(win, screenIndex, where);

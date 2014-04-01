@@ -9,10 +9,6 @@
       <default>0</default>
       <summary>Change width and height when moving to corner (Always, only height, only width)</summary>
     </key>
-    <key type="i" name="never-change-size">
-      <default>0</default>
-      <summary>Never change the size of windows</summary>
-    </key>
     <key type="i" name="always-use-widths">
       <default>0</default>
       <summary>Use multiple widths even if moveing to other screen is possible</summary>

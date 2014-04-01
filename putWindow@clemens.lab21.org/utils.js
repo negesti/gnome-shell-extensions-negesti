@@ -20,7 +20,6 @@ Utils.prototype = {
   CENTER_KEEP_WIDTH: "center-keep-width",
   ALWAYS_USE_WIDTHS: "always-use-widths",
   CORNER_CHANGE: "corner-changes",
-  NEVER_CHANGE_SIZE: "never-change-size",
   REVERSE_MOVE_CENTER: "reverse-move-center",
 
   ALWAYS_KEEP_WIDTH: "always-keep-width",
@@ -115,38 +114,22 @@ Utils.prototype = {
   // ["5", "Nothing on first move, Only height on second"],
   // ["6", "Nothing on first move, Only width on second"]["4", "Keep size on first move"],
   changeCornerHeight: function() {
-    if (this.neverChangeSize()) {
-      return false;
-    }
     let val = this.getNumber(this.CORNER_CHANGE, 1);
     return val == 0 || val == 1 || val == 4 || val == 5;
   },
 
   changeCornerWidth: function() {
-    if (this.neverChangeSize()) {
-      return false;
-    }
     let val = this.getNumber(this.CORNER_CHANGE, 2);
     return val == 0 || val == 2 || val == 4 || val == 6;
   },
 
   changeCornerFirstTime: function() {
-    if (this.neverChangeSize()) {
-      return false;
-    }
     let val = this.getNumber(this.CORNER_CHANGE, 0);
     return val == 0 || val == 4 || val == 5 || val == 6;
   },
 
   changeCornerNever: function() {
-    if (this.neverChangeSize()) {
-      return false;
-    }
     return this.getNumber(this.CORNER_CHANGE, 0) == 3;
-  },
-
-  neverChangeSize: function() {
-    return this.getNumber(this.NEVER_CHANGE_SIZE, 0) == 1;
   },
 
   getNorthHeights: function() {
