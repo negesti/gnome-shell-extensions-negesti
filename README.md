@@ -8,6 +8,13 @@ grid plugin.
 
 [![Friend of GNOME](http://www-old.gnome.org/friends/banners/friends-of-gnome.png)](http://www.gnome.org/friends/ "Friend of GNOME")
 
+Contributors
+-------------
+@krlmr - Move to other display
+@73 - Move focus 
+@Anthony25 - gnome-shell 3.12 support
+@airtonix - gnome-shell 3.5 support
+
 Configuration
 -------------
 
