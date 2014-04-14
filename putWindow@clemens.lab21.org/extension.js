@@ -529,12 +529,23 @@ MoveWindow.prototype = {
     s = this._recalculateSizes(s);
 
     if (where == "c") {
-      let pos = win.get_outer_rect();
-      let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH, 50) / 100),
-        h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT, 50) / 100),
+      let pos = win.get_outer_rect(),
+        centerWidth = this._utils.getNumber(this._utils.CENTER_WIDTH, 50),
+        centerHeight = this._utils.getNumber(this._utils.CENTER_HEIGHT, 50);
+
+
+      let w = s.totalWidth * (centerWidth / 100),
+        h = s.totalHeight * (centerHeight / 100),
         x = s.x + (s.totalWidth - w) / 2,
         y = s.y + (s.totalHeight - h) / 2,
         sameHeight = this._samePoint(h, pos.height);
+
+      if (centerWidth == 100) {
+        w *= -1;
+      }
+      if (centerHeight == 100) {
+        h *= -1;
+      }
 
       if (this._utils.getBoolean(this._utils.REVERSE_MOVE_CENTER, false)) {
         if (win.maximized_horizontally && win.maximized_vertically) {
