@@ -574,7 +574,12 @@ MoveWindow.prototype = {
   },
 
   _moveConfiguredWhenCreated: function(display, win, noRecurse) {
-    if (!this._windowTracker.is_window_interesting(win)) {
+
+    if (this._windowTracker.is_window_interesting) {
+      if (!this._windowTracker.is_window_interesting(win)) {
+        return false;
+      }
+    } else if (!win.get_meta_window().skip_taskbar) {
       return false;
     }
 
