@@ -146,6 +146,56 @@
       <summary>Move to a predifined location</summary>
     </key>
 
+    <key type="i" name="put-to-corner-ne-enabled">
+      <default>1</default>
+      <summary>Move to the top right corner</summary>
+    </key>
+    <key type="i" name="put-to-corner-nw-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to the top left corner</summary>
+    </key>
+    <key type="i" name="put-to-corner-se-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to the bottom right corner</summary>
+    </key>
+    <key type="i" name="put-to-corner-sw-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to the bottom left corner</summary>
+    </key>
+    <key type="i" name="put-to-side-n-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to the top</summary>
+    </key>
+    <key type="i" name="put-to-side-e-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to the right side</summary>
+    </key>
+    <key type="i" name="put-to-side-s-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to bottom</summary>
+    </key>
+    <key type="i" name="put-to-side-w-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to the left side</summary>
+    </key>
+    <key type="i" name="put-to-center-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to center/maximize</summary>
+    </key>
+    <key type="i" name="put-to-location-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to a predifined location</summary>
+    </key>
+    <key type="i" name="put-to-left-screen-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to a predifined location</summary>
+    </key>
+    <key type="i" name="put-to-right-screen-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to a predifined location</summary>
+    </key>
+
+
     <key type="i" name="move-focus-enabled">
       <default>1</default>
       <summary>Enable/Disable the MoveFocus feature</summary>
@@ -177,6 +227,35 @@
     <key type="as" name="move-focus-right-screen">
       <default><![CDATA[['<Shift><Super>Right']]]></default>
       <summary>Move the focus to the right screen</summary>
+    </key>
+
+    <key type="i" name="move-focus-cycle-enabled">
+      <default>1</default>
+      <summary>Enable/Disable cycle through windows at the same postition</summary>
+    </key>
+    <key type="i" name="move-focus-north-enabled">
+      <default>1</default>
+      <summary>Enable/Disable focus the window that's north of the current</summary>
+    </key>
+    <key type="i" name="move-focus-east-enabled">
+      <default>1</default>
+      <summary>Enable/Disable focus the window that's east of the current</summary>
+    </key>
+    <key type="i" name="move-focus-south-enabled">
+      <default>1</default>
+      <summary>Enable/Disable focus the window that's south of the current</summary>
+    </key>
+    <key type="i" name="move-focus-west-enabled">
+      <default>1</default>
+      <summary>Enable/Disable focus the window that's west of the current</summary>
+    </key>
+    <key type="i" name="move-focus-left-screen-enabled">
+      <default>1</default>
+      <summary>Enable/Disable left the focus to the left screen</summary>
+    </key>
+    <key type="i" name="move-focus-right-screen-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move the focus to the right screen</summary>
     </key>
   </schema>
 </schemalist>

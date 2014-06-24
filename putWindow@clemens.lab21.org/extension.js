@@ -149,12 +149,19 @@ MoveWindow.prototype = {
     return this._primary;
   },
 
+  moveToScreen: function(direction) {
+    if (this._utils.getBoolean("put-to-" + direction +"-screen-enabled", true)) {
+      this._moveToScreen(direction);
+    }
+  },
+
   /**
    * Move the focused window to the screen on the "direction" side
    * @param direction left, e, right and w are supported
    * @return true, if it was possible to move the focused window in the given direction
    */
   _moveToScreen: function(direction) {
+
     let win = global.display.focus_window;
     if (win == null) {
       return false;
@@ -514,6 +521,32 @@ MoveWindow.prototype = {
     return true;
   },
 
+
+  /**
+   * _moveFocused is called internal when for example moving between screens.
+   * The -enabled flag should only be checked, if the method is called because of the keybinding. 
+   * e.g. Internal calls should not check the config.
+   */
+  moveFocused: function(where) {
+
+    if ("e,s,w,n".indexOf(where) != -1) {
+      if (!this._utils.getBoolean("put-to-side-" + where + "-enabled", true)) {
+        return;
+      }
+    } else if ("ne,se,sw,nw".indexOf(where) != -1) {
+     if (!this._utils.getBoolean("put-to-corner-" + where + "-enabled", true)) {
+        return;
+      } 
+    } else if ("c" == where) {
+      if (!this._utils.getBoolean("put-to-center-enabled", true)) {
+        return;
+      }
+    }
+
+    this._moveFocused(where);
+
+  },
+
   /**
    * move the current focused window into the given direction (c, n,e,s,w, ne, nw, sw, so)
    */
@@ -610,6 +643,12 @@ MoveWindow.prototype = {
       }
     }
     return false;
+  },
+
+  moveToConfiguredLocation: function(win, appName) {
+    if (this._utils.getBoolean("put-to-location-enabled", true)) {
+      this._moveToConfiguredLocation(win, appName);
+    }
   },
 
   /**
@@ -788,47 +827,47 @@ MoveWindow.prototype = {
     this._bindings = [];
     // move to n, e, s an w
     this._addKeyBinding("put-to-side-n",
-      Lang.bind(this, function(){ this._moveFocused("n");})
+      Lang.bind(this, function(){ this.moveFocused("n");})
     );
     this._addKeyBinding("put-to-side-e",
-      Lang.bind(this, function(){ this._moveFocused("e");})
+      Lang.bind(this, function(){ this.moveFocused("e");})
     );
     this._addKeyBinding("put-to-side-s",
-      Lang.bind(this, function(){ this._moveFocused("s");})
+      Lang.bind(this, function(){ this.moveFocused("s");})
     );
     this._addKeyBinding("put-to-side-w",
-      Lang.bind(this, function(){ this._moveFocused("w");})
+      Lang.bind(this, function(){ this.moveFocused("w");})
     );
 
     // move to  nw, se, sw, nw
     this._addKeyBinding("put-to-corner-ne",
-      Lang.bind(this, function(){ this._moveFocused("ne");})
+      Lang.bind(this, function(){ this.moveFocused("ne");})
     );
     this._addKeyBinding("put-to-corner-se",
-      Lang.bind(this, function(){ this._moveFocused("se");})
+      Lang.bind(this, function(){ this.moveFocused("se");})
     );
     this._addKeyBinding("put-to-corner-sw",
-      Lang.bind(this, function(){ this._moveFocused("sw");})
+      Lang.bind(this, function(){ this.moveFocused("sw");})
     );
     this._addKeyBinding("put-to-corner-nw",
-      Lang.bind(this, function(){ this._moveFocused("nw");})
+      Lang.bind(this, function(){ this.moveFocused("nw");})
     );
 
     // move to center. fix 2 screen setup and resize to 50% 50%
     this._addKeyBinding("put-to-center",
-      Lang.bind(this, function(){ this._moveFocused("c");})
+      Lang.bind(this, function(){ this.moveFocused("c");})
     );
 
     this._addKeyBinding("put-to-location",
-      Lang.bind(this, function() { this._moveToConfiguredLocation();} )
+      Lang.bind(this, function() { this.moveToConfiguredLocation();} )
     );
 
     this._addKeyBinding("put-to-left-screen",
-      Lang.bind(this, function() { this._moveToScreen("left");} )
+      Lang.bind(this, function() { this.moveToScreen("left");} )
     );
 
     this._addKeyBinding("put-to-right-screen",
-      Lang.bind(this, function() { this._moveToScreen("right");} )
+      Lang.bind(this, function() { this.moveToScreen("right");} )
     );
 
     this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils);

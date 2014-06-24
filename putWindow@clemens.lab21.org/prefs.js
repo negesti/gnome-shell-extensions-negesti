@@ -321,6 +321,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     let name, model = new Gtk.ListStore();
 
     model.set_column_types([
+      GObject.TYPE_BOOLEAN,
       GObject.TYPE_STRING,
       GObject.TYPE_STRING,
       GObject.TYPE_INT,
@@ -330,7 +331,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     for (name in bindings) {
       let [key, mods] = Gtk.accelerator_parse(Utils.get_strv(name, null)[0]);
       let row = model.insert(10);
-      model.set(row, [0, 1, 2, 3], [name, bindings[name], mods, key ]);
+      model.set(row, [0, 1, 2, 3, 4], [Utils.getBoolean(name + "-enabled"), name, bindings[name], mods, key ]);
     }
 
     let treeview = new Gtk.TreeView({
@@ -339,11 +340,31 @@ const PutWindowSettingsWidget = new GObject.Class({
       margin: 4
     });
 
-    // Action column
-    let cellrend = new Gtk.CellRendererText();
-    let col = new Gtk.TreeViewColumn({ 'title': 'Action', 'expand': true });
+    // enabled column
+    let cellrend = new Gtk.CellRendererToggle({'radio': false, 'activatable': true});
+    let col = new Gtk.TreeViewColumn({ 'title': 'Enabled', 'expand': false});
     col.pack_start(cellrend, true);
-    col.add_attribute(cellrend, 'text', 1);
+    col.add_attribute(cellrend, 'active', 0);
+
+    cellrend.connect("toggled", function(toggle, iter) {
+        let [succ, iterator ] = model.get_iter_from_string(iter);
+        var value = !model.get_value(iterator, 0);
+        model.set(iterator, [0], [value]);
+        toggle.set_active(value);
+
+        let name = model.get_value(iterator, 1);
+        Utils.setParameter(name + "-enabled", value ? 1 : 0);
+
+    });
+
+    treeview.append_column(col);
+
+
+    // Action column
+    cellrend = new Gtk.CellRendererText();
+    col = new Gtk.TreeViewColumn({ 'title': 'Action', 'expand': true});
+    col.pack_start(cellrend, true);
+    col.add_attribute(cellrend, 'text', 2);
     treeview.append_column(col);
 
     // keybinding column
@@ -360,17 +381,17 @@ const PutWindowSettingsWidget = new GObject.Class({
         throw new Error("Error updating Keybinding");
       }
 
-      let name = model.get_value(iterator, 0);
+      let name = model.get_value(iterator, 1);
 
-      model.set(iterator, [ 2, 3], [ mods, key ]);
+      model.set(iterator, [ 3, 4], [ mods, key ]);
       Utils.set_strv(name, [value]);
     });
 
     col = new Gtk.TreeViewColumn({'title': 'Modify'});
 
     col.pack_end(cellrend, false);
-    col.add_attribute(cellrend, 'accel-mods', 2);
-    col.add_attribute(cellrend, 'accel-key', 3);
+    col.add_attribute(cellrend, 'accel-mods', 3);
+    col.add_attribute(cellrend, 'accel-key', 4);
 
     treeview.append_column(col);
 
