@@ -87,6 +87,10 @@ and only if windows was at side_e (or side_w) before. eg.
 ChangeLog
 -------
 
+__June 24, 2014__
+* support gnome-shell 3.12
+* #56 allow the user to disable keybindings
+
 __October 6, 2013__
  * Conributed by  @krlmlr 
   * Fixed #37 Moving maximized window to other display
