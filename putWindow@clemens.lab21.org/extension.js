@@ -276,10 +276,12 @@ MoveWindow.prototype = {
     }
 
     let useIndex = 0;
+    let moveToOtherScreen = false
     for ( let i=0; i < sizes.length; i++) {
       if (this._samePoint(pos.width, sizes[i].width) && this._samePoint(pos.x, sizes[i].x)) {
         useIndex = i + 1;
         if (useIndex >= sizes.length) {
+          moveToOtherScreen = true;
           useIndex =  0;
         }
         break;
@@ -293,7 +295,7 @@ MoveWindow.prototype = {
       canMoveScreen = !this._isVerticalScreenSetup && screenIndex < (this._screens.length - 1);
     }
 
-    if (useIndex > 0 && canMoveScreen && !this._utils.getBoolean(this._utils.ALWAYS_USE_WIDTHS)) {
+    if (moveToOtherScreen && canMoveScreen && !this._utils.getBoolean(this._utils.ALWAYS_USE_WIDTHS)) {
       // moved in this direction more then once, if a screen exists, move the window there
       if (useIndex > 1) {
         // the window was moved here from an other screen, just resize it
