@@ -3,6 +3,7 @@ const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const Mainloop = imports.mainloop;
 const Shell = imports.gi.Shell;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
@@ -614,7 +615,7 @@ MoveWindow.prototype = {
       if (!this._windowTracker.is_window_interesting(win)) {
         return false;
       }
-    } else if (!win.get_meta_window().skip_taskbar) {
+    } else if (!win.skip_taskbar) {
       return false;
     }
 
@@ -747,25 +748,44 @@ MoveWindow.prototype = {
     }
 
     // user_operation, x, y
+    /*
     if (win.decorated) {
       win.move_frame(true, x, y);
     } else {
       win.move(true, x, y);
-    }
+    }*/
 
-    let padding = this._getPadding(win);
+    let targetRectangle = this._getPadding(win, x, y, width, height);
+
+
+
     // user_operation, width, height, force
-    win.resize(true, width - padding.width, height - padding.height);
+    win.move_resize_frame(true, 
+      targetRectangle.x,
+      targetRectangle.y,
+      targetRectangle.width, 
+      targetRectangle.height);
   },
 
   // the difference between input and outer rect as object.
-  _getPadding: function(win) {
+  _getPadding: function(win, x, y, width, height) {
+    let rect = new Meta.Rectangle();
+    rect.width = width;
+    rect.height = height;
+    rect.x = x;
+    rect.y = y;
+
+    if (win.client_rect_to_frame_rect) {
+      return win.client_rect_to_frame_rect(rect);
+
+    }
+
     let outer = win.get_outer_rect();
     let inner = win.get_rect();
-    return {
-      width: (outer.width - inner.width),
-      height: (outer.height - inner.height)
-    };
+    rect.width =  (outer.width - inner.width);
+    rect.height = (outer.height - inner.height)
+    
+    return rect;
   },
 
   counter: 0,
