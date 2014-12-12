@@ -747,14 +747,6 @@ MoveWindow.prototype = {
       win.unmaximize(unMaximizeFlags)
     }
 
-    // user_operation, x, y
-    /*
-    if (win.decorated) {
-      win.move_frame(true, x, y);
-    } else {
-      win.move(true, x, y);
-    }*/
-
     let targetRectangle = this._getPadding(win, x, y, width, height);
 
     // user_operation, width, height, force

@@ -18,6 +18,9 @@ MoveFocus.prototype = {
   _init: function(utils) {
     this._utils = utils;
 
+    // quite dirty
+    this._isVersion14 = imports.misc.config.PACKAGE_VERSION.startsWith("3.14");
+
     this._settingObject = this._utils.getSettingsObject();
     this._settingsChangedListener = {
       name: this._utils.MOVE_FOCUS_ENABLED,
@@ -198,7 +201,14 @@ MoveFocus.prototype = {
 		let focusWin = global.display.focus_window;
 		let screen = global.screen;
     let display = screen.get_display();
-    let allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace()));
+
+    let allWin;
+     if (this._isVersion14) {
+      allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen.get_active_workspace()));
+    } else {
+      allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace()));
+    }
+    
 		focusWin.lower();
 		let focusRect = focusWin.get_outer_rect();
 		for (let i=(allWin.length-1); i>=0; i--) {
@@ -331,7 +341,11 @@ MoveFocus.prototype = {
 
   _getWindowList: function() {
     let display = global.screen.get_display();
-    return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen, global.screen.get_active_workspace());
+    if (this._isVersion14) {
+      return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen.get_active_workspace());
+    } else {
+      return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen, global.screen.get_active_workspace());
+    }
   },
 
   _focusNearesCandidate: function(candidates) {
