@@ -757,8 +757,6 @@ MoveWindow.prototype = {
 
     let targetRectangle = this._getPadding(win, x, y, width, height);
 
-    global.log("X: " + x + " y: " + y + " width: " + width + "height: "+ height);
-
     // user_operation, width, height, force
     win.move_resize_frame(false, 
       targetRectangle.x,
