@@ -198,7 +198,7 @@ MoveFocus.prototype = {
 		let focusWin = global.display.focus_window;
 		let screen = global.screen;
     let display = screen.get_display();
-    let allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace()));
+    let allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen.get_active_workspace()));
 		focusWin.lower();
 		let focusRect = focusWin.get_outer_rect();
 		for (let i=(allWin.length-1); i>=0; i--) {
@@ -331,7 +331,7 @@ MoveFocus.prototype = {
 
   _getWindowList: function() {
     let display = global.screen.get_display();
-    return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen, global.screen.get_active_workspace());
+    return global.display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen.get_active_workspace());
   },
 
   _focusNearesCandidate: function(candidates) {
