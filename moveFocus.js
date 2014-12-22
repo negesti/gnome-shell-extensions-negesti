@@ -115,8 +115,9 @@ MoveFocus.prototype = {
   },
 
   _getDistance: function(focusWin, candidateWin){
-    let focus = this._getCenter(focusWin.get_outer_rect());
-    let candidate = this._getCenter(candidateWin.get_outer_rect());
+
+    let focus = focusWin.get_center();
+    let candidate = candidateWin.get_center();
 
     let dx = focus.x - candidate.x;
     let dy = focus.y - candidate.y;
@@ -131,8 +132,8 @@ MoveFocus.prototype = {
 
   _isCandidate: function(focusWin, candidateWin, direction){
 
-  	let focus = this._getCenter(focusWin.get_outer_rect());
-  	let candidate = this._getCenter(candidateWin.get_outer_rect());
+  	let focus = this._getCenter(focusWin.get_dimension());
+  	let candidate = this._getCenter(candidateWin.get_dimension());
 
 		// a window is candidate if:
 		// 1. the center of the candidate window is further in the direction you want
@@ -147,7 +148,7 @@ MoveFocus.prototype = {
 				if (focus.y <= candidate.y){
 					return false;
 				}
-				if (focusWin.get_outer_rect().y <= candidateWin.get_outer_rect().y + this._distance_correction){
+				if (focusWin.get_dimension().y <= candidateWin.get_dimension().y + this._distance_correction){
 					return false;
 				}
 				if (Math.abs(focus.y - candidate.y)+this._angle_correction < Math.abs(focus.x - candidate.x)){
@@ -158,7 +159,7 @@ MoveFocus.prototype = {
 				if (focus.x >= candidate.x){
 					return false;
 				}
-				if (focusWin.get_outer_rect().x + focusWin.get_outer_rect().width + this._distance_correction >= candidateWin.get_outer_rect().x + candidateWin.get_outer_rect().width){
+				if (focusWin.get_dimension().x + focusWin.get_dimension().width + this._distance_correction >= candidateWin.get_dimension().x + candidateWin.get_dimension().width){
 					return false;
 				}
 				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+this._angle_correction){
@@ -169,7 +170,7 @@ MoveFocus.prototype = {
 				if (focus.y >= candidate.y){
 					return false;
 				}
-				if (focusWin.get_outer_rect().y + focusWin.get_outer_rect().height + this._distance_correction >= candidateWin.get_outer_rect().y + candidateWin.get_outer_rect().height){
+				if (focusWin.get_dimension().y + focusWin.get_dimension().height + this._distance_correction >= candidateWin.get_dimension().y + candidateWin.get_dimension().height){
 					return false;
 				}
 				if (Math.abs(focus.y - candidate.y)+this._angle_correction < Math.abs(focus.x - candidate.x)){
@@ -180,7 +181,7 @@ MoveFocus.prototype = {
 				if (focus.x <= candidate.x + this._distance_correction){
 					return false;
 				}
-				if (focusWin.get_outer_rect().x <= candidateWin.get_outer_rect().x){
+				if (focusWin.get_dimension().x <= candidateWin.get_dimension().x){
 					return false;
 				}
 				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+this._angle_correction){
@@ -210,12 +211,12 @@ MoveFocus.prototype = {
     }
     
 		focusWin.lower();
-		let focusRect = focusWin.get_outer_rect();
+		let focusRect = focusWin.get_dimension();
 		for (let i=(allWin.length-1); i>=0; i--) {
       if (allWin[i] == focusWin || allWin[i].is_hidden()) {
         continue;
       }
-			if (focusRect.overlap(allWin[i].get_outer_rect())){
+			if (focusRect.overlap(allWin[i].get_dimension())){
 				allWin[i].activate(global.get_current_time());
 				break;
 			}
@@ -272,7 +273,7 @@ MoveFocus.prototype = {
       return;
     }
 
-    let currentScreenIndex = global.screen.get_monitor_index_for_rect(focusWindow.get_outer_rect());
+    let currentScreenIndex = global.screen.get_monitor_index_for_rect(focusWindow.get_dimension());
     let currentScreen = global.screen.get_monitor_geometry(currentScreenIndex);
     // we can not move left
     if (direction == "l" && currentScreen.x == 0) {
@@ -285,7 +286,7 @@ MoveFocus.prototype = {
       if (windows[i].is_hidden()) {
         continue;
       }
-      let windowScreen = global.screen.get_monitor_index_for_rect(windows[i].get_outer_rect());
+      let windowScreen = global.screen.get_monitor_index_for_rect(windows[i].get_dimension());
       if (currentScreenIndex != windowScreen) {
         candidates.push({
           window: windows[i],

@@ -391,7 +391,7 @@ MoveWindow.prototype = {
     keepHeight = keepHeight || false;
 
     let s = this._screens[screenIndex];
-    let pos = win.get_outer_rect();
+    let pos = win.get_dimension();
     let sameWidth = false;
     let sameHeight = false;
 
@@ -495,7 +495,7 @@ MoveWindow.prototype = {
 
   _moveToCornerKeepSize: function(win, screenIndex, direction) {
     let s = this._screens[screenIndex];
-    let pos = win.get_outer_rect();
+    let pos = win.get_dimension();
 
     let x,y;
 
@@ -516,11 +516,7 @@ MoveWindow.prototype = {
       return false;
     }
 
-    if (win.decorated) {
-      win.move_frame(true, x, y);
-    } else {
-      win.move(true, x, y);
-    }
+    win.move_frame(true, x, y);
     return true;
   },
 
@@ -565,7 +561,7 @@ MoveWindow.prototype = {
     s = this._recalculateSizes(s);
 
     if (where == "c") {
-      let pos = win.get_outer_rect(),
+      let pos = win.get_dimension(),
         centerWidth = this._utils.getNumber(this._utils.CENTER_WIDTH, 50),
         centerHeight = this._utils.getNumber(this._utils.CENTER_HEIGHT, 50);
 
@@ -770,7 +766,7 @@ MoveWindow.prototype = {
 
     }
 
-    let outer = win.get_outer_rect();
+    let outer = win.get_dimension();
     let inner = win.get_rect();
     rect.width =  (outer.width - inner.width);
     rect.height = (outer.height - inner.height)
@@ -922,9 +918,30 @@ function init(meta) {
 };
 
 function enable() {
+  // Meta.Window.get_dimensions()
+  let api14 = imports.misc.config.PACKAGE_VERSION.startsWith("3.14");
+  if (api14) {
+    Meta.Window.prototype.get_dimension = function() {
+      return this.get_frame_rect();
+    }
+  } else {
+    Meta.Window.prototype.get_dimension = function() {
+     return this.get_outer_rect();
+    }
+  }
+  
+  //Meta.Window.get_center()
+  Meta.Window.prototype.get_center = function(){
+    let rect = this.get_dimensions();
+    return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
+  }
   this._moveWindow = new MoveWindow();
 };
 
-function disable(){
+function disable() {
+  // remove mokey patches
+  Meta.Window.prototype.get_dimensions = undefined;
+  Meta.Window.prototype.get_center = undefined;
+  
   this._moveWindow.destroy();
 };
