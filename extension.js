@@ -918,7 +918,7 @@ function init(meta) {
 };
 
 function enable() {
-  // Meta.Window.get_dimensions()
+  // Meta.Window.get_dimension()
   let api14 = imports.misc.config.PACKAGE_VERSION.startsWith("3.14");
   if (api14) {
     Meta.Window.prototype.get_dimension = function() {
@@ -932,7 +932,7 @@ function enable() {
   
   //Meta.Window.get_center()
   Meta.Window.prototype.get_center = function(){
-    let rect = this.get_dimensions();
+    let rect = this.get_dimension();
     return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
   }
   this._moveWindow = new MoveWindow();
@@ -940,7 +940,7 @@ function enable() {
 
 function disable() {
   // remove mokey patches
-  Meta.Window.prototype.get_dimensions = undefined;
+  Meta.Window.prototype.get_dimension = undefined;
   Meta.Window.prototype.get_center = undefined;
   
   this._moveWindow.destroy();
