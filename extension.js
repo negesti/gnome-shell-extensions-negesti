@@ -786,7 +786,8 @@ MoveWindow.prototype = {
     let sumX = 0,sumY = 0;
 
     for (let i=0; i<numMonitors; i++) {
-      let geom = global.screen.get_monitor_geometry(i);
+
+      let geom = Main.layoutManager.getWorkAreaForMonitor(i)
       let primary = (i == this._primary);
       sumX += geom.x;
       sumY += geom.y;
