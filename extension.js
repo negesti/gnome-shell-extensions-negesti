@@ -787,7 +787,7 @@ MoveWindow.prototype = {
 
     for (let i=0; i<numMonitors; i++) {
 
-      let geom = Main.layoutManager.getWorkAreaForMonitor(i)
+      let geom = Main.layoutManager.getWorkAreaForMonitor(i);
       let primary = (i == this._primary);
       sumX += geom.x;
       sumY += geom.y;
@@ -920,7 +920,7 @@ function init(meta) {
 
 function enable() {
   // Meta.Window.get_dimension()
-  let api14 = imports.misc.config.PACKAGE_VERSION.startsWith("3.14");
+  let api14 = imports.misc.config.PACKAGE_VERSION.indexOf("3.14") == 0;
   if (api14) {
     Meta.Window.prototype.get_dimension = function() {
       return this.get_frame_rect();
