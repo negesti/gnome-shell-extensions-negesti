@@ -19,7 +19,7 @@ MoveFocus.prototype = {
     this._utils = utils;
 
     // quite dirty
-    this._isVersion14 = imports.misc.config.PACKAGE_VERSION.startsWith("3.14");
+    this._isVersion14 = imports.misc.config.PACKAGE_VERSION.indexOf("3.14") == 0;
 
     this._settingObject = this._utils.getSettingsObject();
     this._settingsChangedListener = {
