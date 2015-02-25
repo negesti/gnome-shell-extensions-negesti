@@ -3,9 +3,50 @@ const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 
+const Clutter = imports.gi.Clutter;
+const Lightbox = imports.ui.lightbox;
+const Tweener = imports.ui.tweener;
+
 function MoveFocus(utils) {
   this._init(utils);
 };
+
+const FLASHSPOT_ANIMATION_OUT_TIME = 2; // seconds
+
+const Flashspot = new Lang.Class({
+  Name: 'Flashspot',
+  Extends: Lightbox.Lightbox,
+  _init: function(area, windowMeta) {
+    this.parent(Main.uiGroup, { inhibitEvents: false,
+                                width: area.width,
+                                height: area.height });
+    this.actor.style_class = 'focusflash';
+    this.actor.set_position(area.x, area.y);
+    this.pactor = windowMeta.get_compositor_private();
+    this.actor.scale_center_x =  0.5;
+    this.actor.scale_center_y =  0.5;
+    this.actor.set_pivot_point(0.5, 0.5);
+    let constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.X, 0.0);
+    this.actor.add_constraint_with_name("x-bind", constraint);
+    constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.Y, 0.0);
+    this.actor.add_constraint_with_name("y-bind", constraint);
+    constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.SIZE, 0.0);
+    this.actor.add_constraint_with_name("size-bind", constraint);
+    Tweener.addTween(this.actor, {
+     opacity: 0,
+     time: 3*FLASHSPOT_ANIMATION_OUT_TIME,
+     onComplete: function() {
+       this.destroy();
+     },
+    });
+
+    this.actor.background_color = new Clutter.Color({red: 255, green: 255, blue: 255, alpha: 128})
+  },
+  fire: function() {
+    this.actor.show();
+    this.actor.opacity = 255;
+  }
+});
 
 MoveFocus.prototype = {
 
@@ -73,6 +114,20 @@ MoveFocus.prototype = {
     if (this._settingsChangedListener) {
       this._settingObject.disconnect(this._settingsChangedListener.handlerId);
     }
+  },
+  
+  _flashWindow: function(window){
+    let actor = window.get_compositor_private();
+    let dimension = window.get_dimension();
+    let flashspot = new Flashspot(dimension, window);
+    flashspot.fire();
+    actor.set_pivot_point(0.5, 0.5);
+    Tweener.addTween(actor, {opacity: 255, time: 1});
+  },
+  
+  _activateWindow: function(window){
+    this._flashWindow(window);
+    window.activate(global.get_current_time());
   },
 
   _enable: function() {
@@ -217,7 +272,7 @@ MoveFocus.prototype = {
         continue;
       }
 			if (focusRect.overlap(allWin[i].get_dimension())){
-				allWin[i].activate(global.get_current_time());
+			  this._activateWindow(allWin[i]);
 				break;
 			}
 		}
@@ -356,17 +411,12 @@ MoveFocus.prototype = {
     let distance_correction = this._distance_correction;
 
     candidates.sort(function(a, b) {
-      /*
-       global.log(a.window.get_title()+" "+b.window.get_title());
-       global.log(a.dist+" "+b.dist);
-       global.log(distance_correction);
-      */
       // if the difference between distances is within the distance correction
       // value we will make our decision based on recend usage
       return (Math.abs(a.dist-b.dist) <= distance_correction) ? -1 : a.dist - b.dist;
 
     });
 
-    candidates[0].window.activate(global.get_current_time());
+    this._activateWindow(candidates[0].window);
   }
 };
