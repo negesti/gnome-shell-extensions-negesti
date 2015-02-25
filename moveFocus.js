@@ -181,14 +181,10 @@ MoveFocus.prototype = {
 
   },
 
-  _getCenter: function(rect){
-  	return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
-  },
-
   _isCandidate: function(focusWin, candidateWin, direction){
 
-  	let focus = this._getCenter(focusWin.get_dimension());
-  	let candidate = this._getCenter(candidateWin.get_dimension());
+  	let focus = focusWin.get_center();
+  	let candidate = candidateWin.get_center();
 
 		// a window is candidate if:
 		// 1. the center of the candidate window is further in the direction you want
