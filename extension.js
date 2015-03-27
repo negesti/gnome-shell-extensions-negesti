@@ -768,8 +768,8 @@ MoveWindow.prototype = {
 
     let outer = win.get_dimension();
     let inner = win.get_rect();
-    rect.width =  (outer.width - inner.width);
-    rect.height = (outer.height - inner.height)
+    rect.width =  rect.width - (outer.width - inner.width);
+    rect.height = recht.height - (outer.height - inner.height)
     
     return rect;
   },
@@ -787,7 +787,13 @@ MoveWindow.prototype = {
 
     for (let i=0; i<numMonitors; i++) {
 
-      let geom = Main.layoutManager.getWorkAreaForMonitor(i);
+      let geom;
+      if (Main.layoutManager.getWorkAreaForMonitor) {
+        geom = Main.layoutManager.getWorkAreaForMonitor(i);
+      } else {
+        geom = global.screen.get_monitor_geometry(i)
+      }
+
       let primary = (i == this._primary);
       sumX += geom.x;
       sumY += geom.y;
@@ -940,7 +946,7 @@ function enable() {
 };
 
 function disable() {
-  // remove mokey patches
+  // remove monkey patches
   Meta.Window.prototype.get_dimension = undefined;
   Meta.Window.prototype.get_center = undefined;
   
