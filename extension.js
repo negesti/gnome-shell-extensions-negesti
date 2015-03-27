@@ -885,7 +885,7 @@ MoveWindow.prototype = {
       Lang.bind(this, function() { this.moveToScreen("right");} )
     );
 
-    this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils);
+    this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils, this._screens);
   },
 
   /**

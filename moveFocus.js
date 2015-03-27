@@ -56,8 +56,12 @@ MoveFocus.prototype = {
   _bindings: [],
   _settingsChangedListener: {},
 
-  _init: function(utils) {
+  _init: function(utils, screens) {
     this._utils = utils;
+    this._screens = screens;
+
+    global.log("_init " + this._screens);
+
 
     // quite dirty
     this._isVersion14 = imports.misc.config.PACKAGE_VERSION.indexOf("3.14") == 0;
@@ -324,7 +328,7 @@ MoveFocus.prototype = {
       return;
     }
 
-    let currentScreenIndex = global.screen.get_monitor_index_for_rect(focusWindow.get_dimension());
+    let currentScreenIndex = this._getCurrentScreenIndex(focusWindow);
     let currentScreen = global.screen.get_monitor_geometry(currentScreenIndex);
     // we can not move left
     if (direction == "l" && currentScreen.x == 0) {
@@ -337,7 +341,7 @@ MoveFocus.prototype = {
       if (windows[i].is_hidden()) {
         continue;
       }
-      let windowScreen = global.screen.get_monitor_index_for_rect(windows[i].get_dimension());
+      let windowScreen = this._getCurrentScreenIndex(windows[i]);
       if (currentScreenIndex != windowScreen) {
         candidates.push({
           window: windows[i],
@@ -348,6 +352,25 @@ MoveFocus.prototype = {
     }
 
     this._focusNearesCandidate(candidates);
+  },
+
+  _getCurrentScreenIndex: function(win) {
+    if (global.screen.get_monitor_index_for_rect) {
+      return global.screen.get_monitor_index_for_rect(win.get_dimension());
+    }
+
+    let screenLen = this._screens.length;
+    let winRect = win.get_dimension();
+
+    for (let i=0; i < screenLen; i++) {
+      let s = this._screens[i];
+
+      global.log("screen " + s.x + " win: " + winRect.x);
+      if (s.x < winRect.x && (s.x + s.totalWidth) > winRect.x) {
+        return i;
+      }
+    }
+    return 0;
   },
 
   _moveFocus: function(direction) {

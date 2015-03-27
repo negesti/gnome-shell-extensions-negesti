@@ -287,20 +287,48 @@ const PutWindowSettingsWidget = new GObject.Class({
     });
     description.set_line_wrap(true);
     ret.attach(description, 0, row++, 5, 1);
+  
+    let labels = [
+      "Enable 'Move focus'",
+      "Enable cycle through windows at the same postition",
+      "Enable focus the window that's north of the current",
+      "Enable focus the window that's east of the current",
+      "Enable focus the window that's south of the current",
+      "Enable focus the window that's west of the current",
+      "Enable move the focus to the left screen",
+      "Enable move the focus to the right screen"
+    ];
 
-    ret.attach(new Gtk.Label({
-      halign: Gtk.Align.START,
-      margin_left: 4,
-      label: "Enable 'Move focus':"
-    }), 0, row, 4, 1);
+     let configNames = [
+      Utils.MOVE_FOCUS_ENABLED,
+      "move-focus-cycle-enabled",
+      "move-focus-north-enabled",
+      "move-focus-east-enabled",
+      "move-focus-south-enabled",
+      "move-focus-west-enabled",
+      "move-focus-left-screen-enabled",
+      "move-focus-right-screen-enabled",
+    ];
 
-    let enabledSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END, vexpand: false});
-    enabledSwitch.set_active(Utils.getBoolean(Utils.MOVE_FOCUS_ENABLED, false));
-    enabledSwitch.connect("notify::active", function(obj) {
-      Utils.setParameter(Utils.MOVE_FOCUS_ENABLED, obj.get_active());
-    });
-    ret.attach(enabledSwitch, 4, row++, 1, 1);
+    for (let i=0; i<labels.length; i++) {
+      ret.attach(new Gtk.Label({
+        halign: Gtk.Align.START,
+        margin_left: 4,
+        label: labels[i] + ":"
+      }), 0, row, 4, 1);
 
+      let enabledSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END, vexpand: false});
+      enabledSwitch.set_active(Utils.getBoolean(configNames[i], true));
+
+      enabledSwitch.connect("notify::active", Lang.bind(
+        {configName: configNames[i]}, // funny scope, but works :)
+        function(obj) {
+        Utils.setParameter(this.configName, obj.get_active());
+      }));
+      ret.attach(enabledSwitch, 4, row++, 1, 1);  
+    }
+   
+    
     ret.attach(new Gtk.Label({label: "<b>Keyboard bindings</b>", halign:Gtk.Align.START, margin_left: 4, margin_top: 5, use_markup: true}), 0, row++, 5, 1);
     ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_left: 4, margin_top: 4, margin_bottom: 4}), 0, row++, 5, 1);
 
@@ -309,7 +337,9 @@ const PutWindowSettingsWidget = new GObject.Class({
       "move-focus-east": "Move the window focus right",
       "move-focus-south": "Move the window focus down",
       "move-focus-west": "Move the window focus left",
-      "move-focus-cycle": "Push focused window to the background"
+      "move-focus-cycle": "Push focused window to the background",
+      "move-focus-left-screen": "Move the focus to the left screen",
+      "move-focus-right-screen": "Move the focus to the right screen"
     });
     ret.attach(keyBinding, 0, row, 5, 1);
 
