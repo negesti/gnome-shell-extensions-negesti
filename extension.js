@@ -769,7 +769,7 @@ MoveWindow.prototype = {
     let outer = win.get_dimension();
     let inner = win.get_rect();
     rect.width =  rect.width - (outer.width - inner.width);
-    rect.height = recht.height - (outer.height - inner.height)
+    rect.height = rect.height - (outer.height - inner.height)
     
     return rect;
   },
