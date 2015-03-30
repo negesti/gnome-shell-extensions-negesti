@@ -222,7 +222,7 @@
     </key>
     <key type="as" name="move-focus-left-screen">
       <default><![CDATA[['<Shift><Super>Left']]]></default>
-      <summary>Left the focus to the left screen</summary>
+      <summary>Move the focus to the left screen</summary>
     </key>
     <key type="as" name="move-focus-right-screen">
       <default><![CDATA[['<Shift><Super>Right']]]></default>

@@ -7,8 +7,8 @@ const Clutter = imports.gi.Clutter;
 const Lightbox = imports.ui.lightbox;
 const Tweener = imports.ui.tweener;
 
-function MoveFocus(utils) {
-  this._init(utils);
+function MoveFocus(utils, screens) {
+  this._init(utils, screens);
 };
 
 const FLASHSPOT_ANIMATION_OUT_TIME = 2; // seconds
@@ -59,8 +59,6 @@ MoveFocus.prototype = {
   _init: function(utils, screens) {
     this._utils = utils;
     this._screens = screens;
-
-    global.log("_init " + this._screens);
 
 
     // quite dirty
@@ -365,7 +363,6 @@ MoveFocus.prototype = {
     for (let i=0; i < screenLen; i++) {
       let s = this._screens[i];
 
-      global.log("screen " + s.x + " win: " + winRect.x);
       if (s.x < winRect.x && (s.x + s.totalWidth) > winRect.x) {
         return i;
       }
