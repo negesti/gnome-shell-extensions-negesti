@@ -125,7 +125,7 @@ MoveFocus.prototype = {
     let dimension = window.get_dimension();
     let flashspot = new Flashspot(dimension, window);
     flashspot.fire();
-    if (this.actor.set_pivot_point) {
+    if (actor.set_pivot_point) {
       actor.set_pivot_point(0.5, 0.5);
     }
     Tweener.addTween(actor, {opacity: 255, time: 1});
