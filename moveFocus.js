@@ -25,7 +25,9 @@ const Flashspot = new Lang.Class({
     this.pactor = windowMeta.get_compositor_private();
     this.actor.scale_center_x =  0.5;
     this.actor.scale_center_y =  0.5;
-    this.actor.set_pivot_point(0.5, 0.5);
+    if (this.actor.set_pivot_point) {
+      this.actor.set_pivot_point(0.5, 0.5);  
+    }    
     let constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.X, 0.0);
     this.actor.add_constraint_with_name("x-bind", constraint);
     constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.Y, 0.0);
@@ -123,7 +125,9 @@ MoveFocus.prototype = {
     let dimension = window.get_dimension();
     let flashspot = new Flashspot(dimension, window);
     flashspot.fire();
-    actor.set_pivot_point(0.5, 0.5);
+    if (this.actor.set_pivot_point) {
+      actor.set_pivot_point(0.5, 0.5);
+    }
     Tweener.addTween(actor, {opacity: 255, time: 1});
   },
   
