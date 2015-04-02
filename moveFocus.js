@@ -96,7 +96,13 @@ MoveFocus.prototype = {
   _addKeyBinding: function(key, handler) {
     this._bindings.push(key);
     // Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
-    if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
+    if (Main.wm.addKeybinding && Shell.ActionMode){ // introduced in 3.16
+    	Main.wm.addKeybinding(key,
+        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
+        Shell.ActionMode.NORMAL,
+        handler
+      );
+    } else if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
       Main.wm.addKeybinding(key,
         this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
         Shell.KeyBindingMode.NORMAL,

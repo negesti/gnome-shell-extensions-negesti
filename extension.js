@@ -44,7 +44,13 @@ MoveWindow.prototype = {
   _addKeyBinding: function(key, handler) {
     this._bindings.push(key);
 
-    if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
+	if (Main.wm.addKeybinding && Shell.ActionMode){ // introduced in 3.16
+      Main.wm.addKeybinding(key,
+        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
+        Shell.ActionMode.NORMAL,
+        handler
+      );
+    } else if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
       // Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
       Main.wm.addKeybinding(key,
         this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
@@ -131,7 +137,7 @@ MoveWindow.prototype = {
   _getCurrentScreenIndex: function(win) {
 
     // left edge is sometimes -1px...
-    let pos = win.get_outer_rect();
+    let pos = win.get_frame_rect();
     pos.x = pos.x < 0 ? 0 : pos.x;
 
     let sl = this._screens.length;
@@ -202,7 +208,7 @@ MoveWindow.prototype = {
         win.unmaximize(wasMaximizeFlags);
       }
 
-      let position = win.get_outer_rect();
+      let position = win.get_frame_rect();
 
       let xRatio = s.totalWidth / old.totalWidth;
       let x = s.x + (position.x - old.x) * xRatio;
@@ -263,7 +269,7 @@ MoveWindow.prototype = {
   _moveToSide: function(win, screenIndex, direction) {
 
     let s = this._screens[screenIndex];
-    let pos = win.get_outer_rect();
+    let pos = win.get_frame_rect();
     let sizes = direction == "e" ? s.east : s.west;
 
     if (win.maximized_horizontally && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
@@ -318,7 +324,7 @@ MoveWindow.prototype = {
 
   _moveNorthSouth: function(win, screenIndex, direction) {
     let s = this._screens[screenIndex];
-    let pos = win.get_outer_rect();
+    let pos = win.get_frame_rect();
     let sizes = direction == "n" ? s.north : s.south;
 
     if ( win.maximized_vertically && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
@@ -933,7 +939,7 @@ function enable() {
     }
   } else {
     Meta.Window.prototype.get_dimension = function() {
-     return this.get_outer_rect();
+     return this.get_frame_rect();
     }
   }
   
