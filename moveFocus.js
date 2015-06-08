@@ -23,11 +23,12 @@ const Flashspot = new Lang.Class({
     this.actor.style_class = 'focusflash';
     this.actor.set_position(area.x, area.y);
     this.pactor = windowMeta.get_compositor_private();
-    this.actor.scale_center_x =  0.5;
-    this.actor.scale_center_y =  0.5;
     if (this.actor.set_pivot_point) {
       this.actor.set_pivot_point(0.5, 0.5);  
-    }    
+    } else {
+      this.actor.scale_center_x =  0.5;
+      this.actor.scale_center_y =  0.5;
+    }
     let constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.X, 0.0);
     this.actor.add_constraint_with_name("x-bind", constraint);
     constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.Y, 0.0);
@@ -64,7 +65,10 @@ MoveFocus.prototype = {
 
 
     // quite dirty
-    this._isVersion14 = imports.misc.config.PACKAGE_VERSION.indexOf("3.14") == 0;
+    let version = imports.misc.config.PACKAGE_VERSION;
+    version = version.split(".");
+    version = new Number(version[1]);
+    this._isVersion14 = version >= 14;
 
     this._settingObject = this._utils.getSettingsObject();
     this._settingsChangedListener = {
@@ -263,6 +267,10 @@ MoveFocus.prototype = {
     }
 
 		let focusWin = global.display.focus_window;
+    if (focusWin == null) {
+      return;
+    }
+
 		let screen = global.screen;
     let display = screen.get_display();
 
@@ -272,9 +280,10 @@ MoveFocus.prototype = {
     } else {
       allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace()));
     }
-    
+
 		focusWin.lower();
 		let focusRect = focusWin.get_dimension();
+
 		for (let i=(allWin.length-1); i>=0; i--) {
       if (allWin[i] == focusWin || allWin[i].is_hidden()) {
         continue;
