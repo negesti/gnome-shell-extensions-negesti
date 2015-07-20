@@ -933,9 +933,17 @@ function init(meta) {
 function enable() {
   // Meta.Window.get_dimension()
   let api14 = imports.misc.config.PACKAGE_VERSION.indexOf("3.14") == 0;
+  this.original_get_frame_rect = Meta.Window.prototype.get_frame_rect;
+  this.original_get_center = Meta.Window.prototype.get_center;
+  this.original_get_dimension = Meta.Window.prototype.get_dimension;
+
+
   if (api14) {
     Meta.Window.prototype.get_dimension = function() {
       return this.get_frame_rect();
+    }
+    if (typeof(Meta.Window.prototype.get_frame_rect) == "undefined") {
+      Meta.Window.prototype.get_frame_rect = Meta.Window.prototype.get_outer_rect;
     }
   } else {
     Meta.Window.prototype.get_dimension = function() {
@@ -953,8 +961,9 @@ function enable() {
 
 function disable() {
   // remove monkey patches
-  Meta.Window.prototype.get_dimension = undefined;
-  Meta.Window.prototype.get_center = undefined;
+  Meta.Window.prototype.get_dimension = this.original_get_frame_rect;
+  Meta.Window.prototype.get_center = this.original_get_center;
+  Meta.Window.prototype.get_frame_rect = this.original_get_frame_rect;
   
   this._moveWindow.destroy();
 };
