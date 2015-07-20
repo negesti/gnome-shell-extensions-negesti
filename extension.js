@@ -939,11 +939,11 @@ function enable() {
 
 
   if (api14) {
-    Meta.Window.prototype.get_dimension = function() {
-      return this.get_frame_rect();
-    }
     if (typeof(Meta.Window.prototype.get_frame_rect) == "undefined") {
       Meta.Window.prototype.get_frame_rect = Meta.Window.prototype.get_outer_rect;
+    }
+    Meta.Window.prototype.get_dimension = function() {
+      return this.get_frame_rect();
     }
   } else {
     Meta.Window.prototype.get_dimension = function() {
@@ -959,11 +959,12 @@ function enable() {
   this._moveWindow = new MoveWindow();
 };
 
-function disable() {
+function disable() {  
   // remove monkey patches
+  Meta.Window.prototype.get_frame_rect = this.original_get_frame_rect;
   Meta.Window.prototype.get_dimension = this.original_get_frame_rect;
   Meta.Window.prototype.get_center = this.original_get_center;
-  Meta.Window.prototype.get_frame_rect = this.original_get_frame_rect;
+  
   
   this._moveWindow.destroy();
 };
