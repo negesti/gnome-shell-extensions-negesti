@@ -9,6 +9,7 @@ const Shell = imports.gi.Shell;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
 const MoveFocus = Extension.imports.moveFocus;
+const MoveWorkspace = Extension.imports.moveWorkspace;
 
 /**
  * Thanks to:
@@ -892,6 +893,7 @@ MoveWindow.prototype = {
     );
 
     this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils, this._screens);
+    this._moveWorkspacePlugin = new MoveWorkspace.MoveWorkspace(this._utils);
   },
 
   /**
@@ -923,6 +925,10 @@ MoveWindow.prototype = {
     this._utils.destroy();
     if (this._moveFocusPlugin) {
       this._moveFocusPlugin.destroy();
+    }
+
+    if (this_moveWorkspacePlugin) {
+      this_moveWorkspacePlugin.destroy();
     }
   }
 }

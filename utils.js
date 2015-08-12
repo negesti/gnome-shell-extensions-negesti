@@ -27,6 +27,8 @@ Utils.prototype = {
 
   MOVE_FOCUS_ENABLED: "move-focus-enabled",
 
+  ENABLE_MOVE_WORKSPACE: "enable-move-workspace", 
+
   INTELLIGENT_CORNER_MOVEMENT: "intelligent-corner-movement",
 
   START_CONFIG: {
