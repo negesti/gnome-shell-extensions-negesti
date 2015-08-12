@@ -927,8 +927,8 @@ MoveWindow.prototype = {
       this._moveFocusPlugin.destroy();
     }
 
-    if (this_moveWorkspacePlugin) {
-      this_moveWorkspacePlugin.destroy();
+    if (this._moveWorkspacePlugin) {
+      this._moveWorkspacePlugin.destroy();
     }
   }
 }
