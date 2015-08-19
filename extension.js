@@ -767,14 +767,18 @@ MoveWindow.prototype = {
     rect.x = x;
     rect.y = y;
 
-    // dont know why but if the function is 
-    // available, no padding calculation is needed...
-    if (win.client_rect_to_frame_rect) {
+    if (win.decorated && win.client_rect_to_frame_rect) {
       return win.client_rect_to_frame_rect(rect);
     }
 
     let outer = win.get_dimension();
-    let inner = win.get_rect();
+    let inner;
+    if (win.get_rect) {
+      inner = win.get_rect();
+    } else {
+      inner = win.get_dimension();
+    }
+
     rect.width =  rect.width - (outer.width - inner.width);
     rect.height = rect.height - (outer.height - inner.height)
     
