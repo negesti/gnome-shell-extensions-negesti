@@ -770,8 +770,7 @@ MoveWindow.prototype = {
     // dont know why but if the function is 
     // available, no padding calculation is needed...
     if (win.client_rect_to_frame_rect) {
-      return ret;
-      //return win.client_rect_to_frame_rect(rect);
+      return win.client_rect_to_frame_rect(rect);
     }
 
     let outer = win.get_dimension();
