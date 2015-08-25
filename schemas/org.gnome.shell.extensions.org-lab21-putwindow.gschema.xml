@@ -201,23 +201,23 @@
       <summary>Enable/Disable the MoveFocus feature</summary>
     </key>
     <key type="as" name="move-focus-cycle">
-      <default><![CDATA[['<Super>o']]]></default>
+      <default><![CDATA[['<Shift><Super>o']]]></default>
       <summary>Cycle through windows at the same postition</summary>
     </key>
     <key type="as" name="move-focus-north">
-      <default><![CDATA[['<Super>i']]]></default>
+      <default><![CDATA[['<Shift><Super>i']]]></default>
       <summary>Focus the window that's north of the current</summary>
     </key>
     <key type="as" name="move-focus-east">
-      <default><![CDATA[['<Super>l']]]></default>
+      <default><![CDATA[['<Shift><Super>l']]]></default>
       <summary>Focus the window that's east of the current</summary>
     </key>
     <key type="as" name="move-focus-south">
-      <default><![CDATA[['<Super>k']]]></default>
+      <default><![CDATA[['<Shift><Super>k']]]></default>
       <summary>Focus the window that's south of the current</summary>
     </key>
     <key type="as" name="move-focus-west">
-      <default><![CDATA[['<Super>j']]]></default>
+      <default><![CDATA[['<Shift><Super>j']]]></default>
       <summary>Focus the window that's west of the current</summary>
     </key>
     <key type="as" name="move-focus-left-screen">
