@@ -412,6 +412,21 @@ const PutWindowSettingsWidget = new GObject.Class({
       }
 
       let name = model.get_value(iterator, 1);
+      let existingBinding = Utils.keyboardBindingExists(name, value);
+      if (existingBinding) {
+        var md = new Gtk.MessageDialog({
+          modal:true,
+          message_type: Gtk.MessageType.WARNING,
+          buttons:Gtk. ButtonsType.OK,
+          title: "Keyboard binding alread defined",
+          text: "The binding is alread used by " + existingBinding
+        });
+
+        md.run();
+        md.destroy();
+        return;
+      }
+      
 
       model.set(iterator, [ 3, 4], [ mods, key ]);
       Utils.set_strv(name, [value]);
@@ -427,7 +442,6 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     return treeview;
   }
-
 
 });
 
@@ -804,11 +818,10 @@ const PutWindowLocationWidget = new GObject.Class({
 
 
 function init() {
-
 }
 
 function buildPrefsWidget() {
-    let widget = new PutWindowSettingsWidget();
-    widget.show_all();
-    return widget;
+  let widget = new PutWindowSettingsWidget();
+  widget.show_all();
+  return widget;
 };

@@ -14,6 +14,7 @@ Utils.prototype = {
   _settings: "",
 
   _changeEventListeners: [],
+  _gnomeBindings: null,
 
   CENTER_WIDTH: "center-width",
   CENTER_HEIGHT: "center-height",
@@ -92,6 +93,64 @@ Utils.prototype = {
       centerHeight: this._settingsObject.get_int("center-height"),
       locations: JSON.parse(this._settingsObject.get_string("locations"))
     };
+
+
+    
+  },
+
+  _loadGlobalBindings: function() {
+    this._gnomeBindings = new Gio.Settings({
+      settings_schema: Gio.SettingsSchemaSource.get_default().lookup("org.gnome.desktop.wm.keybindings", false)
+    });
+    this._mutterBindings = new Gio.Settings({
+      settings_schema: Gio.SettingsSchemaSource.get_default().lookup("org.gnome.mutter.keybindings", false)
+    });
+  },
+
+  keyboardBindingExists: function (key, value) {
+    if (this._gnomeBindings == null) {
+      this._loadGlobalBindings();
+    }
+    
+    let bindingSource = "PutWindow: ";
+    // compare with other extension settings
+    let keys = this._settingsObject.list_keys();
+    for (let i=0; i< keys.length; i++) {
+      // dont compare with our self
+      if (keys[i] == key) { 
+        continue
+      }
+
+      if (keys[i].indexOf("move-") != 0 && keys[i].indexOf("put-") != 0 ) {
+        continue;
+      }
+
+      if (keys[i].length > 7 && keys[i].substr(-7) == "enabled") {
+        continue;
+      }
+
+      if (value == this.get_strv(keys[i])) {
+        return bindingSource + keys[i]           
+      }
+    }
+
+    bindingSource = "GNOME Shell: ";
+    keys = this._gnomeBindings.list_keys();
+    for (let i=0; i< keys.length; i++) {
+      if (value == this._gnomeBindings.get_strv(keys[i])) {
+        return bindingSource + keys[i];
+      }
+    }
+
+    bindingSource = "Mutter: ";
+    keys = this._mutterBindings.list_keys();
+    for (let i=0; i< keys.length; i++) {
+      if (value == this._mutterBindings.get_strv(keys[i])) {
+        return bindingSource + keys[i];
+      }
+    }
+
+    return false;
   },
 
   saveSettings: function() {
@@ -99,8 +158,6 @@ Utils.prototype = {
       this._settingsObject.set_int("center-width", this.getNumber(this.CENTER_WIDTH));
       this._settingsObject.set_int("center-height", this.getNumber(this.CENTER_HEIGHT));
       this._settingsObject.set_string("locations", JSON.stringify(this._settings.locations));
-      // sometimes the shell hangs after the gtk messagebox is displayed :(
-      // this.showMessage("Success!", "Changes successfully saved");
     } catch (e) {
       this.showErrorMessage("Error saving settings ", e);
     }
