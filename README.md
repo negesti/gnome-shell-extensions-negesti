@@ -8,6 +8,14 @@ grid plugin.
 
 [![Friend of GNOME](http://www-old.gnome.org/friends/banners/friends-of-gnome.png)](http://www.gnome.org/friends/ "Friend of GNOME")
 
+Contributors
+-------------
+ * krlmr - Move to other display
+ * 73 - Move focus 
+ * Anthony25 - gnome-shell 3.12 support
+ * airtonix - gnome-shell 3.5 support
+ * zara86 - gnom-shell 3.16 support
+
 Configuration
 -------------
 
@@ -20,6 +28,15 @@ The extension can be configured using the gnome prefs tool.
   * move-focus-north/east/south/west using super + i/l/k/j (default)
  * Application based config (hit the save button)
 
+Wnck
+-----
+For application base configuration the extension requires the wnck library. If wnck is not installed, you can not open
+the preferences window
+
+* Suse: `sudo zypper in libwnck-devel`
+* Arch: `pacman -S libwnck3`
+* Fedora: `sudo yum install libwnck3` (should be installed on F19)
+* Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
 Keybindings
 -----------
@@ -70,6 +87,10 @@ and only if windows was at side_e (or side_w) before. eg.
 
 ChangeLog
 -------
+
+__June 24, 2014__
+* support gnome-shell 3.12
+* #56 allow the user to disable keybindings
 
 __October 6, 2013__
  * Conributed by  @krlmlr 

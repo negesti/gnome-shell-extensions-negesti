@@ -34,22 +34,23 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.parent(params);
     this.orientation = Gtk.Orientation.VERTICAL;
     this.hexpand = true;
+    this.tab_pos = Gtk.PositionType.LEFT;
     this._wnckScreen = Wnck.Screen.get_default();
 
     this.append_page(this._generateMainSettings(), new Gtk.Label({label: "<b>Main</b>",
-        halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+        halign:Gtk.Align.START, margin_top: 0, use_markup: true}));
 
     this.append_page(this._createPositionSettings(), new Gtk.Label({label: "<b>Width &amp; Height</b>",
-        halign:Gtk.Align.START, margin_left:2, use_markup: true}));
+        halign:Gtk.Align.START, use_markup: true}));
 
     this.append_page(this._createKeyboardConfig(), new Gtk.Label({label: "<b>Keyboard Shortcuts</b>",
-         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+         halign:Gtk.Align.START, use_markup: true}));
 
     this.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>Move Focus</b>",
-         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+         halign:Gtk.Align.START, use_markup: true}));
 
     this.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>Applications</b>",
-         halign:Gtk.Align.START, margin_left: 4, use_markup: true}));
+         halign:Gtk.Align.START, use_markup: true}));
   },
 
   _createCornerChangesCombo: function() {
@@ -118,7 +119,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "Always use multiple widths:",
+      label: "Always use multiple widths/heights:",
       tooltip_text:"Disable this option to move to other screen if possible",
     }), 0, row, 4, 1);
 
@@ -150,6 +151,30 @@ const PutWindowSettingsWidget = new GObject.Class({
     let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
     intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.INTELLIGENT_CORNER_MOVEMENT, false));
     intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.INTELLIGENT_CORNER_MOVEMENT, obj.get_active()); });
+    ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
+
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      margin_left: 10,
+      label: "Keep width when moving north/south:",
+      tooltip_text: "Windows will not change there width when moved north or south",
+    }), 0, row, 4, 1);
+
+    let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_WIDTH, false));
+    intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_WIDTH, obj.get_active()); });
+    ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
+
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      margin_left: 10,
+      label: "Keep height when moving east/west:",
+      tooltip_text: "Windows will not change there height when moved east or west",
+    }), 0, row, 4, 1);
+
+    let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_HEIGHT, false));
+    intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_HEIGHT, obj.get_active()); });
     ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
@@ -262,20 +287,48 @@ const PutWindowSettingsWidget = new GObject.Class({
     });
     description.set_line_wrap(true);
     ret.attach(description, 0, row++, 5, 1);
+  
+    let labels = [
+      "Enable 'Move focus'",
+      "Enable cycle through windows at the same postition",
+      "Enable focus the window that's north of the current",
+      "Enable focus the window that's east of the current",
+      "Enable focus the window that's south of the current",
+      "Enable focus the window that's west of the current",
+      "Enable move the focus to the left screen",
+      "Enable move the focus to the right screen"
+    ];
 
-    ret.attach(new Gtk.Label({
-      halign: Gtk.Align.START,
-      margin_left: 4,
-      label: "Enable 'Move focus':"
-    }), 0, row, 4, 1);
+     let configNames = [
+      Utils.MOVE_FOCUS_ENABLED,
+      "move-focus-cycle-enabled",
+      "move-focus-north-enabled",
+      "move-focus-east-enabled",
+      "move-focus-south-enabled",
+      "move-focus-west-enabled",
+      "move-focus-left-screen-enabled",
+      "move-focus-right-screen-enabled",
+    ];
 
-    let enabledSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END, vexpand: false});
-    enabledSwitch.set_active(Utils.getBoolean(Utils.MOVE_FOCUS_ENABLED, false));
-    enabledSwitch.connect("notify::active", function(obj) {
-      Utils.setParameter(Utils.MOVE_FOCUS_ENABLED, obj.get_active());
-    });
-    ret.attach(enabledSwitch, 4, row++, 1, 1);
+    for (let i=0; i<labels.length; i++) {
+      ret.attach(new Gtk.Label({
+        halign: Gtk.Align.START,
+        margin_left: 4,
+        label: labels[i] + ":"
+      }), 0, row, 4, 1);
 
+      let enabledSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END, vexpand: false});
+      enabledSwitch.set_active(Utils.getBoolean(configNames[i], true));
+
+      enabledSwitch.connect("notify::active", Lang.bind(
+        {configName: configNames[i]}, // funny scope, but works :)
+        function(obj) {
+        Utils.setParameter(this.configName, obj.get_active());
+      }));
+      ret.attach(enabledSwitch, 4, row++, 1, 1);  
+    }
+   
+    
     ret.attach(new Gtk.Label({label: "<b>Keyboard bindings</b>", halign:Gtk.Align.START, margin_left: 4, margin_top: 5, use_markup: true}), 0, row++, 5, 1);
     ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_left: 4, margin_top: 4, margin_bottom: 4}), 0, row++, 5, 1);
 
@@ -284,7 +337,9 @@ const PutWindowSettingsWidget = new GObject.Class({
       "move-focus-east": "Move the window focus right",
       "move-focus-south": "Move the window focus down",
       "move-focus-west": "Move the window focus left",
-      "move-focus-cycle": "Push focused window to the background"
+      "move-focus-cycle": "Push focused window to the background",
+      "move-focus-left-screen": "Move the focus to the left screen",
+      "move-focus-right-screen": "Move the focus to the right screen"
     });
     ret.attach(keyBinding, 0, row, 5, 1);
 
@@ -296,6 +351,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     let name, model = new Gtk.ListStore();
 
     model.set_column_types([
+      GObject.TYPE_BOOLEAN,
       GObject.TYPE_STRING,
       GObject.TYPE_STRING,
       GObject.TYPE_INT,
@@ -305,7 +361,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     for (name in bindings) {
       let [key, mods] = Gtk.accelerator_parse(Utils.get_strv(name, null)[0]);
       let row = model.insert(10);
-      model.set(row, [0, 1, 2, 3], [name, bindings[name], mods, key ]);
+      model.set(row, [0, 1, 2, 3, 4], [Utils.getBoolean(name + "-enabled"), name, bindings[name], mods, key ]);
     }
 
     let treeview = new Gtk.TreeView({
@@ -314,11 +370,31 @@ const PutWindowSettingsWidget = new GObject.Class({
       margin: 4
     });
 
-    // Action column
-    let cellrend = new Gtk.CellRendererText();
-    let col = new Gtk.TreeViewColumn({ 'title': 'Action', 'expand': true });
+    // enabled column
+    let cellrend = new Gtk.CellRendererToggle({'radio': false, 'activatable': true});
+    let col = new Gtk.TreeViewColumn({ 'title': 'Enabled', 'expand': false});
     col.pack_start(cellrend, true);
-    col.add_attribute(cellrend, 'text', 1);
+    col.add_attribute(cellrend, 'active', 0);
+
+    cellrend.connect("toggled", function(toggle, iter) {
+        let [succ, iterator ] = model.get_iter_from_string(iter);
+        var value = !model.get_value(iterator, 0);
+        model.set(iterator, [0], [value]);
+        toggle.set_active(value);
+
+        let name = model.get_value(iterator, 1);
+        Utils.setParameter(name + "-enabled", value ? 1 : 0);
+
+    });
+
+    treeview.append_column(col);
+
+
+    // Action column
+    cellrend = new Gtk.CellRendererText();
+    col = new Gtk.TreeViewColumn({ 'title': 'Action', 'expand': true});
+    col.pack_start(cellrend, true);
+    col.add_attribute(cellrend, 'text', 2);
     treeview.append_column(col);
 
     // keybinding column
@@ -335,23 +411,37 @@ const PutWindowSettingsWidget = new GObject.Class({
         throw new Error("Error updating Keybinding");
       }
 
-      let name = model.get_value(iterator, 0);
+      let name = model.get_value(iterator, 1);
+      let existingBinding = Utils.keyboardBindingExists(name, value);
+      if (existingBinding) {
+        var md = new Gtk.MessageDialog({
+          modal:true,
+          message_type: Gtk.MessageType.WARNING,
+          buttons:Gtk. ButtonsType.OK,
+          title: "Keyboard binding alread defined",
+          text: "The binding is alread used by " + existingBinding
+        });
 
-      model.set(iterator, [ 2, 3], [ mods, key ]);
+        md.run();
+        md.destroy();
+        return;
+      }
+      
+
+      model.set(iterator, [ 3, 4], [ mods, key ]);
       Utils.set_strv(name, [value]);
     });
 
     col = new Gtk.TreeViewColumn({'title': 'Modify'});
 
     col.pack_end(cellrend, false);
-    col.add_attribute(cellrend, 'accel-mods', 2);
-    col.add_attribute(cellrend, 'accel-key', 3);
+    col.add_attribute(cellrend, 'accel-mods', 3);
+    col.add_attribute(cellrend, 'accel-key', 4);
 
     treeview.append_column(col);
 
     return treeview;
   }
-
 
 });
 
@@ -728,11 +818,10 @@ const PutWindowLocationWidget = new GObject.Class({
 
 
 function init() {
-
 }
 
 function buildPrefsWidget() {
-    let widget = new PutWindowSettingsWidget();
-    widget.show_all();
-    return widget;
+  let widget = new PutWindowSettingsWidget();
+  widget.show_all();
+  return widget;
 };

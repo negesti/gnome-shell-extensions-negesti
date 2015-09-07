@@ -3,6 +3,7 @@ const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+const Mainloop = imports.mainloop;
 const Shell = imports.gi.Shell;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
@@ -35,13 +36,21 @@ MoveWindow.prototype = {
 
   _screens: [],
 
+  focusListener: null,
+
   /**
    * Helper functions to set custom handler for keybindings
    */
   _addKeyBinding: function(key, handler) {
     this._bindings.push(key);
 
-    if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
+	if (Main.wm.addKeybinding && Shell.ActionMode){ // introduced in 3.16
+      Main.wm.addKeybinding(key,
+        this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
+        Shell.ActionMode.NORMAL,
+        handler
+      );
+    } else if (Main.wm.addKeybinding && Shell.KeyBindingMode) { // introduced in 3.7.5
       // Shell.KeyBindingMode.NORMAL | Shell.KeyBindingMode.MESSAGE_TRAY,
       Main.wm.addKeybinding(key,
         this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
@@ -59,6 +68,13 @@ MoveWindow.prototype = {
   },
 
   _getTopPanelHeight: function() {
+
+    // 0 means hidden, 255 is visible
+    let opacity = Main.panel.actor.get_paint_opacity();
+    if (opacity == 0) {
+      return 0;
+    }
+
     return Main.panel.actor.y + Main.panel.actor.height;
   },
 
@@ -121,19 +137,29 @@ MoveWindow.prototype = {
   _getCurrentScreenIndex: function(win) {
 
     // left edge is sometimes -1px...
-    let pos = win.get_outer_rect();
+    let pos = win.get_frame_rect();
     pos.x = pos.x < 0 ? 0 : pos.x;
 
     let sl = this._screens.length;
-    for (let i=0; i<sl; i++) {
+    for (let i=0; i < sl; i++) {
       if (i == sl-1) {
         return i;
       }
-      if (this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x) {
+
+      if (!this._isVerticalScreenSetup && this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x ) {
+        return i;
+      } else if (this._isVerticalScreenSetup && this._screens[i].y <= pos.y && this._screens[(i+1)].y > pos.y ) {
         return i;
       }
     }
+
     return this._primary;
+  },
+
+  moveToScreen: function(direction) {
+    if (this._utils.getBoolean("put-to-" + direction +"-screen-enabled", true)) {
+      this._moveToScreen(direction);
+    }
   },
 
   /**
@@ -142,6 +168,7 @@ MoveWindow.prototype = {
    * @return true, if it was possible to move the focused window in the given direction
    */
   _moveToScreen: function(direction) {
+
     let win = global.display.focus_window;
     if (win == null) {
       return false;
@@ -153,17 +180,17 @@ MoveWindow.prototype = {
     let old = {
       primary: this._screens[screenIndex].primary,
       x: this._screens[screenIndex].x,
+      y: this._screens[screenIndex].y,
       totalWidth: this._screens[screenIndex].totalWidth,
       totalHeight: this._screens[screenIndex].totalHeight
     };
-
     if ((direction == "right" || direction == "e") && screenIndex < (this._screens.length - 1)) {
       s = this._screens[screenIndex + 1];
       s = this._recalculateSizes(s);
     }
 
     if ((direction == "left" || direction == "w") && screenIndex > 0) {
-      s = this._screens[screenIndex -1];
+      s = this._screens[screenIndex - 1];
       s = this._recalculateSizes(s);
     }
 
@@ -181,7 +208,7 @@ MoveWindow.prototype = {
         win.unmaximize(wasMaximizeFlags);
       }
 
-      let position = win.get_outer_rect();
+      let position = win.get_frame_rect();
 
       let xRatio = s.totalWidth / old.totalWidth;
       let x = s.x + (position.x - old.x) * xRatio;
@@ -191,29 +218,29 @@ MoveWindow.prototype = {
       }
 
       let yRatio = s.totalHeight / old.totalHeight;
+
       let height = position.height;
       // we are moving away from the primary screen and topPanel is visible,
       // e.g. height was max but is smaller then the totalHeight because of topPanel height
       if (old.primary) {
-        height += Main.panel.actor.height;
+        height += this._getTopPanelHeight();
       }
       height *= yRatio;
       if (s.primary) {
-        height -= Main.panel.actor.height;
+        height -= this._getTopPanelHeight();
       }
 
       if (height >= s.totalHeight) {
         wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
       }
 
-      let y = position.y;
+      let y = s.y + (position.y - old.y) * yRatio;
       // add/remove the top panel offset to the y position
       if (old.primary) {
-        y -= Main.panel.actor.height;
+        y -= this._getTopPanelHeight();
       }
-      y *= yRatio;
       if (s.primary) {
-        y += Main.panel.actor.height;
+        y += this._getTopPanelHeight();
       }
       if (y < 0) {
         y = 0;
@@ -242,7 +269,7 @@ MoveWindow.prototype = {
   _moveToSide: function(win, screenIndex, direction) {
 
     let s = this._screens[screenIndex];
-    let pos = win.get_outer_rect();
+    let pos = win.get_frame_rect();
     let sizes = direction == "e" ? s.east : s.west;
 
     if (win.maximized_horizontally && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
@@ -256,10 +283,12 @@ MoveWindow.prototype = {
     }
 
     let useIndex = 0;
+    let moveToOtherScreen = false
     for ( let i=0; i < sizes.length; i++) {
       if (this._samePoint(pos.width, sizes[i].width) && this._samePoint(pos.x, sizes[i].x)) {
         useIndex = i + 1;
         if (useIndex >= sizes.length) {
+          moveToOtherScreen = true;
           useIndex =  0;
         }
         break;
@@ -270,10 +299,10 @@ MoveWindow.prototype = {
     let canMoveScreen = screenIndex > 0;
     if (direction == "e") {
       otherDirection = "w";
-      canMoveScreen = screenIndex < (this._screens.length - 1);
+      canMoveScreen = !this._isVerticalScreenSetup && screenIndex < (this._screens.length - 1);
     }
 
-    if (useIndex > 0 && canMoveScreen && !this._utils.getBoolean(this._utils.ALWAYS_USE_WIDTHS)) {
+    if (moveToOtherScreen && canMoveScreen && !this._utils.getBoolean(this._utils.ALWAYS_USE_WIDTHS)) {
       // moved in this direction more then once, if a screen exists, move the window there
       if (useIndex > 1) {
         // the window was moved here from an other screen, just resize it
@@ -286,12 +315,16 @@ MoveWindow.prototype = {
       }
     }
 
-    this._resize(win, sizes[useIndex].x, s.y, sizes[useIndex].width, s.totalHeight * -1);
+    if (this._utils.getBoolean(this._utils.ALWAYS_KEEP_HEIGHT, false)) {
+      this._resize(win, sizes[useIndex].x, pos.y, sizes[useIndex].width, pos.height);
+    } else {
+      this._resize(win, sizes[useIndex].x, s.y, sizes[useIndex].width, s.totalHeight * -1);
+    }
   },
 
   _moveNorthSouth: function(win, screenIndex, direction) {
     let s = this._screens[screenIndex];
-    let pos = win.get_outer_rect();
+    let pos = win.get_frame_rect();
     let sizes = direction == "n" ? s.north : s.south;
 
     if ( win.maximized_vertically && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
@@ -315,12 +348,35 @@ MoveWindow.prototype = {
       }
     }
 
+    let canMoveScreen = screenIndex > 0;
+    let screenMoveDirection = direction == "s" ? "e" : "w";
+    if (direction == "s") {
+      canMoveScreen = this._isVerticalScreenSetup && screenIndex < (this._screens.length - 1);
+    }
+
+    if (useIndex > 0 && canMoveScreen && !this._utils.getBoolean(this._utils.ALWAYS_USE_WIDTHS)) {
+      // moved in this direction more then once, if a screen exists, move the window there
+      if (useIndex > 1) {
+        // the window was moved here from an other screen, just resize it
+        useIndex = 0;
+      } else {
+        // moving to other screen is possible, move to screen and resize afterwards
+        this._moveToScreen(screenMoveDirection);
+        this._moveFocused(direction == "s" ? "n" : "s");
+        return;
+      }
+    }
+
     if (this._utils.getBoolean(this._utils.CENTER_KEEP_WIDTH, false) && this._isCenterWidth(screenIndex, pos)) {
       this._resize(win, pos.x, sizes[useIndex].y, pos.width, sizes[useIndex].height);
       return;
     }
 
-    this._resize(win, s.x, sizes[useIndex].y, s.totalWidth * -1, sizes[useIndex].height);
+    if (this._utils.getBoolean(this._utils.ALWAYS_KEEP_WIDTH, false)) {
+      this._resize(win, pos.x, sizes[useIndex].y, pos.width, sizes[useIndex].height);
+    } else {
+      this._resize(win, s.x, sizes[useIndex].y, s.totalWidth * -1, sizes[useIndex].height);
+    }
   },
 
   _isCenterWidth: function(screenIndex, pos) {
@@ -341,7 +397,7 @@ MoveWindow.prototype = {
     keepHeight = keepHeight || false;
 
     let s = this._screens[screenIndex];
-    let pos = win.get_outer_rect();
+    let pos = win.get_frame_rect();
     let sameWidth = false;
     let sameHeight = false;
 
@@ -445,7 +501,7 @@ MoveWindow.prototype = {
 
   _moveToCornerKeepSize: function(win, screenIndex, direction) {
     let s = this._screens[screenIndex];
-    let pos = win.get_outer_rect();
+    let pos = win.get_frame_rect();
 
     let x,y;
 
@@ -466,12 +522,34 @@ MoveWindow.prototype = {
       return false;
     }
 
-    if (win.decorated) {
-      win.move_frame(true, x, y);
-    } else {
-      win.move(true, x, y);
-    }
+    win.move_frame(true, x, y);
     return true;
+  },
+
+
+  /**
+   * _moveFocused is called internal when for example moving between screens.
+   * The -enabled flag should only be checked, if the method is called because of the keybinding. 
+   * e.g. Internal calls should not check the config.
+   */
+  moveFocused: function(where) {
+
+    if ("e,s,w,n".indexOf(where) != -1) {
+      if (!this._utils.getBoolean("put-to-side-" + where + "-enabled", true)) {
+        return;
+      }
+    } else if ("ne,se,sw,nw".indexOf(where) != -1) {
+     if (!this._utils.getBoolean("put-to-corner-" + where + "-enabled", true)) {
+        return;
+      } 
+    } else if ("c" == where) {
+      if (!this._utils.getBoolean("put-to-center-enabled", true)) {
+        return;
+      }
+    }
+
+    this._moveFocused(where);
+
   },
 
   /**
@@ -489,12 +567,23 @@ MoveWindow.prototype = {
     s = this._recalculateSizes(s);
 
     if (where == "c") {
-      let pos = win.get_outer_rect();
-      let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH, 50) / 100),
-        h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT, 50) / 100),
+      let pos = win.get_frame_rect(),
+        centerWidth = this._utils.getNumber(this._utils.CENTER_WIDTH, 50),
+        centerHeight = this._utils.getNumber(this._utils.CENTER_HEIGHT, 50);
+
+
+      let w = s.totalWidth * (centerWidth / 100),
+        h = s.totalHeight * (centerHeight / 100),
         x = s.x + (s.totalWidth - w) / 2,
         y = s.y + (s.totalHeight - h) / 2,
         sameHeight = this._samePoint(h, pos.height);
+
+      if (centerWidth == 100) {
+        w *= -1;
+      }
+      if (centerHeight == 100) {
+        h *= -1;
+      }
 
       if (this._utils.getBoolean(this._utils.REVERSE_MOVE_CENTER, false)) {
         if (win.maximized_horizontally && win.maximized_vertically) {
@@ -523,7 +612,12 @@ MoveWindow.prototype = {
   },
 
   _moveConfiguredWhenCreated: function(display, win, noRecurse) {
-    if (!this._windowTracker.is_window_interesting(win)) {
+
+    if (this._windowTracker.is_window_interesting) {
+      if (!this._windowTracker.is_window_interesting(win)) {
+        return false;
+      }
+    } else if (!win.skip_taskbar) {
       return false;
     }
 
@@ -545,11 +639,21 @@ MoveWindow.prototype = {
 
     if (this._utils.getParameter(appPath, false)) {
       if (this._utils.getBoolean(appPath + ".autoMove", false)) {
-        this._moveToConfiguredLocation(win, app);
+      	this.focusListener = win.connect("focus",
+      	  Lang.bind(this, function() {
+            this._moveToConfiguredLocation(win, app);
+          })
+      	);
         return true;
       }
     }
     return false;
+  },
+
+  moveToConfiguredLocation: function(win, appName) {
+    if (this._utils.getBoolean("put-to-location-enabled", true)) {
+      this._moveToConfiguredLocation(win, appName);
+    }
   },
 
   /**
@@ -565,6 +669,12 @@ MoveWindow.prototype = {
 
       appName = win.get_wm_class();
     }
+
+    if (this.focusListener != null) {
+      win.disconnect(this.focusListener);
+      this.focusListener = null;
+    }
+
     let config = this._utils.getParameter("locations." + appName, false);
 
     // no config for appName. maybe we have a config for "all"
@@ -639,26 +749,44 @@ MoveWindow.prototype = {
       win.unmaximize(unMaximizeFlags)
     }
 
-    // snap, x, y
-    if (win.decorated) {
-      win.move_frame(true, x, y);
-    } else {
-      win.move(true, x, y);
-    }
+    let targetRectangle = this._getRectangle(win, x, y, width, height);
 
-    let padding = this._getPadding(win);
-    // snap, width, height, force
-    win.resize(true, width - padding.width, height - padding.height);
+    // user_operation, width, height, force
+    win.move_resize_frame(false, 
+      targetRectangle.x,
+      targetRectangle.y,
+      targetRectangle.width, 
+      targetRectangle.height);
   },
 
   // the difference between input and outer rect as object.
-  _getPadding: function(win) {
-    let outer = win.get_outer_rect();
-    let inner = win.get_rect();
-    return {
-      width: (outer.width - inner.width),
-      height: (outer.height - inner.height)
-    };
+  _getRectangle: function(win, x, y, width, height) {
+    let rect = new Meta.Rectangle();
+    rect.width = width;
+    rect.height = height;
+    rect.x = x;
+    rect.y = y;
+
+    // mutter already works with frame_rect, no need to calculate padding
+    if (win.client_rect_to_frame_rect) {
+      return rect;
+    }
+
+
+    let outer = win.get_frame_rect();
+    if (win.get_outer_rect) {
+      outer = win.get_outer_rect();
+    }
+
+    let inner = win.get_frame_rect();
+    if (win.get_rect) {
+      inner = win.get_rect();
+    }
+
+    rect.width =  rect.width - (outer.width - inner.width);
+    rect.height = rect.height - (outer.height - inner.height)
+    
+    return rect;
   },
 
   counter: 0,
@@ -670,9 +798,20 @@ MoveWindow.prototype = {
 
     this._screens = [];
     // only tested with 2 screen setup
+    let sumX = 0,sumY = 0;
+
     for (let i=0; i<numMonitors; i++) {
-      let geom = global.screen.get_monitor_geometry(i);
+
+      let geom;
+      if (Main.layoutManager.getWorkAreaForMonitor) {
+        geom = Main.layoutManager.getWorkAreaForMonitor(i);
+      } else {
+        geom = global.screen.get_monitor_geometry(i)
+      }
+
       let primary = (i == this._primary);
+      sumX += geom.x;
+      sumY += geom.y;
 
       this._screens[i] =  {
         primary: primary,
@@ -688,6 +827,9 @@ MoveWindow.prototype = {
         south: []
       };
     }
+
+    this._isVerticalScreenSetup = sumX < sumY;
+
     // sort by x position. makes it easier to find the correct screen
     this._screens.sort(function(s1, s2) {
         return s1.x - s2.x;
@@ -715,50 +857,50 @@ MoveWindow.prototype = {
     this._bindings = [];
     // move to n, e, s an w
     this._addKeyBinding("put-to-side-n",
-      Lang.bind(this, function(){ this._moveFocused("n");})
+      Lang.bind(this, function(){ this.moveFocused("n");})
     );
     this._addKeyBinding("put-to-side-e",
-      Lang.bind(this, function(){ this._moveFocused("e");})
+      Lang.bind(this, function(){ this.moveFocused("e");})
     );
     this._addKeyBinding("put-to-side-s",
-      Lang.bind(this, function(){ this._moveFocused("s");})
+      Lang.bind(this, function(){ this.moveFocused("s");})
     );
     this._addKeyBinding("put-to-side-w",
-      Lang.bind(this, function(){ this._moveFocused("w");})
+      Lang.bind(this, function(){ this.moveFocused("w");})
     );
 
     // move to  nw, se, sw, nw
     this._addKeyBinding("put-to-corner-ne",
-      Lang.bind(this, function(){ this._moveFocused("ne");})
+      Lang.bind(this, function(){ this.moveFocused("ne");})
     );
     this._addKeyBinding("put-to-corner-se",
-      Lang.bind(this, function(){ this._moveFocused("se");})
+      Lang.bind(this, function(){ this.moveFocused("se");})
     );
     this._addKeyBinding("put-to-corner-sw",
-      Lang.bind(this, function(){ this._moveFocused("sw");})
+      Lang.bind(this, function(){ this.moveFocused("sw");})
     );
     this._addKeyBinding("put-to-corner-nw",
-      Lang.bind(this, function(){ this._moveFocused("nw");})
+      Lang.bind(this, function(){ this.moveFocused("nw");})
     );
 
     // move to center. fix 2 screen setup and resize to 50% 50%
     this._addKeyBinding("put-to-center",
-      Lang.bind(this, function(){ this._moveFocused("c");})
+      Lang.bind(this, function(){ this.moveFocused("c");})
     );
 
     this._addKeyBinding("put-to-location",
-      Lang.bind(this, function() { this._moveToConfiguredLocation();} )
+      Lang.bind(this, function() { this.moveToConfiguredLocation();} )
     );
 
     this._addKeyBinding("put-to-left-screen",
-      Lang.bind(this, function() { this._moveToScreen("left");} )
+      Lang.bind(this, function() { this.moveToScreen("left");} )
     );
 
     this._addKeyBinding("put-to-right-screen",
-      Lang.bind(this, function() { this._moveToScreen("right");} )
+      Lang.bind(this, function() { this.moveToScreen("right");} )
     );
 
-    this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils);
+    this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils, this._screens);
   },
 
   /**
@@ -798,9 +940,31 @@ function init(meta) {
 };
 
 function enable() {
+  this.original_get_center = Meta.Window.prototype.get_center;
+  
+  if ((typeof Meta.Window.prototype.get_frame_rect) == "undefined") {
+    this.original_get_frame_rect = Meta.Window.prototype.get_frame_rect;
+    Meta.Window.prototype.get_frame_rect = function() {
+      return this.get_outer_rect();
+    }
+  }
+
+  //Meta.Window.get_center()
+  Meta.Window.prototype.get_center = function(){
+    let rect = this.get_frame_rect();
+    return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
+  }
   this._moveWindow = new MoveWindow();
 };
 
-function disable(){
+function disable() {  
+  // remove monkey patch, get_center
+  Meta.Window.prototype.get_center = this.original_get_center;
+
+  if (this.original_get_frame_rect) { 
+    Meta.Window.prototype.get_frame_rect = this.original_get_frame_rect;
+  }
+  
+  
   this._moveWindow.destroy();
 };
