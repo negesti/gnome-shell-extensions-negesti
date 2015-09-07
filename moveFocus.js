@@ -203,7 +203,7 @@ MoveFocus.prototype = {
     let focusRect = focusWin.get_frame_rect();
 
   	let candidate = candidateWin.get_center();
-    let candidateRect = candidateWin.get_frame_rectt();
+    let candidateRect = candidateWin.get_frame_rect();
 
 		// a window is candidate if:
 		// 1. the center of the candidate window is further in the direction you want
