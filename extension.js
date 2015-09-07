@@ -397,7 +397,7 @@ MoveWindow.prototype = {
     keepHeight = keepHeight || false;
 
     let s = this._screens[screenIndex];
-    let pos = win.get_dimension();
+    let pos = win.get_frame_rect();
     let sameWidth = false;
     let sameHeight = false;
 
@@ -501,7 +501,7 @@ MoveWindow.prototype = {
 
   _moveToCornerKeepSize: function(win, screenIndex, direction) {
     let s = this._screens[screenIndex];
-    let pos = win.get_dimension();
+    let pos = win.get_frame_rect();
 
     let x,y;
 
@@ -567,7 +567,7 @@ MoveWindow.prototype = {
     s = this._recalculateSizes(s);
 
     if (where == "c") {
-      let pos = win.get_dimension(),
+      let pos = win.get_frame_rect(),
         centerWidth = this._utils.getNumber(this._utils.CENTER_WIDTH, 50),
         centerHeight = this._utils.getNumber(this._utils.CENTER_HEIGHT, 50);
 
@@ -749,7 +749,7 @@ MoveWindow.prototype = {
       win.unmaximize(unMaximizeFlags)
     }
 
-    let targetRectangle = this._getPadding(win, x, y, width, height);
+    let targetRectangle = this._getRectangle(win, x, y, width, height);
 
     // user_operation, width, height, force
     win.move_resize_frame(false, 
@@ -760,23 +760,27 @@ MoveWindow.prototype = {
   },
 
   // the difference between input and outer rect as object.
-  _getPadding: function(win, x, y, width, height) {
+  _getRectangle: function(win, x, y, width, height) {
     let rect = new Meta.Rectangle();
     rect.width = width;
     rect.height = height;
     rect.x = x;
     rect.y = y;
 
-    if (win.decorated && win.client_rect_to_frame_rect) {
-      return win.client_rect_to_frame_rect(rect);
+    // mutter already works with frame_rect, no need to calculate padding
+    if (win.client_rect_to_frame_rect) {
+      return rect;
     }
 
-    let outer = win.get_dimension();
-    let inner;
+
+    let outer = win.get_frame_rect();
+    if (win.get_outer_rect) {
+      outer = win.get_outer_rect();
+    }
+
+    let inner = win.get_frame_rect();
     if (win.get_rect) {
       inner = win.get_rect();
-    } else {
-      inner = win.get_dimension();
     }
 
     rect.width =  rect.width - (outer.width - inner.width);
@@ -936,32 +940,30 @@ function init(meta) {
 };
 
 function enable() {
-  // Meta.Window.get_dimension()
-  this.original_get_frame_rect = Meta.Window.prototype.get_frame_rect;
-  this.original_get_dimension = Meta.Window.prototype.get_dimension;
   this.original_get_center = Meta.Window.prototype.get_center;
+  
+  if ((typeof Meta.Window.prototype.get_frame_rect) == "undefined") {
+    this.original_get_frame_rect = Meta.Window.prototype.get_frame_rect;
+    Meta.Window.prototype.get_frame_rect = function() {
+      return this.get_outer_rect();
+    }
+  }
 
-  if (typeof(Meta.Window.prototype.get_frame_rect) == "undefined") {
-    Meta.Window.prototype.get_frame_rect = Meta.Window.prototype.get_outer_rect;
-  }
-  
-  Meta.Window.prototype.get_dimension = function() {
-    return this.get_frame_rect();
-  }
-  
   //Meta.Window.get_center()
   Meta.Window.prototype.get_center = function(){
-    let rect = this.get_dimension();
+    let rect = this.get_frame_rect();
     return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
   }
   this._moveWindow = new MoveWindow();
 };
 
 function disable() {  
-  // remove monkey patches
-  Meta.Window.prototype.get_frame_rect = this.original_get_frame_rect;
-  Meta.Window.prototype.get_dimension = this.original_get_frame_rect;
+  // remove monkey patch, get_center
   Meta.Window.prototype.get_center = this.original_get_center;
+
+  if (this.original_get_frame_rect) { 
+    Meta.Window.prototype.get_frame_rect = this.original_get_frame_rect;
+  }
   
   
   this._moveWindow.destroy();

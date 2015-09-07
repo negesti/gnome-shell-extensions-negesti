@@ -132,7 +132,7 @@ MoveFocus.prototype = {
   
   _flashWindow: function(window){
     let actor = window.get_compositor_private();
-    let dimension = window.get_dimension();
+    let dimension = window.get_frame_rect();
     let flashspot = new Flashspot(dimension, window);
     flashspot.fire();
     if (actor.set_pivot_point) {
@@ -200,7 +200,10 @@ MoveFocus.prototype = {
   _isCandidate: function(focusWin, candidateWin, direction){
 
   	let focus = focusWin.get_center();
+    let focusRect = focusWin.get_frame_rect();
+
   	let candidate = candidateWin.get_center();
+    let candidateRect = candidateWin.get_frame_rectt();
 
 		// a window is candidate if:
 		// 1. the center of the candidate window is further in the direction you want
@@ -215,7 +218,7 @@ MoveFocus.prototype = {
 				if (focus.y <= candidate.y){
 					return false;
 				}
-				if (focusWin.get_dimension().y <= candidateWin.get_dimension().y + this._distance_correction){
+				if (focusRect.y <= candidateRect.y + this._distance_correction){
 					return false;
 				}
 				if (Math.abs(focus.y - candidate.y)+this._angle_correction < Math.abs(focus.x - candidate.x)){
@@ -226,7 +229,7 @@ MoveFocus.prototype = {
 				if (focus.x >= candidate.x){
 					return false;
 				}
-				if (focusWin.get_dimension().x + focusWin.get_dimension().width + this._distance_correction >= candidateWin.get_dimension().x + candidateWin.get_dimension().width){
+				if (focusRect.x + focusRect.width + this._distance_correction >= candidateRect.x + candidateRect.width){
 					return false;
 				}
 				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+this._angle_correction){
@@ -237,7 +240,7 @@ MoveFocus.prototype = {
 				if (focus.y >= candidate.y){
 					return false;
 				}
-				if (focusWin.get_dimension().y + focusWin.get_dimension().height + this._distance_correction >= candidateWin.get_dimension().y + candidateWin.get_dimension().height){
+				if (focusRect.y + focusRect.height + this._distance_correction >= candidateRect.y + candidateRect.height){
 					return false;
 				}
 				if (Math.abs(focus.y - candidate.y)+this._angle_correction < Math.abs(focus.x - candidate.x)){
@@ -248,7 +251,7 @@ MoveFocus.prototype = {
 				if (focus.x <= candidate.x + this._distance_correction){
 					return false;
 				}
-				if (focusWin.get_dimension().x <= candidateWin.get_dimension().x){
+				if (focusRect.x <= candidateRect.x){
 					return false;
 				}
 				if (Math.abs(focus.y - candidate.y) > Math.abs(focus.x - candidate.x)+this._angle_correction){
@@ -282,13 +285,13 @@ MoveFocus.prototype = {
     }
 
 		focusWin.lower();
-		let focusRect = focusWin.get_dimension();
+		let focusRect = focusWin.get_frame_rect();
 
 		for (let i=(allWin.length-1); i>=0; i--) {
       if (allWin[i] == focusWin || allWin[i].is_hidden()) {
         continue;
       }
-			if (focusRect.overlap(allWin[i].get_dimension())){
+			if (focusRect.overlap(allWin[i].get_frame_rect())){
 			  this._activateWindow(allWin[i]);
 				break;
 			}
@@ -373,11 +376,11 @@ MoveFocus.prototype = {
 
   _getCurrentScreenIndex: function(win) {
     if (global.screen.get_monitor_index_for_rect) {
-      return global.screen.get_monitor_index_for_rect(win.get_dimension());
+      return global.screen.get_monitor_index_for_rect(win.get_frame_rect());
     }
 
     let screenLen = this._screens.length;
-    let winRect = win.get_dimension();
+    let winRect = win.get_frame_rect();
 
     for (let i=0; i < screenLen; i++) {
       let s = this._screens[i];
