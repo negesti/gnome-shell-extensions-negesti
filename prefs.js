@@ -125,9 +125,21 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     let alwaysSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
     alwaysSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_USE_WIDTHS, false));
-    alwaysSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active()); });
+    alwaysSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active()); });    
 
     ret.attach(alwaysSwitch, 4, row++, 1, 1);
+
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      margin_left: 10,
+      label: "Enable move to workspace:"
+    }), 0, row, 4, 1);
+
+    let workspaceSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    workspaceSwitch.set_active(Utils.getBoolean(Utils.ENABLE_MOVE_WORKSPACE, false));
+    workspaceSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ENABLE_MOVE_WORKSPACE, obj.get_active()); });
+
+    ret.attach(workspaceSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
@@ -676,6 +688,51 @@ const PutWindowLocationWidget = new GObject.Class({
     let configLocation = "locations." + appName + ".";
 
     let ret = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, margin_left: 10 });
+
+    if (Utils.getBoolean(Utils.ENABLE_MOVE_WORKSPACE, false)) {
+      let workspaceBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
+
+      workspaceBox.pack_start(new Gtk.Label({label: "Move window to workspace when created", xalign: 0}), true, true, 0);
+
+      let workspacesActive = Utils.getBoolean(configLocation + "moveWorkspace", false);
+
+      let btn = new Gtk.Switch({ active: workspacesActive });
+      btn.connect("notify::active", 
+        function(sw) {
+        Utils.setParameter(configLocation + "moveWorkspace", sw.get_active());
+        numberButton.set_sensitive(sw.get_active());
+      })
+      workspaceBox.pack_start(btn, false, false, 0);
+      ret.pack_start(workspaceBox, false, false, 0);
+
+      let workspaceIndexBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
+      let numberButton = new Gtk.SpinButton( {
+        value: Utils.getNumber(configLocation + "targetWorkspace", 1),
+        numeric: true,
+        snap_to_ticks: true,
+        adjustment: new Gtk.Adjustment({
+          lower: 1,
+          upper: 10,
+          step_increment: 1
+        })
+      });
+      numberButton.connect("changed", 
+        function(btn){
+          Utils.setParameter(configLocation + "targetWorkspace", btn.value);
+      });
+
+      numberButton.set_sensitive(workspacesActive);
+
+
+      workspaceIndexBox.pack_start(new Gtk.Label({label: "Window target workspace", xalign: 0}), true, true, 0);
+      workspaceIndexBox.pack_start(numberButton, false, false, 0);
+
+      ret.pack_start(workspaceIndexBox, false, false, 0);
+
+      ret.pack_start(
+        new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}),
+        false, false, 0);
+    }
 
     let autoMoveBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL});
     autoMoveBox.pack_start(new Gtk.Label({label: "Auto-Move window when created", xalign: 0}), true, true, 0);
