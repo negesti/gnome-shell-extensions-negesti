@@ -14,7 +14,8 @@ Contributors
  * 73 - Move focus 
  * Anthony25 - gnome-shell 3.12 support
  * airtonix - gnome-shell 3.5 support
- * zara86 - gnom-shell 3.16 support
+ * zara86 - gnome-shell 3.16 support
+ * cleverlycoding - gnome-shell 3.18 support
 
 Configuration
 -------------
