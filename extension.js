@@ -143,13 +143,9 @@ MoveWindow.prototype = {
 
     let sl = this._screens.length;
     for (let i=0; i < sl; i++) {
-      if (i == sl-1) {
-        return i;
-      }
-
-      if (!this._isVerticalScreenSetup && this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x ) {
-        return i;
-      } else if (this._isVerticalScreenSetup && this._screens[i].y <= pos.y && this._screens[(i+1)].y > pos.y ) {
+      let s = this._screens[i];
+      
+      if ((s.x <= pos.x && (s.x + s.totalWidth) > pos.x ) && (s.y <= pos.y && (s.y + s.totalHeight) > pos.y )) {
         return i;
       }
     }
