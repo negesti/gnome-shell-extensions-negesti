@@ -204,6 +204,10 @@
       <default>1</default>
       <summary>Enable/Disable the MoveFocus feature</summary>
     </key>
+    <key type="i" name="move-focus-animation">
+      <default>1</default>
+      <summary>Enable/Disable the MoveFocus animation</summary>
+    </key>
     <key type="as" name="move-focus-cycle">
       <default><![CDATA[['<Shift><Super>o']]]></default>
       <summary>Cycle through windows at the same postition</summary>

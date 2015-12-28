@@ -155,8 +155,6 @@ MoveWorkspace.prototype = {
       return;
     }
 
-    global.log("now move. recurse?" + noRecurse + " APP: " + app);
-
     app = window.get_wm_class();
     // move the window if a location is configured and autoMove is set to true
     let appPath = "locations." + app;

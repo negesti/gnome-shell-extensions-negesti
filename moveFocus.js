@@ -57,7 +57,9 @@ MoveFocus.prototype = {
   _distance_correction: 10,
 
   _bindings: [],
+  _animationEnabled: true,
   _settingsChangedListener: {},
+  _animationSettingListener: {},
 
   _init: function(utils, screens) {
     this._utils = utils;
@@ -87,6 +89,18 @@ MoveFocus.prototype = {
       'changed::' + this._utils.MOVE_FOCUS_ENABLED,
       this._settingsChangedListener.fn
     );
+
+    this._animationSettingListener = {
+      name: this._utils.MOVE_FOCUS_ANIMATION,
+      fn: Lang.bind(this, function() {
+        this._animationEnabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ANIMATION, true);
+      })
+    };
+    this._animationSettingListener.handlerId = this._settingObject.connect(
+      'changed::' + this._utils.MOVE_FOCUS_ANIMATION,
+      this._animationSettingListener.fn
+    );
+    this._animationEnabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ANIMATION, true);
 
     let enabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ENABLED, false);
     if (enabled) {
@@ -128,6 +142,9 @@ MoveFocus.prototype = {
     if (this._settingsChangedListener) {
       this._settingObject.disconnect(this._settingsChangedListener.handlerId);
     }
+    if (this._animationSettingListener) {
+      this._settingObject.disconnect(this._animationSettingListener.handlerId);
+    }
   },
   
   _flashWindow: function(window){
@@ -141,8 +158,10 @@ MoveFocus.prototype = {
     Tweener.addTween(actor, {opacity: 255, time: 1});
   },
   
-  _activateWindow: function(window){
-    this._flashWindow(window);
+  _activateWindow: function(window) {
+    if (this._animationEnabled) {
+      this._flashWindow(window);
+    }
     window.activate(global.get_current_time());
   },
 

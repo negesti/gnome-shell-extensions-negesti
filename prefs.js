@@ -302,6 +302,7 @@ const PutWindowSettingsWidget = new GObject.Class({
   
     let labels = [
       "Enable 'Move focus'",
+      "Show animation when moving",
       "Enable cycle through windows at the same postition",
       "Enable focus the window that's north of the current",
       "Enable focus the window that's east of the current",
@@ -313,6 +314,7 @@ const PutWindowSettingsWidget = new GObject.Class({
 
      let configNames = [
       Utils.MOVE_FOCUS_ENABLED,
+      Utils.MOVE_FOCUS_ANIMATION,
       "move-focus-cycle-enabled",
       "move-focus-north-enabled",
       "move-focus-east-enabled",
