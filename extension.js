@@ -85,7 +85,12 @@ MoveWindow.prototype = {
     if (Math.abs(tbHeight) <= 2) {
       tbHeight = 0;
     }
-    s.y = s.geomY + tbHeight;
+    if (s.geomY != tbHeight) {
+      s.y = s.geomY + tbHeight;  
+    } else {
+      s.y = s.geomY;
+    }
+    
 
     tbHeight = tbHeight / 2;
 
@@ -142,8 +147,10 @@ MoveWindow.prototype = {
     pos.x = pos.x < 0 ? 0 : pos.x;
 
     let sl = this._screens.length;
+
     for (let i=0; i < sl; i++) {
       let s = this._screens[i];
+
       if ((s.x <= pos.x && (s.x + s.totalWidth) > pos.x ) && (s.y <= pos.y && (s.y + s.totalHeight) > pos.y )) {
         return i;
       }
