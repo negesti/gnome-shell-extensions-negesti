@@ -36,7 +36,9 @@ the preferences window
 
 * Suse: `sudo zypper in libwnck-devel`
 * Arch: `pacman -S libwnck3`
-* Fedora: `sudo yum install libwnck3` (should be installed on F19)
+* Fedora: 
+** `sudo yum install libwnck3` (should be installed on F19)
+** `sudo dnf install linwnck3` (dnf is the new yum since F23)
 * Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
 Keybindings
@@ -67,109 +69,38 @@ The following keys are available:
   *  resize to a configured location (see wiki for details)
 
 __Gnome Shell 3.2__
-The keybinding can not be stored in a custom schema. The extension uses de predefined bindings
-/apps/metacity/window_keybindings. Modify ghem with gconf-editor/gconftool/gconftool-2.
-    run gconf-editor /apps/metacity/window_keybindings
 
-For details how to configure it, please check the wiki.
+In version 3.2 it was not possible for extension developers to add custom keybinding. This extension works (or let's better call say "worked") with v3.2 and  used pre defined global keyboard binding. 
 
-2 screen setup support
+
+For details, how to configure the extension in v3.2, please check the [[wiki|https://github.com/negesti/gnome-shell-extensions-negesti/wiki/Gnome-Shell-3.2]]
+
+
+Multi screen setup support
 -------
 
-the extention works well with 2 screens in horizontal setup.
+the extention works well with mutliple screens.
 
-Moving windows from one screen to another only possible widh side_e and side_w
-and only if windows was at side_e (or side_w) before. eg.
+Moving windows from one screen to another is currently only possible in horizontal setup. e.g. a window that is a the left or right side of one screen, can be moved to the next screen using keyboard shortcuts.
 
-* a window in corner_nw of the right screen is not move to the left screen.
-* a window at side_e of the right screen is move to the left screen (side_w)
+ * Move to left screen: default binding: <Super> <Shift> Left 
+ * Move to right screen: default binding: <Super> <Shift> Right
+
+The keyboard settings can be changed using the preferences.
 
 
+License:
+--------
 
-ChangeLog
--------
+Copyright (c) 2011-2016 Clemens Eberwein
 
-__June 24, 2014__
-* support gnome-shell 3.12
-* #56 allow the user to disable keybindings
+This program is free software; you can redistribute it and/or
+modify it under the terms of VERSION 2 of the GNU General Public
+License as published by the Free Software Foundation provided
+that the above copyright notice is included.
 
-__October 6, 2013__
- * Conributed by  @krlmlr 
-  * Fixed #37 Moving maximized window to other display
-  * General improvement for "move to other display"
-
-__July 20, 2013__
- * Settings are now organized in tabs
- * New feature 'intelligent corner movement'
- * New config option to keep window width when moving from center to north/south
- * additional options for "move to corner". When moving to a corner you have the choice to change:
-  * both
-  * only height
-  * only width
-  * never change size
-  * Nothing on first move, both on second
-  * Nothing on first move, only height on second
-  * Nothing on first move, only width on second
-
-__April 17, 2013__
- * "Move Focus" using the keyboard 
- * Fix for overlapping windows
- * Contributors: @73
-
-__December 27, 2012__
- * Config to change center/maximize to maximize/center
-
-__Octover 31, 2012__
- * new the config ui including 3 heights
- * fix window height if topPanel is visible
-
-__Octover 30, 2012__
- * Support multiple heights when moving to top/bottom
- * "move to corner" uses widths and heights defined for sides
-  * atm NO CONFIG UI to define heights (can be modified in utils.js)
-  * CORNER_CHANGE_WIDTH
-   * true... move to corner multiple times will change width and height
-   * false.. width is not changed, if the window is has a "known" width
-
-__October 9, 2012__
- * Support multiple widths when moving to left/right side
- * Added keybindings to move window to left/right screen
-
-__July 13, 2012__
- * Fixed config reload -> no need to reload the shell
-
-__July 08, 2012__
- * KNOWN ISSUES: config is not reloaded after modifying with the prefs tool (manual reload required)
- * moved config to gsettings
- * custom keybindings using gsettings
-
-__May 31, 2012__
- * dont maximize chrome, resize it to max-size (e.g. dont change into fullscreen mode)
-
-__May 12, 2012__
-
- * Added GTK Settings window
-  * Open from [extensions.gnome.org](https://extensions.gnome.org/local/)
-  * Open from command line `gnome-shell-extension-prefs putWindow@clemens.lab21.org`
-
-__April 26, 2012__
-
- * Extension is now **3.4** compatible (Tested with 3.4.1)
- * SettingsWindow is disabled for the moment (will be replaced by tweak-tool "plugin")
- * **The shell uses gsettings now!**
-
-__January 15, 2012__
-
- * added a config ui
- * position.x/y/width/height must be integers between 0 and 100 (was 0...1)
-
-__December 17, 2011__
-
- * fix a bug that occures if the top panel is hidden.
-  * checkout https://extensions.gnome.org/extension/42/auto-hide-top-panel/ it's awesome!
-
-__December 11, 2011__
-
- * reduced the horizontal and vertical "gap" between windows
- * hitting move_to_center twice will now correctly maximize evolution
-
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Go to http://www.gnu.org/licenses/gpl-2.0.html to get a copy
+of the license.

@@ -143,11 +143,11 @@
     </key>
     <key type="as" name="put-to-left-screen">
       <default><![CDATA[['<Super><Shift>Left']]]></default>
-      <summary>Move to a predifined location</summary>
+      <summary>Move to the screen on the left site</summary>
     </key>
     <key type="as" name="put-to-right-screen">
       <default><![CDATA[['<Super><Shift>Right']]]></default>
-      <summary>Move to a predifined location</summary>
+      <summary>Move to the screen on the right site</summary>
     </key>
 
     <key type="i" name="put-to-corner-ne-enabled">
