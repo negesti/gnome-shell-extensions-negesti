@@ -76,6 +76,10 @@ MoveWindow.prototype = {
       return 0;
     }
 
+    if (!Main.layoutManager.panelBox.visible) {
+      return 0;
+    }
+
     return Main.panel.actor.y + Main.panel.actor.height;
   },
 
@@ -151,7 +155,7 @@ MoveWindow.prototype = {
     for (let i=0; i < sl; i++) {
       let s = this._screens[i];
 
-      if ((s.x <= pos.x && (s.x + s.totalWidth) > pos.x ) && (s.y <= pos.y && (s.y + s.totalHeight) > pos.y )) {
+      if ((s.x <= pos.x && (s.x + s.totalWidth) > pos.x ) && ((s.y - this._getTopPanelHeight()) <= pos.y && (s.y + s.totalHeight) > pos.y )) {
         return i;
       }
     }
