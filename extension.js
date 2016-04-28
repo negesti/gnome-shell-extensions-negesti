@@ -290,9 +290,15 @@ MoveWindow.prototype = {
     }
 
     let useIndex = 0;
-    let moveToOtherScreen = false
+    let moveToOtherScreen = false;
+    let minDistance = false;
+    let dist;
     for ( let i=0; i < sizes.length; i++) {
-      if (this._samePoint(pos.width, sizes[i].width) && this._samePoint(pos.x, sizes[i].x)) {
+      if (!this._samePoint(pos.x, sizes[i].x)) {
+        continue;
+      }
+
+      if (this._samePoint(pos.width, sizes[i].width)) {
         useIndex = i + 1;
         if (useIndex >= sizes.length) {
           moveToOtherScreen = true;
@@ -300,6 +306,17 @@ MoveWindow.prototype = {
         }
         break;
       }
+      dist = Math.abs((pos.width - sizes[i].width));
+
+      if (!minDistance || minDistance > dist) {
+        minDistance = dist;
+        useIndex = i+1;
+
+      }
+    }
+    if (useIndex >= sizes.length) {
+      moveToOtherScreen = true;
+      useIndex = 0;
     }
 
     let otherDirection = "e";
