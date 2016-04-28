@@ -857,6 +857,9 @@ MoveWindow.prototype = {
     this._screenListener = global.screen.connect("monitors-changed",
       Lang.bind(this, this._loadScreenData));
 
+    this._workaresChangedListener = global.screen.connect("workareas-changed",
+      Lang.bind(this, this._loadScreenData));
+
     this._windowCreatedListener = global.screen.get_display().connect_after('window-created',
       Lang.bind(this, this._moveConfiguredWhenCreated)
     );
@@ -924,6 +927,11 @@ MoveWindow.prototype = {
     if (this._screenListener) {
       global.screen.disconnect(this._screenListener);
       this._screenListener = false;
+    }
+
+    if (this.__workaresChangedListener) {
+      global.screen.disconnect(this._workaresChangedListener);
+      this._workaresChangedListener = false;
     }
 
     let size = this._bindings.length;
