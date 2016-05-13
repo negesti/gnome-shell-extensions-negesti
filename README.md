@@ -104,3 +104,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 Go to http://www.gnu.org/licenses/gpl-2.0.html to get a copy
 of the license.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/negesti/gnome-shell-extensions-negesti/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
