@@ -27,6 +27,9 @@ Utils.prototype = {
   ALWAYS_KEEP_HEIGHT: "always-keep-height",
 
   MOVE_FOCUS_ENABLED: "move-focus-enabled",
+  MOVE_FOCUS_ANIMATION: "move-focus-animation",
+
+  ENABLE_MOVE_WORKSPACE: "enable-move-workspace", 
 
   INTELLIGENT_CORNER_MOVEMENT: "intelligent-corner-movement",
 

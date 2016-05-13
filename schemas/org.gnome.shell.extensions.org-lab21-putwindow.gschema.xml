@@ -5,6 +5,10 @@
       <summary>Application based configuration</summary>
     </key>
 
+    <key type="i" name="enable-move-workspace">
+      <default>0</default>
+      <summary>Enable move to workspace feature</summary>
+    </key>
     <key type="i" name="corner-changes">
       <default>0</default>
       <summary>Change width and height when moving to corner (Always, only height, only width)</summary>
@@ -139,11 +143,11 @@
     </key>
     <key type="as" name="put-to-left-screen">
       <default><![CDATA[['<Super><Shift>Left']]]></default>
-      <summary>Move to a predifined location</summary>
+      <summary>Move to the screen on the left site</summary>
     </key>
     <key type="as" name="put-to-right-screen">
       <default><![CDATA[['<Super><Shift>Right']]]></default>
-      <summary>Move to a predifined location</summary>
+      <summary>Move to the screen on the right site</summary>
     </key>
 
     <key type="i" name="put-to-corner-ne-enabled">
@@ -199,6 +203,10 @@
     <key type="i" name="move-focus-enabled">
       <default>1</default>
       <summary>Enable/Disable the MoveFocus feature</summary>
+    </key>
+    <key type="i" name="move-focus-animation">
+      <default>1</default>
+      <summary>Enable/Disable the MoveFocus animation</summary>
     </key>
     <key type="as" name="move-focus-cycle">
       <default><![CDATA[['<Shift><Super>o']]]></default>

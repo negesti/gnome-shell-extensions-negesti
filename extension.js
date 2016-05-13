@@ -9,6 +9,7 @@ const Shell = imports.gi.Shell;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
 const MoveFocus = Extension.imports.moveFocus;
+const MoveWorkspace = Extension.imports.moveWorkspace;
 
 /**
  * Thanks to:
@@ -75,6 +76,10 @@ MoveWindow.prototype = {
       return 0;
     }
 
+    if (!Main.layoutManager.panelBox.visible) {
+      return 0;
+    }
+
     return Main.panel.actor.y + Main.panel.actor.height;
   },
 
@@ -84,7 +89,12 @@ MoveWindow.prototype = {
     if (Math.abs(tbHeight) <= 2) {
       tbHeight = 0;
     }
-    s.y = s.geomY + tbHeight;
+    if (s.geomY != tbHeight) {
+      s.y = s.geomY + tbHeight;  
+    } else {
+      s.y = s.geomY;
+    }
+    
 
     tbHeight = tbHeight / 2;
 
@@ -141,14 +151,11 @@ MoveWindow.prototype = {
     pos.x = pos.x < 0 ? 0 : pos.x;
 
     let sl = this._screens.length;
-    for (let i=0; i < sl; i++) {
-      if (i == sl-1) {
-        return i;
-      }
 
-      if (!this._isVerticalScreenSetup && this._screens[i].x <= pos.x && this._screens[(i+1)].x > pos.x ) {
-        return i;
-      } else if (this._isVerticalScreenSetup && this._screens[i].y <= pos.y && this._screens[(i+1)].y > pos.y ) {
+    for (let i=0; i < sl; i++) {
+      let s = this._screens[i];
+
+      if ((s.x <= pos.x && (s.x + s.totalWidth) > pos.x ) && ((s.y - this._getTopPanelHeight()) <= pos.y && (s.y + s.totalHeight) > pos.y )) {
         return i;
       }
     }
@@ -283,9 +290,15 @@ MoveWindow.prototype = {
     }
 
     let useIndex = 0;
-    let moveToOtherScreen = false
+    let moveToOtherScreen = false;
+    let minDistance = false;
+    let dist;
     for ( let i=0; i < sizes.length; i++) {
-      if (this._samePoint(pos.width, sizes[i].width) && this._samePoint(pos.x, sizes[i].x)) {
+      if (!this._samePoint(pos.x, sizes[i].x)) {
+        continue;
+      }
+
+      if (this._samePoint(pos.width, sizes[i].width)) {
         useIndex = i + 1;
         if (useIndex >= sizes.length) {
           moveToOtherScreen = true;
@@ -293,6 +306,17 @@ MoveWindow.prototype = {
         }
         break;
       }
+      dist = Math.abs((pos.width - sizes[i].width));
+
+      if (!minDistance || minDistance > dist) {
+        minDistance = dist;
+        useIndex = i+1;
+
+      }
+    }
+    if (useIndex >= sizes.length) {
+      moveToOtherScreen = true;
+      useIndex = 0;
     }
 
     let otherDirection = "e";
@@ -850,6 +874,9 @@ MoveWindow.prototype = {
     this._screenListener = global.screen.connect("monitors-changed",
       Lang.bind(this, this._loadScreenData));
 
+    this._workaresChangedListener = global.screen.connect("workareas-changed",
+      Lang.bind(this, this._loadScreenData));
+
     this._windowCreatedListener = global.screen.get_display().connect_after('window-created',
       Lang.bind(this, this._moveConfiguredWhenCreated)
     );
@@ -901,6 +928,7 @@ MoveWindow.prototype = {
     );
 
     this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils, this._screens);
+    this._moveWorkspacePlugin = new MoveWorkspace.MoveWorkspace(this._utils);
   },
 
   /**
@@ -918,6 +946,11 @@ MoveWindow.prototype = {
       this._screenListener = false;
     }
 
+    if (this.__workaresChangedListener) {
+      global.screen.disconnect(this._workaresChangedListener);
+      this._workaresChangedListener = false;
+    }
+
     let size = this._bindings.length;
 
     for(let i = 0; i<size; i++) {
@@ -932,6 +965,10 @@ MoveWindow.prototype = {
     this._utils.destroy();
     if (this._moveFocusPlugin) {
       this._moveFocusPlugin.destroy();
+    }
+
+    if (this._moveWorkspacePlugin) {
+      this._moveWorkspacePlugin.destroy();
     }
   }
 }
