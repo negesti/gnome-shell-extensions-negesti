@@ -169,7 +169,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       halign: Gtk.Align.START,
       margin_left: 10,
       label: "Keep width when moving north/south:",
-      tooltip_text: "Windows will not change there width when moved north or south",
+      tooltip_text: "Windows will not change their width when moved north or south",
     }), 0, row, 4, 1);
 
     let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -181,7 +181,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       halign: Gtk.Align.START,
       margin_left: 10,
       label: "Keep height when moving east/west:",
-      tooltip_text: "Windows will not change there height when moved east or west",
+      tooltip_text: "Windows will not change their height when moved east or west",
     }), 0, row, 4, 1);
 
     let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
