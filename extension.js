@@ -637,12 +637,11 @@ MoveWindow.prototype = {
 
   _moveConfiguredWhenCreated: function(display, win, noRecurse) {
 
+    global.log("is_window_interesting " + this._windowTracker.is_window_interesting);
     if (this._windowTracker.is_window_interesting) {
       if (!this._windowTracker.is_window_interesting(win)) {
         return false;
       }
-    } else if (!win.skip_taskbar) {
-      return false;
     }
 
     let app = this._windowTracker.get_window_app(win);
