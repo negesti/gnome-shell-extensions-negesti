@@ -637,11 +637,8 @@ MoveWindow.prototype = {
 
   _moveConfiguredWhenCreated: function(display, win, noRecurse) {
 
-    global.log("is_window_interesting " + this._windowTracker.is_window_interesting);
-    if (this._windowTracker.is_window_interesting) {
-      if (!this._windowTracker.is_window_interesting(win)) {
-        return false;
-      }
+    if (win.skip_taskbar) {
+      return;
     }
 
     let app = this._windowTracker.get_window_app(win);
@@ -651,10 +648,10 @@ MoveWindow.prototype = {
         // window is not tracked yet
         Mainloop.idle_add(Lang.bind(this, function() {
           this._moveConfiguredWhenCreated(display, win, true);
-          return false;
+          return ;
         }));
       }
-      return false;
+      return;
     }
     app = win.get_wm_class();
     // move the window if a location is configured and autoMove is set to true
@@ -667,10 +664,10 @@ MoveWindow.prototype = {
             this._moveToConfiguredLocation(win, app);
           })
       	);
-        return true;
+        return;
       }
     }
-    return false;
+    return;
   },
 
   moveToConfiguredLocation: function(win, appName) {
