@@ -191,6 +191,7 @@ MoveWindow.prototype = {
       totalWidth: this._screens[screenIndex].totalWidth,
       totalHeight: this._screens[screenIndex].totalHeight
     };
+
     if ((direction == "right" || direction == "e") && screenIndex < (this._screens.length - 1)) {
       s = this._screens[screenIndex + 1];
       s = this._recalculateSizes(s);
@@ -202,6 +203,7 @@ MoveWindow.prototype = {
     }
 
     if (s != null) {
+
       let wasMaximizeFlags = 0;
       if (win.maximized_horizontally) {
         wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
@@ -279,7 +281,8 @@ MoveWindow.prototype = {
     let pos = win.get_frame_rect();
     let sizes = direction == "e" ? s.east : s.west;
 
-    if (win.maximized_horizontally && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
+
+    if (win.maximized_horizontally && !win.maximized_vertically && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
       // currently at the left side (WEST)
       if (pos.y == s.y) {
         this._moveToCorner(win, screenIndex, "n" + direction, false, true, true);
@@ -351,7 +354,7 @@ MoveWindow.prototype = {
     let pos = win.get_frame_rect();
     let sizes = direction == "n" ? s.north : s.south;
 
-    if ( win.maximized_vertically && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
+    if ( win.maximized_vertically && !win.maximized_horizontally && this._utils.getBoolean(this._utils.INTELLIGENT_CORNER_MOVEMENT, false)) {
       // currently at the left side (WEST)
       if (pos.x == s.x) {
         this._moveToCorner(win, screenIndex, "w" + direction, true, false, true);
