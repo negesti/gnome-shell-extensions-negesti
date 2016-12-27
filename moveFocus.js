@@ -293,7 +293,7 @@ MoveFocus.prototype = {
       return;
     }
 
-		let screen = global.screen;
+		let screen = this.get_screen();
     let display = screen.get_display();
 
     let allWin;

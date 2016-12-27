@@ -348,5 +348,16 @@ Utils.prototype = {
   showErrorMessage: function(title, message) {
     global.log("ERROR: " + title + " " + message);
     //throw new Error(title + ' ' message);
+  },
+
+  createSlider: function(configName) {
+    let ret = new Gtk.Scale({digits: 0, sensitive: true, orientation: Gtk.Orientation.HORIZONTAL, margin_right: 6, margin_left: 6});
+    ret.set_range(0, 100);
+    ret.set_value(this.getNumber(configName, 50));
+    ret.set_value_pos(Gtk.PositionType.RIGHT);
+    ret.connect("value-changed", function(obj, userData) {
+      this.setParameter(configName, obj.get_value());
+    });
+    return ret;
   }
 };

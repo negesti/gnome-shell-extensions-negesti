@@ -1,29 +1,16 @@
-const Gtk = imports.gi.Gtk;
+const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
-const Gio = imports.gi.Gio;
-
-const Gdk = imports.gi.Gdk;
-const Wnck = imports.gi.Wnck;
+const Gtk = imports.gi.Gtk;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Utils = new Me.imports.utils.Utils();
+const PutWindowLocationWidget = Me.imports.locationWidget.PutWindowLocationWidget;
 
 const Lang = imports.lang;
 const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
-
-let createSlider = function(configName) {
-  let ret = new Gtk.Scale({digits: 0, sensitive: true, orientation: Gtk.Orientation.HORIZONTAL, margin_right: 6, margin_left: 6});
-  ret.set_range(0, 100);
-  ret.set_value(Utils.getNumber(configName, 50));
-  ret.set_value_pos(Gtk.PositionType.RIGHT);
-  ret.connect("value-changed", function(obj, userData) {
-    Utils.setParameter(configName, obj.get_value());
-  });
-  return ret;
-}
 
 const PutWindowSettingsWidget = new GObject.Class({
   Name: 'PutWindow.Prefs.PutWindowSettingsWidget',
@@ -35,7 +22,6 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.orientation = Gtk.Orientation.VERTICAL;
     this.hexpand = true;
     this.tab_pos = Gtk.PositionType.LEFT;
-    this._wnckScreen = Wnck.Screen.get_default();
 
     this.append_page(this._generateMainSettings(), new Gtk.Label({label: "<b>Main</b>",
       halign:Gtk.Align.START, margin_top: 0, use_markup: true}));
@@ -49,7 +35,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>Move Focus</b>",
      halign:Gtk.Align.START, use_markup: true}));
 
-    this.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>Applications</b>",
+    this.append_page(new PutWindowLocationWidget(), new Gtk.Label({label: "<b>Applications</b>",
      halign:Gtk.Align.START, use_markup: true}));
   },
 
@@ -62,14 +48,14 @@ const PutWindowSettingsWidget = new GObject.Class({
     let currentValue = Utils.getNumber(Utils.CORNER_CHANGE, 0);
 
     let values = [
-    ["0", "Both"],
-    ["1", "Only height"],
-    ["2", "Only width"],
-    ["3", "Never change size"],
-    ["4", "Nothing on first move, both on second"],
-    ["5", "Nothing on first move, Only height on second"],
-    ["6", "Nothing on first move, Only width on second"]
-    ]
+      ["0", "Both"],
+      ["1", "Only height"],
+      ["2", "Only width"],
+      ["3", "Never change size"],
+      ["4", "Nothing on first move, both on second"],
+      ["5", "Nothing on first move, Only height on second"],
+      ["6", "Nothing on first move, Only width on second"]
+    ];
     let selectMe = null;
     for (let i=0; i< values.length; i++) {
       let iter = this._model.append();
@@ -102,7 +88,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     for (let i=0; i < labels.length; i++) {
       row++;
       grid.attach(new Gtk.Label({label: labels[i], halign:Gtk.Align.START, margin_left: 15 }), 0, row, 1, 1);
-      grid.attach(createSlider(configName + "-" + i), 1, row, 5, 1);
+      grid.attach(Utils.createSlider(configName + "-" + i), 1, row, 5, 1);
     }
     return row;
   },
@@ -215,9 +201,9 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(keepWidthSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_WIDTH), 1, row++, 4, 1);
+    ret.attach(Utils.createSlider(Utils.CENTER_WIDTH), 1, row++, 4, 1);
     ret.attach(new Gtk.Label({label: "Height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_HEIGHT), 1, row++, 4, 1);
+    ret.attach(Utils.createSlider(Utils.CENTER_HEIGHT), 1, row++, 4, 1);
 
     return ret;
   },
@@ -301,27 +287,27 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(description, 0, row++, 5, 1);
     
     let labels = [
-    "Enable 'Move focus'",
-    "Show animation when moving",
-    "Enable cycle through windows at the same postition",
-    "Enable focus the window that's north of the current",
-    "Enable focus the window that's east of the current",
-    "Enable focus the window that's south of the current",
-    "Enable focus the window that's west of the current",
-    "Enable move the focus to the left screen",
-    "Enable move the focus to the right screen"
+      "Enable 'Move focus'",
+      "Show animation when moving",
+      "Enable cycle through windows at the same postition",
+      "Enable focus the window that's north of the current",
+      "Enable focus the window that's east of the current",
+      "Enable focus the window that's south of the current",
+      "Enable focus the window that's west of the current",
+      "Enable move the focus to the left screen",
+      "Enable move the focus to the right screen"
     ];
 
     let configNames = [
     Utils.MOVE_FOCUS_ENABLED,
     Utils.MOVE_FOCUS_ANIMATION,
-    "move-focus-cycle-enabled",
-    "move-focus-north-enabled",
-    "move-focus-east-enabled",
-    "move-focus-south-enabled",
-    "move-focus-west-enabled",
-    "move-focus-left-screen-enabled",
-    "move-focus-right-screen-enabled",
+      "move-focus-cycle-enabled",
+      "move-focus-north-enabled",
+      "move-focus-east-enabled",
+      "move-focus-south-enabled",
+      "move-focus-west-enabled",
+      "move-focus-left-screen-enabled",
+      "move-focus-right-screen-enabled",
     ];
 
     for (let i=0; i<labels.length; i++) {
@@ -448,7 +434,7 @@ const PutWindowSettingsWidget = new GObject.Class({
         var md = new Gtk.MessageDialog({
           modal: true,
           message_type: Gtk.MessageType.WARNING,
-          buttons:Gtk. ButtonsType.OK,
+          buttons: Gtk.ButtonsType.OK,
           title: "Keyboard binding alread defined",
           text: "The binding is alread used by " + existingBinding
         });
@@ -493,422 +479,6 @@ const PutWindowSettingsWidget = new GObject.Class({
   }
 
 });
-
-const PutWindowLocationWidget = new GObject.Class({
-  Name: 'PutWindow.Prefs.PutWindowLocationWidget',
-  GTypeName: 'PutWindowLocationWidget',
-  Extends: Gtk.Grid,
-  _init: function(wnckScreen) {
-    this.parent();
-    this._wnckScreen = wnckScreen
-    this.margin = 4;
-    this.orientation= Gtk.Orientation.VERTICAL;
-    this.column_homogeneous = true;
-
-    let label = new Gtk.Label({label: "Application based size and location setting, that allows you to " +
-      "move windows on startup or circle between multiple configured locations.", halign:Gtk.Align.START, margin_left: 4,});
-    label.set_line_wrap(true);
-    this.attach(label, 0, 0, 8, 1);
-
-    this._selectedApp = null;
-    this._apps = [];
-
-    this.treeModel = new Gtk.ListStore();
-    this.treeModel.set_column_types([GObject.TYPE_STRING]);
-
-    this.treeView = new Gtk.TreeView({model: this.treeModel, headers_visible: false});
-
-    this.treeView.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
-    let column = new Gtk.TreeViewColumn({ min_width: 150 });
-    let renderer = new Gtk.CellRendererText();
-    column.pack_start(renderer, true);
-    column.add_attribute(renderer, 'text', 0);
-
-    let appsLength = 1;
-    if (Utils.getParameter("locations", null) != null) {
-      let apps = Object.getOwnPropertyNames(Utils.getParameter("locations"));
-      appsLength = apps.length;
-      apps.sort();
-      for(let i=0; i< appsLength; i++) {
-        let iter = this.treeModel.append();
-        this.treeModel.set(iter, [0], [ apps[i] ]);
-        this._apps.push({name: apps[i], listElement: iter});
-      }
-    }
-
-    this.treeView.append_column(column);
-
-    this.treeView.get_selection().connect("changed",
-      Lang.bind(this, function(selection) {
-        let s = selection.get_selected();
-        // no new selection
-        if (!s[0]) {
-          return;
-        }
-        let selectedValue = s[1].get_value(s[2], 0);
-        if (this._selectedApp != null && this._selectedApp == selectedValue) {
-          return;
-        }
-
-        this._removeAppButton.set_sensitive(true);
-        this._updateAppContainerContent(selectedValue, this.createAppWidgets(selectedValue));
-      })
-      );
-
-    let toolbar = new Gtk.Toolbar({});
-    toolbar.set_icon_size(Gtk.IconSize.MENU);
-    toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR)
-
-    this._removeAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_REMOVE} );
-    this._removeAppButton.set_sensitive(false);
-    this._removeAppButton.set_tooltip_text("Remove an existing application");
-
-    this._removeAppButton.connect("clicked",
-      Lang.bind(this, function() {
-
-        let dialog = new Gtk.MessageDialog({
-          modal: true,
-          message_type: Gtk.MessageType.QUESTION,
-          title: "Delete application '" + this._selectedApp + "'?",
-          text: "Are you sure to delete the configuration for  '" + this._selectedApp + "'?"
-        });
-
-        dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
-        dialog.add_button(Gtk.STOCK_DELETE, Gtk.ResponseType.DELETE_EVENT);
-
-        dialog.connect("response",
-          Lang.bind(this, function(dialog, responseType) {
-            if (responseType == Gtk.ResponseType.DELETE_EVENT) {
-              for (let i=0; i< this._apps.length; i++) {
-                if (this._apps[i].name != this._selectedApp) {
-                  continue;
-                }
-                // remove the widget
-                if (this._appContainer.get_child()) {
-                  this._appContainer.get_child().destroy();
-                }
-                // remove the list entry
-                this.treeModel.remove(this._apps[i].listElement);
-                // unset the parameter
-                Utils.unsetParameter("locations." + this._apps[i].name);
-                // remove the entry from _apps array
-                this._apps.pop(this._apps[i]);
-                break;
-              }
-            }
-          })
-          );
-        dialog.run();
-        dialog.destroy();
-
-      })
-      );
-
-    this._addAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_ADD} );
-    this._addAppButton.set_tooltip_text("Add a new application (make sure it is runnging)");
-    this._addAppButton.connect("clicked",
-      Lang.bind(this, function() {
-
-        let dialog = new Gtk.MessageDialog({
-          modal: false,
-          message_type: Gtk.MessageType.QUESTION,
-          title: "Add application",
-          text: "Please select the application you want to add"
-        });
-
-        let appModel = new Gtk.ListStore();
-        appModel.set_column_types([ GObject.TYPE_INT, GObject.TYPE_STRING ]);
-
-        let appSelector = new Gtk.ComboBox({ model: appModel, hexpand: true });
-        appSelector.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
-
-        let renderer = new Gtk.CellRendererText();
-        appSelector.pack_start(renderer, true);
-        appSelector.add_attribute(renderer, 'text', 1);
-
-        let apps = this._getRunningApps(this._apps);
-        let appsLength = apps.length;
-
-        for (let i = 0; i < appsLength; i++ ) {
-          let iter = appModel.append();
-          appModel.set(iter, [0, 1], apps[i] );
-        }
-
-        appSelector.connect('changed',
-          Lang.bind(this, function(combo) {
-            let selection = combo.get_model().get_value(combo.get_active_iter()[1], 1);
-            let configPath = "locations." + selection;
-            Utils.setParameter(configPath, Utils.START_CONFIG);
-
-            this._addToTreeView(selection, true);
-
-            this._updateAppContainerContent(selection, this.createAppWidgets(selection));
-            dialog.destroy();
-          })
-          );
-        //box.pack_start(appSelector, true, true, 2);
-
-        dialog.get_action_area().add(appSelector);
-        dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
-
-        dialog.set_default_size(350, 100);
-        dialog.show_all();
-        dialog.run();
-        dialog.destroy();
-      })
-      );
-
-    this._saveButton = new Gtk.ToolButton({stock_id: Gtk.STOCK_SAVE});
-    this._saveButton.set_tooltip_text("'Applications' config is not saved automatically.")
-    this._saveButton.connect("clicked", function() {
-      Utils.saveSettings();
-    });
-
-    toolbar.insert(this._removeAppButton, 0);
-    toolbar.insert(this._addAppButton, 1);
-    toolbar.insert(this._saveButton, 2);
-
-    let leftPanel = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
-    leftPanel.pack_start(this.treeView, true, true, 0);
-    leftPanel.pack_start(toolbar, false, false, 0);
-    this.attach(leftPanel, 0, 1, 2, 1);
-
-    this._appContainer = new Gtk.Frame({ hexpand: true});
-    this._appContainer.add(new Gtk.Label({label: _("Select an application to configure using the list on the left side.") }));
-    let scroll = new Gtk.ScrolledWindow({
-      'vexpand': true
-    });
-    scroll.add_with_viewport(this._appContainer);
-    this.attach(scroll, 2, 1, 6, 1);
-  },
-
-  _getRunningApps: function(exclude) {
-
-    let windows = this._wnckScreen.get_windows();
-
-    let winSize = windows.length;
-    let apps = [];
-    for (let i=0; i < winSize; i++) {
-      apps.push( windows[i].get_class_group_name() );
-    }
-    apps.push("All");
-
-    let ret = [],
-    exludeLength = exclude.length;
-
-    for (let i=0; i < apps.length; i++) {
-      let wm =  apps[i],
-      found = false;
-      // dont add excluded entries to the returned value
-      for (let j=0; j < exludeLength; j++) {
-        if (exclude[j].name == wm || wm == "Update-notifier") {
-          found = true;
-          break;
-        }
-      }
-
-      if (!found) {
-        ret.push( [ret.length, wm]);
-      }
-    }
-
-    ret.sort(function(a, b){
-      return  a[1] < b[1] ? -1
-      : a[1]==b[1] ? 0 : 1;
-    });
-
-    return ret;
-  },
-
-  createAppWidgets: function(appName) {
-
-    let configLocation = "locations." + appName + ".";
-
-    let ret = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, margin_left: 10 });
-
-    if (Utils.getBoolean(Utils.ENABLE_MOVE_WORKSPACE, false)) {
-      let workspaceBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
-
-      workspaceBox.pack_start(new Gtk.Label({label: "Move window to workspace when created", xalign: 0}), true, true, 0);
-
-      let workspacesActive = Utils.getBoolean(configLocation + "moveWorkspace", false);
-
-      let btn = new Gtk.Switch({ active: workspacesActive });
-      btn.connect("notify::active", 
-        function(sw) {
-          Utils.setParameter(configLocation + "moveWorkspace", sw.get_active());
-          numberButton.set_sensitive(sw.get_active());
-        })
-      workspaceBox.pack_start(btn, false, false, 0);
-      ret.pack_start(workspaceBox, false, false, 0);
-
-      let workspaceIndexBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
-      let numberButton = new Gtk.SpinButton( {
-        value: Utils.getNumber(configLocation + "targetWorkspace", 1),
-        numeric: true,
-        snap_to_ticks: true,
-        adjustment: new Gtk.Adjustment({
-          lower: 1,
-          upper: 10,
-          step_increment: 1
-        })
-      });
-      numberButton.connect("changed", 
-        function(btn){
-          Utils.setParameter(configLocation + "targetWorkspace", btn.value);
-        });
-
-      numberButton.set_sensitive(workspacesActive);
-
-
-      workspaceIndexBox.pack_start(new Gtk.Label({label: "Window target workspace", xalign: 0}), true, true, 0);
-      workspaceIndexBox.pack_start(numberButton, false, false, 0);
-
-      ret.pack_start(workspaceIndexBox, false, false, 0);
-
-      ret.pack_start(
-        new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}),
-        false, false, 0);
-    }
-
-    let autoMoveBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL});
-    autoMoveBox.pack_start(new Gtk.Label({label: "Auto-Move window when created", xalign: 0}), true, true, 0);
-
-    let btn = new Gtk.Switch({ active: Utils.getBoolean(configLocation + "autoMove", false) });
-    btn.connect("notify::active", function(sw) {
-      Utils.setParameter(configLocation + "autoMove", sw.get_active());
-    })
-    autoMoveBox.pack_end(btn, false, false, 0);
-
-    ret.pack_start(autoMoveBox, false, false, 0);
-
-
-    // widgets for the positions defined for the app
-    let positions = Utils.getParameter(configLocation + "positions", { positions: []});
-    let positionSize = positions.length;
-
-    this.locationBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL });
-    for (let i = 0; i < positionSize; i++) {
-      this.locationBox.pack_start(this._generateOnePositionWidgets(configLocation, i, positionSize), false, false, 0);
-    }
-    ret.pack_start(this.locationBox, false, false, 0);
-
-    return ret;
-  },
-
-  _updateAppContainerContent: function(appName, widget) {
-    this._selectedApp = appName;
-    if (this._appContainer.get_child()) {
-      this._appContainer.get_child().destroy();
-    }
-    this._appContainer.add(widget);
-    this._appContainer.show_all();
-  },
-
-  _addToTreeView: function(value, select) {
-    let iter = this.treeModel.append();
-    this.treeModel.set(iter, [0], [ value ]);
-    this._apps.push({name: value, listElement: iter});
-
-    if (select && select == true) {
-      this.treeView.get_selection().select_iter(iter);
-      this._selectedApp = value;
-    }
-  },
-
-  _generateOnePositionWidgets: function(configLocation, index, positionSize) {
-
-    let loc = configLocation + "positions." + index + ".",
-    top = 0;
-
-    let grid = new Gtk.Grid({ hexpand: true});
-    grid.locationIndex = index;
-    // screen ComboBox
-    let screenModel = new Gtk.ListStore();
-    screenModel.set_column_types([GObject.TYPE_STRING, GObject.TYPE_INT]);
-
-    let screenSelector = new Gtk.ComboBox({ model: screenModel, hexpand: true, margin_top: 6, margin_bottom: 6 });
-    screenSelector.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
-
-    let screenSelectRenderer = new Gtk.CellRendererText();
-    screenSelector.pack_start(screenSelectRenderer, true);
-    screenSelector.add_attribute(screenSelectRenderer, 'text', 0);
-
-    let numScreens =  Gdk.Screen.get_default().get_n_monitors();
-    for (let j = 0; j < numScreens; j++ ) {
-      let iter = screenModel.append();
-      screenModel.set(iter, [0, 1], ["Screen " + (j+1), j]);
-    }
-
-    screenSelector.set_active(Utils.getNumber(loc + "screen", 0));
-    screenSelector.connect('changed',
-      Lang.bind(this, function(combo) {
-        Utils.setParameter(loc + "screen", combo.get_model().get_value(combo.get_active_iter()[1], 1));
-      })
-      );
-
-    grid.attach(new Gtk.Label({label: "Screen", xalign: 0}), 0, top, 3, 1);
-    grid.attach(screenSelector, 3, top, 1, 1);
-
-    // add/delete buttons
-    let buttonContainer = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
-    let addButton = new Gtk.ToolButton({ stock_id: Gtk.STOCK_ADD });
-    addButton.connect("clicked",
-      Lang.bind(this, function() {
-
-        let length = Utils.getParameter(configLocation + "positions", []).length;
-        let newLocation = configLocation + "positions." + length;
-        Utils.setParameter(newLocation, {x: 0, y: 0, width: 100, height: 100, screen: 0} );
-
-        this.locationBox.pack_start(this._generateOnePositionWidgets(configLocation, length, length), false, false, 0);
-        this.locationBox.show_all();
-      })
-      );
-    buttonContainer.pack_end(addButton, false, false, 0)
-
-    // don't delete the first position
-    if (index > 0) {
-      let deleteButton = new Gtk.ToolButton({ stock_id: Gtk.STOCK_REMOVE });
-      deleteButton.connect("clicked",
-        Lang.bind(this, function() {
-          Utils.unsetParameter(configLocation + "positions." + index);
-          this.locationBox.remove(grid);
-
-        })
-        );
-      buttonContainer.pack_end(deleteButton, false, false, 0)
-    }
-
-    grid.attach(buttonContainer, 4, top, 1, 1);
-
-    // sliders for widht, height, x, y
-    top++;
-    let scaleW = createSlider(loc + "width");
-    grid.attach(new Gtk.Label({label: "width", xalign: 0}), 0, top, 1, 1);
-    grid.attach(scaleW, 1, top, 4, 1);
-
-    top++;
-    let scaleH = createSlider(loc + "height");
-    grid.attach(new Gtk.Label({label: "Height", xalign: 0}), 0, top, 1, 1);
-    grid.attach(scaleH, 1, top, 4, 1);
-
-    top++;
-    let scaleX = createSlider(loc + "x");
-    grid.attach(new Gtk.Label({label: "X-Position", xalign: 0}), 0, top, 1, 1);
-    grid.attach(scaleX, 1, top, 4, 1);
-
-    top++;
-    let scaleY = createSlider(loc + "y");
-    grid.attach(new Gtk.Label({label: "Y-Position", xalign: 0}), 0, top, 1, 1);
-    grid.attach(scaleY, 1, top, 4, 1);
-
-    if (index < (positionSize -1 )) {
-      top++;
-      grid.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, top, 6, 1);
-    }
-    return grid;
-  }
-})
 
 
 function init() {
