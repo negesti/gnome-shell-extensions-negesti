@@ -26,7 +26,7 @@ The extension can be configured using the gnome prefs tool.
  * Change width and height when moving to corner (Always, only height, only width)
  * Use multiple widths even if moving to other screen is possible
  * Move focus using the keyboard
-  * move-focus-north/east/south/west using super + i/l/k/j (default)
+   * move-focus-north/east/south/west using super + i/l/k/j (default)
  * Application based config (hit the save button)
 
 Wnck
@@ -37,8 +37,8 @@ the preferences window
 * Suse: `sudo zypper in libwnck-devel`
 * Arch: `pacman -S libwnck3`
 * Fedora: 
-** `sudo yum install libwnck3` (should be installed on F19)
-** `sudo dnf install linwnck3` (dnf is the new yum since F23)
+  * `sudo yum install libwnck3` (should be installed on F19)
+  * `sudo dnf install libwnck3` (dnf is the new yum since F23)
 * Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
 Keybindings
