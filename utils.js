@@ -3,6 +3,8 @@ const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 
+const Convenience = Me.imports.convenience;
+
 function Utils() {
   this._init();
 }
@@ -74,7 +76,7 @@ Utils.prototype = {
   },
 
   loadSettings: function() {
-    let schema = Me.metadata['settings-schema'];
+/*    let schema = Me.metadata['settings-schema'];
 
     const GioSSS = Gio.SettingsSchemaSource;
 
@@ -91,8 +93,8 @@ Utils.prototype = {
         throw new Error('Schema ' + schema + ' could not be found for extension '
                         + Me.metadata.uuid + '. Please check your installation.');
     }
-
-    this._settingsObject = new Gio.Settings({ settings_schema: schema });
+*/
+    this._settingsObject = Convenience.getSettings();
     this._settings = {
       centerWidth: this._settingsObject.get_int("center-width"),
       centerHeight: this._settingsObject.get_int("center-height"),

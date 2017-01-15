@@ -69,7 +69,9 @@ MoveWindow.prototype = {
   },
 
   _getTopPanelHeight: function() {
-
+    if (this._utils.getBoolean(this._utils.IGNORE_TOP_PANEL, false)) {
+      return 0;
+    }
     // 0 means hidden, 255 is visible
     let opacity = Main.panel.actor.get_paint_opacity();
     if (opacity == 0) {
