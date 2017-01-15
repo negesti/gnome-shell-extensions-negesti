@@ -23,6 +23,8 @@ Utils.prototype = {
   CORNER_CHANGE: "corner-changes",
   REVERSE_MOVE_CENTER: "reverse-move-center",
 
+  IGNORE_TOP_PANEL: "ignore-top-panel",
+
   ALWAYS_KEEP_WIDTH: "always-keep-width",
   ALWAYS_KEEP_HEIGHT: "always-keep-height",
 

@@ -1,0 +1,414 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-15 13:15+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: prefs.js:40
+msgid "Main"
+msgstr ""
+
+#: prefs.js:43
+msgid "Width &amp; Height"
+msgstr ""
+
+#: prefs.js:46
+msgid "Keyboard Shortcuts"
+msgstr ""
+
+#: prefs.js:49
+msgid "Move Focus"
+msgstr ""
+
+#: prefs.js:52
+msgid "Applications"
+msgstr ""
+
+#: prefs.js:65
+msgid "Both"
+msgstr ""
+
+#: prefs.js:66
+msgid "Only height"
+msgstr ""
+
+#: prefs.js:67
+msgid "Only width"
+msgstr ""
+
+#: prefs.js:68
+msgid "Never change size"
+msgstr ""
+
+#: prefs.js:69
+msgid "Nothing on first move, both on second"
+msgstr ""
+
+#: prefs.js:70
+msgid "Nothing on first move, Only height on second"
+msgstr ""
+
+#: prefs.js:71
+msgid "Nothing on first move, Only width on second"
+msgstr ""
+
+#: prefs.js:116
+msgid "Main settings"
+msgstr ""
+
+#: prefs.js:122
+msgid "Always use multiple widths/heights:"
+msgstr ""
+
+#: prefs.js:123
+msgid "Disable this option to move to other screen if possible"
+msgstr ""
+
+#: prefs.js:135
+msgid "Enable move to workspace:"
+msgstr ""
+
+#: prefs.js:147
+msgid "Always ignore top panel:"
+msgstr ""
+
+#: prefs.js:148
+msgid "Enable this if you use an extension to hide the top panel"
+msgstr ""
+
+#: prefs.js:161
+msgid "First maximize then, move to center:"
+msgstr ""
+
+#: prefs.js:162
+msgid ""
+"'Move to center' maximizes the current window, and centers maximized windows"
+msgstr ""
+
+#: prefs.js:173
+msgid "Intelligent corner movement:"
+msgstr ""
+
+#: prefs.js:174
+msgid "Quite difficult to describe. Enable it and move a window from S to E, "
+msgstr ""
+
+#: prefs.js:185 prefs.js:222
+msgid "Keep width when moving north/south:"
+msgstr ""
+
+#: prefs.js:186
+msgid "Windows will not change their width when moved north or south"
+msgstr ""
+
+#: prefs.js:197
+msgid "Keep height when moving east/west:"
+msgstr ""
+
+#: prefs.js:198
+msgid "Windows will not change their height when moved east or west"
+msgstr ""
+
+#: prefs.js:207
+msgid "Moving to corner:"
+msgstr ""
+
+#: prefs.js:209
+msgid "Adjust window width and height when moved to corner?"
+msgstr ""
+
+#: prefs.js:217
+msgid "Center Width &amp; Heigth"
+msgstr ""
+
+#: prefs.js:223
+msgid "Don't change width when moving window from center to north or south."
+msgstr ""
+
+#: prefs.js:249
+msgid ""
+"You can define up to three sizes that will be used when you move a window to "
+"the same direction multiple times. Equal values are ignored."
+msgstr ""
+
+#: prefs.js:255
+msgid "First:"
+msgstr ""
+
+#: prefs.js:255
+msgid "Second:"
+msgstr ""
+
+#: prefs.js:255
+msgid "Third:"
+msgstr ""
+
+#: prefs.js:257
+msgid "North height"
+msgstr ""
+
+#: prefs.js:263
+msgid "South height"
+msgstr ""
+
+#: prefs.js:270
+msgid "East width"
+msgstr ""
+
+#: prefs.js:276
+msgid "West width"
+msgstr ""
+
+#: prefs.js:288
+msgid "Move to top right corner"
+msgstr ""
+
+#: prefs.js:289
+msgid "Move to top left corner"
+msgstr ""
+
+#: prefs.js:290
+msgid "Move to bottom right corner"
+msgstr ""
+
+#: prefs.js:291
+msgid "Move to bottom left corner"
+msgstr ""
+
+#: prefs.js:292
+msgid "Move to top"
+msgstr ""
+
+#: prefs.js:293
+msgid "Move right"
+msgstr ""
+
+#: prefs.js:294
+msgid "Move to bottom"
+msgstr ""
+
+#: prefs.js:295
+msgid "Move to left"
+msgstr ""
+
+#: prefs.js:296
+msgid "Move to center/maximize"
+msgstr ""
+
+#: prefs.js:297
+msgid "Move to configured location"
+msgstr ""
+
+#: prefs.js:298
+msgid "Move to the left screen"
+msgstr ""
+
+#: prefs.js:299
+msgid "Move to the right screen"
+msgstr ""
+
+#: prefs.js:312
+msgid ""
+"'Move Focus' allows you to change the focus based on the relative location "
+"of the current focussed window using the keyboard and to push the currently "
+"focused window into the background to get the focus to the windows below."
+msgstr ""
+
+#: prefs.js:318
+msgid "Enable 'Move focus'"
+msgstr ""
+
+#: prefs.js:319
+msgid "Show animation when moving"
+msgstr ""
+
+#: prefs.js:320
+msgid "Enable cycle through windows at the same postition"
+msgstr ""
+
+#: prefs.js:321
+msgid "Enable focus the window that's north of the current"
+msgstr ""
+
+#: prefs.js:322
+msgid "Enable focus the window that's east of the current"
+msgstr ""
+
+#: prefs.js:323
+msgid "Enable focus the window that's south of the current"
+msgstr ""
+
+#: prefs.js:324
+msgid "Enable focus the window that's west of the current"
+msgstr ""
+
+#: prefs.js:325
+msgid "Enable move the focus to the left screen"
+msgstr ""
+
+#: prefs.js:326
+msgid "Enable move the focus to the right screen"
+msgstr ""
+
+#: prefs.js:332
+msgid "move-focus-cycle-enabled"
+msgstr ""
+
+#: prefs.js:333
+msgid "move-focus-north-enabled"
+msgstr ""
+
+#: prefs.js:334
+msgid "move-focus-east-enabled"
+msgstr ""
+
+#: prefs.js:335
+msgid "move-focus-south-enabled"
+msgstr ""
+
+#: prefs.js:336
+msgid "move-focus-west-enabled"
+msgstr ""
+
+#: prefs.js:337
+msgid "move-focus-left-screen-enabled"
+msgstr ""
+
+#: prefs.js:338
+msgid "move-focus-right-screen-enabled"
+msgstr ""
+
+#: prefs.js:360
+msgid "Keyboard bindings"
+msgstr ""
+
+#: prefs.js:364
+msgid "Move the window focus up"
+msgstr ""
+
+#: prefs.js:365
+msgid "Move the window focus right"
+msgstr ""
+
+#: prefs.js:366
+msgid "Move the window focus down"
+msgstr ""
+
+#: prefs.js:367
+msgid "Move the window focus left"
+msgstr ""
+
+#: prefs.js:368
+msgid "Push focused window to the background"
+msgstr ""
+
+#: prefs.js:369
+msgid "Move the focus to the left screen"
+msgstr ""
+
+#: prefs.js:370
+msgid "Move the focus to the right screen"
+msgstr ""
+
+#: prefs.js:417
+msgid "Enabled"
+msgstr ""
+
+#: prefs.js:440
+msgid "Action"
+msgstr ""
+
+#: prefs.js:456
+msgid "Error updating Keybinding"
+msgstr ""
+
+#: prefs.js:466
+msgid "Keyboard binding alread defined"
+msgstr ""
+
+#: prefs.js:467
+msgid "The binding is alread used by "
+msgstr ""
+
+#: prefs.js:486
+msgid "Error clearing keybinding"
+msgstr ""
+
+#: prefs.js:498
+msgid "Modify"
+msgstr ""
+
+#: prefs.js:523
+msgid ""
+"Application based size and location setting, that allows you to move windows "
+"on startup or circle between multiple configured locations."
+msgstr ""
+
+#: prefs.js:581
+msgid "Remove an existing application setting"
+msgstr ""
+
+#: prefs.js:625
+msgid "Add a new application (make sure it is runnging)"
+msgstr ""
+
+#: prefs.js:632
+msgid "Add application"
+msgstr ""
+
+#: prefs.js:633
+msgid "Please select the application you want to add"
+msgstr ""
+
+#: prefs.js:679
+msgid "'Applications' config is not saved automatically."
+msgstr ""
+
+#: prefs.js:694
+msgid "Select an application to configure using the list on the left side."
+msgstr ""
+
+#: prefs.js:750
+msgid "Move window to workspace when created"
+msgstr ""
+
+#: prefs.js:784
+msgid "Window target workspace"
+msgstr ""
+
+#: prefs.js:795
+msgid "Auto-Move window when created"
+msgstr ""
+
+#: prefs.js:870
+msgid "Screen"
+msgstr ""
+
+#: prefs.js:907
+msgid "Width"
+msgstr ""
+
+#: prefs.js:912
+msgid "Height"
+msgstr ""
+
+#: prefs.js:917
+msgid "X-Position"
+msgstr ""
+
+#: prefs.js:922
+msgid "Y-Position"
+msgstr ""

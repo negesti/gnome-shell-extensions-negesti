@@ -5,6 +5,10 @@
       <summary>Application based configuration</summary>
     </key>
 
+    <key type="i" name="ignore-top-panel">
+      <default>0</default>
+      <summary>Ignore top panel height</summary>
+    </key>
     <key type="i" name="enable-move-workspace">
       <default>0</default>
       <summary>Enable move to workspace feature</summary>

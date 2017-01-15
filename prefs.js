@@ -37,19 +37,19 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.tab_pos = Gtk.PositionType.LEFT;
     this._wnckScreen = Wnck.Screen.get_default();
 
-    this.append_page(this._generateMainSettings(), new Gtk.Label({label: "<b>Main</b>",
+    this.append_page(this._generateMainSettings(), new Gtk.Label({label: "<b>" + _("Main") + "</b>",
       halign:Gtk.Align.START, margin_top: 0, use_markup: true}));
 
-    this.append_page(this._createPositionSettings(), new Gtk.Label({label: "<b>Width &amp; Height</b>",
+    this.append_page(this._createPositionSettings(), new Gtk.Label({label: "<b>" + _("Width &amp; Height") + "</b>",
       halign:Gtk.Align.START, use_markup: true}));
 
-    this.append_page(this._createKeyboardConfig(), new Gtk.Label({label: "<b>Keyboard Shortcuts</b>",
+    this.append_page(this._createKeyboardConfig(), new Gtk.Label({label: "<b>" + _("Keyboard Shortcuts") + "</b>",
      halign:Gtk.Align.START, use_markup: true}));
 
-    this.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>Move Focus</b>",
+    this.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>" + _("Move Focus") + "</b>",
      halign:Gtk.Align.START, use_markup: true}));
 
-    this.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>Applications</b>",
+    this.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>" + _("Applications") + "</b>",
      halign:Gtk.Align.START, use_markup: true}));
   },
 
@@ -62,13 +62,13 @@ const PutWindowSettingsWidget = new GObject.Class({
     let currentValue = Utils.getNumber(Utils.CORNER_CHANGE, 0);
 
     let values = [
-    ["0", "Both"],
-    ["1", "Only height"],
-    ["2", "Only width"],
-    ["3", "Never change size"],
-    ["4", "Nothing on first move, both on second"],
-    ["5", "Nothing on first move, Only height on second"],
-    ["6", "Nothing on first move, Only width on second"]
+    ["0", _("Both")],
+    ["1", _("Only height")],
+    ["2", _("Only width")],
+    ["3", _("Never change size")],
+    ["4", _("Nothing on first move, both on second")],
+    ["5", _("Nothing on first move, Only height on second")],
+    ["6", _("Nothing on first move, Only width on second")]
     ]
     let selectMe = null;
     for (let i=0; i< values.length; i++) {
@@ -113,14 +113,14 @@ const PutWindowSettingsWidget = new GObject.Class({
     let ret = new Gtk.Grid();
     ret.column_homogeneous = true;
 
-    ret.attach(new Gtk.Label({label: "<b>Main settings</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
+    ret.attach(new Gtk.Label({label: "<b>" + _("Main settings") + "</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
     ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 5, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "Always use multiple widths/heights:",
-      tooltip_text:"Disable this option to move to other screen if possible",
+      label: _("Always use multiple widths/heights:"),
+      tooltip_text: _("Disable this option to move to other screen if possible"),
     }), 0, row, 4, 1);
 
     let alwaysSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -132,7 +132,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "Enable move to workspace:"
+      label: _("Enable move to workspace:")
     }), 0, row, 4, 1);
 
     let workspaceSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -144,9 +144,23 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "First maximize then move to center:",
-      tooltip_text: "'Move to center' maximizes the current window, and centers maximized windows",
-    }), 0, row, 4, 1);
+      label: _("Always ignore top panel:"),
+      tooltip_text: _("Enable this if you use an extension to hide the top panel")
+    }), 0, row, 4, 1)
+
+    let ignoreTopPanelSwitch = new Gtk.Switch({sensitive: true, halign: Gtk.Align.END });
+    ignoreTopPanelSwitch.set_active(Utils.getBoolean(Utils.IGNORE_TOP_PANEL, false));
+    ignoreTopPanelSwitch.connect("notify::active", function(obj) {
+      Utils.setParameter(Utils.IGNORE_TOP_PANEL, obj.get_active());
+    });
+    ret.attach(ignoreTopPanelSwitch, 4, row++, 1, 1)
+
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      margin_left: 10,
+      label: _("First maximize then, move to center:"),
+      tooltip_text: _("'Move to center' maximizes the current window, and centers maximized windows"),
+    }), 0, row, 4, 1);;
 
     let centerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
     centerSwitch.set_active(Utils.getBoolean(Utils.REVERSE_MOVE_CENTER, false));
@@ -156,8 +170,8 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "Intelligent corner movement:",
-      tooltip_text: "Quite difficult to describe. Enable it and move a window from S to E, ",
+      label: _("Intelligent corner movement:"),
+      tooltip_text: _("Quite difficult to describe. Enable it and move a window from S to E, "),
     }), 0, row, 4, 1);
 
     let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -168,8 +182,8 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "Keep width when moving north/south:",
-      tooltip_text: "Windows will not change their width when moved north or south",
+      label: _("Keep width when moving north/south:"),
+      tooltip_text: _("Windows will not change their width when moved north or south"),
     }), 0, row, 4, 1);
 
     let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -180,8 +194,8 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "Keep height when moving east/west:",
-      tooltip_text: "Windows will not change their height when moved east or west",
+      label: _("Keep height when moving east/west:"),
+      tooltip_text: _("Windows will not change their height when moved east or west"),
     }), 0, row, 4, 1);
 
     let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -190,9 +204,9 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
-      label: "Moving to corner:",
+      label: _("Moving to corner:"),
       margin_left: 10,
-      tooltip_text:"Adjust window width and height when moved to corner?",
+      tooltip_text: _("Adjust window width and height when moved to corner?"),
       halign: Gtk.Align.START
     }), 0, row, 2, 1);
 
@@ -200,13 +214,13 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(combo, 2, row++, 3, 1);
 
     // ------------------------------------- center ----------------------------------------
-    ret.attach(new Gtk.Label({label: "<b>Center Width &amp; Heigth</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
+    ret.attach(new Gtk.Label({label: "<b>" + _("Center Width &amp; Heigth") + "</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
     ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 5, 1);
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: "Keep width when moving north/south:",
-      tooltip_text: "Don't change width when moving window from center to north or south.",
+      label: _("Keep width when moving north/south:"),
+      tooltip_text: _("Don't change width when moving window from center to north or south."),
     }), 0, row, 4, 1);
 
     let keepWidthSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -232,34 +246,34 @@ const PutWindowSettingsWidget = new GObject.Class({
       halign: Gtk.Align.START,
       margin_top: 4,
       margin_left: 4,
-      label: "You can define up to three sizes that will be used when you move a window to the same direction " +
-      "multiple times. Equal values are ignored."
+      label: _("You can define up to three sizes that will be used when you move a window to the same direction " +
+      "multiple times. Equal values are ignored.")
     });
     description.set_line_wrap(true);
     positions.attach(description, 0, row++, 6, 1);
 
-    let labels = ["First:", "Second: ", "Third:"];
+    let labels = [_("First:"), _("Second:"), _("Third:")];
     // ------------------------------------- north ----------------------------------------
-    positions.attach(new Gtk.Label({label: "<b>North height</b>", halign:Gtk.Align.START, margin_left: 4, margin_top: 4, use_markup: true}), 0, row++, 5, 1);
+    positions.attach(new Gtk.Label({label: "<b>" + _("North height") + "</b>", halign:Gtk.Align.START, margin_left: 4, margin_top: 4, use_markup: true}), 0, row++, 5, 1);
     positions.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
     row = this._addSliders(positions, row, labels, "north-height");
     row++;
 
     // ------------------------------------- south ----------------------------------------
-    positions.attach(new Gtk.Label({label: "<b>South height</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
+    positions.attach(new Gtk.Label({label: "<b>" + _("South height") + "</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
     positions.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
     row = this._addSliders(positions, row, labels, "south-height");
     row++;
 
 
     // ------------------------------------- east ----------------------------------------
-    positions.attach(new Gtk.Label({label: "<b>East width</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
+    positions.attach(new Gtk.Label({label: "<b>" + _("East width") + "</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
     positions.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
     row = this._addSliders(positions, row, labels, "right-side-widths");
     row++;
 
     // ------------------------------------- west ----------------------------------------
-    positions.attach(new Gtk.Label({label: "<b>West width</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
+    positions.attach(new Gtk.Label({label: "<b>" + _("West width") + "</b>", halign:Gtk.Align.START, margin_left:4, use_markup: true}), 0, row++, 5, 1);
     positions.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 6, 1);
     this._addSliders(positions, row, labels, "left-side-widths");
 
@@ -271,18 +285,18 @@ const PutWindowSettingsWidget = new GObject.Class({
 
   _createKeyboardConfig: function() {
     return this._createBindingList({
-      "put-to-corner-ne": "Move to top right corner",
-      "put-to-corner-nw": "Move to top left corner",
-      "put-to-corner-se": "Move to bottom right corner",
-      "put-to-corner-sw": "Move to bottom left corner",
-      "put-to-side-n": "Move to top",
-      "put-to-side-e": "Move right",
-      "put-to-side-s": "Move to bottom",
-      "put-to-side-w": "Move to left",
-      "put-to-center": "Move to center/maximize",
-      "put-to-location": "Move to configured location",
-      "put-to-left-screen": "Move to the left screen",
-      "put-to-right-screen": "Move to the right screen",
+      "put-to-corner-ne": _("Move to top right corner"),
+      "put-to-corner-nw": _("Move to top left corner"),
+      "put-to-corner-se": _("Move to bottom right corner"),
+      "put-to-corner-sw": _("Move to bottom left corner"),
+      "put-to-side-n": _("Move to top"),
+      "put-to-side-e": _("Move right"),
+      "put-to-side-s": _("Move to bottom"),
+      "put-to-side-w": _("Move to left"),
+      "put-to-center": _("Move to center/maximize"),
+      "put-to-location": _("Move to configured location"),
+      "put-to-left-screen": _("Move to the left screen"),
+      "put-to-right-screen": _("Move to the right screen"),
     });
   },
 
@@ -295,33 +309,33 @@ const PutWindowSettingsWidget = new GObject.Class({
     let description = new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 4,
-      label: "'Move Focus' allows you to change the focus based on the relative location of the current focussed window using the keyboard and to push the currently focused window into the background to get the focus to the windows below."
+      label: _("'Move Focus' allows you to change the focus based on the relative location of the current focussed window using the keyboard and to push the currently focused window into the background to get the focus to the windows below.")
     });
     description.set_line_wrap(true);
     ret.attach(description, 0, row++, 5, 1);
     
     let labels = [
-    "Enable 'Move focus'",
-    "Show animation when moving",
-    "Enable cycle through windows at the same postition",
-    "Enable focus the window that's north of the current",
-    "Enable focus the window that's east of the current",
-    "Enable focus the window that's south of the current",
-    "Enable focus the window that's west of the current",
-    "Enable move the focus to the left screen",
-    "Enable move the focus to the right screen"
+      _("Enable 'Move focus'"),
+      _("Show animation when moving"),
+      _("Enable cycle through windows at the same postition"),
+      _("Enable focus the window that's north of the current"),
+      _("Enable focus the window that's east of the current"),
+      _("Enable focus the window that's south of the current"),
+      _("Enable focus the window that's west of the current"),
+      _("Enable move the focus to the left screen"),
+      _("Enable move the focus to the right screen")
     ];
 
     let configNames = [
     Utils.MOVE_FOCUS_ENABLED,
     Utils.MOVE_FOCUS_ANIMATION,
-    "move-focus-cycle-enabled",
-    "move-focus-north-enabled",
-    "move-focus-east-enabled",
-    "move-focus-south-enabled",
-    "move-focus-west-enabled",
-    "move-focus-left-screen-enabled",
-    "move-focus-right-screen-enabled",
+      _("move-focus-cycle-enabled"),
+      _("move-focus-north-enabled"),
+      _("move-focus-east-enabled"),
+      _("move-focus-south-enabled"),
+      _("move-focus-west-enabled"),
+      _("move-focus-left-screen-enabled"),
+      _("move-focus-right-screen-enabled")
     ];
 
     for (let i=0; i<labels.length; i++) {
@@ -343,17 +357,17 @@ const PutWindowSettingsWidget = new GObject.Class({
     }
     
     
-    ret.attach(new Gtk.Label({label: "<b>Keyboard bindings</b>", halign:Gtk.Align.START, margin_left: 4, margin_top: 5, use_markup: true}), 0, row++, 5, 1);
+    ret.attach(new Gtk.Label({label: "<b>" + _("Keyboard bindings") + "</b>", halign:Gtk.Align.START, margin_left: 4, margin_top: 5, use_markup: true}), 0, row++, 5, 1);
     ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_left: 4, margin_top: 4, margin_bottom: 4}), 0, row++, 5, 1);
 
     let keyBinding = this._createBindingList({
-      "move-focus-north": "Move the window focus up",
-      "move-focus-east": "Move the window focus right",
-      "move-focus-south": "Move the window focus down",
-      "move-focus-west": "Move the window focus left",
-      "move-focus-cycle": "Push focused window to the background",
-      "move-focus-left-screen": "Move the focus to the left screen",
-      "move-focus-right-screen": "Move the focus to the right screen"
+      "move-focus-north": _("Move the window focus up"),
+      "move-focus-east": _("Move the window focus right"),
+      "move-focus-south": _("Move the window focus down"),
+      "move-focus-west": _("Move the window focus left"),
+      "move-focus-cycle": _("Push focused window to the background"),
+      "move-focus-left-screen": _("Move the focus to the left screen"),
+      "move-focus-right-screen": _("Move the focus to the right screen")
     });
     ret.attach(keyBinding, 0, row, 5, 1);
 
@@ -400,7 +414,7 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     // enabled column
     let cellrend = new Gtk.CellRendererToggle({'radio': false, 'activatable': true});
-    let col = new Gtk.TreeViewColumn({ 'title': 'Enabled', 'expand': false});
+    let col = new Gtk.TreeViewColumn({ 'title': _('Enabled'), 'expand': false});
     col.pack_start(cellrend, true);
     col.add_attribute(cellrend, 'active', 0);
 
@@ -423,7 +437,7 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     // Action column
     cellrend = new Gtk.CellRendererText();
-    col = new Gtk.TreeViewColumn({ 'title': 'Action', 'expand': true});
+    col = new Gtk.TreeViewColumn({ 'title': _('Action'), 'expand': true});
     col.pack_start(cellrend, true);
     col.add_attribute(cellrend, 'text', 2);
     treeview.append_column(col);
@@ -439,7 +453,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       let [succ, iterator ] = model.get_iter_from_string(iter);
 
       if(!succ) {
-        throw new Error("Error updating Keybinding");
+        throw new Error(_("Error updating Keybinding"));
       }
 
       let name = model.get_value(iterator, 1);
@@ -449,8 +463,8 @@ const PutWindowSettingsWidget = new GObject.Class({
           modal: true,
           message_type: Gtk.MessageType.WARNING,
           buttons:Gtk. ButtonsType.OK,
-          title: "Keyboard binding alread defined",
-          text: "The binding is alread used by " + existingBinding
+          title: _("Keyboard binding alread defined"),
+          text: _("The binding is alread used by ") + existingBinding
         });
 
         md.run();
@@ -469,7 +483,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       let [succ, iterator] = model.get_iter_from_string(iter);
 
       if (!succ) {
-        throw new Error("Error clearing keybinding");
+        throw new Error(_("Error clearing keybinding");
       }
       let name = model.get_value(iterator, 1);
 
@@ -481,7 +495,7 @@ const PutWindowSettingsWidget = new GObject.Class({
         Utils.set_strv(name, []);
       });
 
-    col = new Gtk.TreeViewColumn({'title': 'Modify'});
+    col = new Gtk.TreeViewColumn({'title': _('Modify')});
 
     col.pack_end(cellrend, false);
     col.add_attribute(cellrend, 'accel-mods', 3);
@@ -505,8 +519,11 @@ const PutWindowLocationWidget = new GObject.Class({
     this.orientation= Gtk.Orientation.VERTICAL;
     this.column_homogeneous = true;
 
-    let label = new Gtk.Label({label: "Application based size and location setting, that allows you to " +
-      "move windows on startup or circle between multiple configured locations.", halign:Gtk.Align.START, margin_left: 4,});
+    let label = new Gtk.Label({
+      label: _("Application based size and location setting, that allows you to move windows on startup or circle between multiple configured locations."), 
+      halign:Gtk.Align.START,
+      margin_left: 4
+    });
     label.set_line_wrap(true);
     this.attach(label, 0, 0, 8, 1);
 
@@ -561,7 +578,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
     this._removeAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_REMOVE} );
     this._removeAppButton.set_sensitive(false);
-    this._removeAppButton.set_tooltip_text("Remove an existing application");
+    this._removeAppButton.set_tooltip_text(_("Remove an existing application setting");
 
     this._removeAppButton.connect("clicked",
       Lang.bind(this, function() {
@@ -605,15 +622,15 @@ const PutWindowLocationWidget = new GObject.Class({
       );
 
     this._addAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_ADD} );
-    this._addAppButton.set_tooltip_text("Add a new application (make sure it is runnging)");
+    this._addAppButton.set_tooltip_text(_("Add a new application (make sure it is runnging)"));
     this._addAppButton.connect("clicked",
       Lang.bind(this, function() {
 
         let dialog = new Gtk.MessageDialog({
           modal: false,
           message_type: Gtk.MessageType.QUESTION,
-          title: "Add application",
-          text: "Please select the application you want to add"
+          title: _("Add application"),
+          text: _("Please select the application you want to add")
         });
 
         let appModel = new Gtk.ListStore();
@@ -659,7 +676,7 @@ const PutWindowLocationWidget = new GObject.Class({
       );
 
     this._saveButton = new Gtk.ToolButton({stock_id: Gtk.STOCK_SAVE});
-    this._saveButton.set_tooltip_text("'Applications' config is not saved automatically.")
+    this._saveButton.set_tooltip_text(_("'Applications' config is not saved automatically."))
     this._saveButton.connect("clicked", function() {
       Utils.saveSettings();
     });
@@ -729,7 +746,10 @@ const PutWindowLocationWidget = new GObject.Class({
     if (Utils.getBoolean(Utils.ENABLE_MOVE_WORKSPACE, false)) {
       let workspaceBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
 
-      workspaceBox.pack_start(new Gtk.Label({label: "Move window to workspace when created", xalign: 0}), true, true, 0);
+      workspaceBox.pack_start(new Gtk.Label({
+        label: _("Move window to workspace when created"), 
+        xalign: 0
+      }), true, true, 0);
 
       let workspacesActive = Utils.getBoolean(configLocation + "moveWorkspace", false);
 
@@ -761,7 +781,7 @@ const PutWindowLocationWidget = new GObject.Class({
       numberButton.set_sensitive(workspacesActive);
 
 
-      workspaceIndexBox.pack_start(new Gtk.Label({label: "Window target workspace", xalign: 0}), true, true, 0);
+      workspaceIndexBox.pack_start(new Gtk.Label({label: _("Window target workspace"), xalign: 0}), true, true, 0);
       workspaceIndexBox.pack_start(numberButton, false, false, 0);
 
       ret.pack_start(workspaceIndexBox, false, false, 0);
@@ -772,7 +792,7 @@ const PutWindowLocationWidget = new GObject.Class({
     }
 
     let autoMoveBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL});
-    autoMoveBox.pack_start(new Gtk.Label({label: "Auto-Move window when created", xalign: 0}), true, true, 0);
+    autoMoveBox.pack_start(new Gtk.Label({label: _("Auto-Move window when created"), xalign: 0}), true, true, 0);
 
     let btn = new Gtk.Switch({ active: Utils.getBoolean(configLocation + "autoMove", false) });
     btn.connect("notify::active", function(sw) {
@@ -847,7 +867,7 @@ const PutWindowLocationWidget = new GObject.Class({
       })
       );
 
-    grid.attach(new Gtk.Label({label: "Screen", xalign: 0}), 0, top, 3, 1);
+    grid.attach(new Gtk.Label({label: _("Screen"), xalign: 0}), 0, top, 3, 1);
     grid.attach(screenSelector, 3, top, 1, 1);
 
     // add/delete buttons
@@ -884,22 +904,22 @@ const PutWindowLocationWidget = new GObject.Class({
     // sliders for widht, height, x, y
     top++;
     let scaleW = createSlider(loc + "width");
-    grid.attach(new Gtk.Label({label: "width", xalign: 0}), 0, top, 1, 1);
+    grid.attach(new Gtk.Label({label: _("Width"), xalign: 0}), 0, top, 1, 1);
     grid.attach(scaleW, 1, top, 4, 1);
 
     top++;
     let scaleH = createSlider(loc + "height");
-    grid.attach(new Gtk.Label({label: "Height", xalign: 0}), 0, top, 1, 1);
+    grid.attach(new Gtk.Label({label: _("Height"), xalign: 0}), 0, top, 1, 1);
     grid.attach(scaleH, 1, top, 4, 1);
 
     top++;
     let scaleX = createSlider(loc + "x");
-    grid.attach(new Gtk.Label({label: "X-Position", xalign: 0}), 0, top, 1, 1);
+    grid.attach(new Gtk.Label({label: _("X-Position"), xalign: 0}), 0, top, 1, 1);
     grid.attach(scaleX, 1, top, 4, 1);
 
     top++;
     let scaleY = createSlider(loc + "y");
-    grid.attach(new Gtk.Label({label: "Y-Position", xalign: 0}), 0, top, 1, 1);
+    grid.attach(new Gtk.Label({label: _("Y-Position"), xalign: 0}), 0, top, 1, 1);
     grid.attach(scaleY, 1, top, 4, 1);
 
     if (index < (positionSize -1 )) {
