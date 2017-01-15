@@ -8,11 +8,13 @@ const Wnck = imports.gi.Wnck;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
+
+const Convenience = Me.imports.convenience;
 const Utils = new Me.imports.utils.Utils();
 
 const Lang = imports.lang;
-const Gettext = imports.gettext.domain('gnome-shell-extensions');
-const _ = Gettext.gettext;
+
+const _ = imports.gettext.domain(Me.metadata['gettext-domain']).gettext;
 
 let createSlider = function(configName) {
   let ret = new Gtk.Scale({digits: 0, sensitive: true, orientation: Gtk.Orientation.HORIZONTAL, margin_right: 6, margin_left: 6});
@@ -464,7 +466,7 @@ const PutWindowSettingsWidget = new GObject.Class({
           message_type: Gtk.MessageType.WARNING,
           buttons:Gtk. ButtonsType.OK,
           title: _("Keyboard binding alread defined"),
-          text: _("The binding is alread used by ") + existingBinding
+          text: _("The binding is alread used by '%s'").format(existingBinding)
         });
 
         md.run();
@@ -483,7 +485,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       let [succ, iterator] = model.get_iter_from_string(iter);
 
       if (!succ) {
-        throw new Error(_("Error clearing keybinding");
+        throw new Error(_("Error clearing keybinding"));
       }
       let name = model.get_value(iterator, 1);
 
@@ -578,7 +580,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
     this._removeAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_REMOVE} );
     this._removeAppButton.set_sensitive(false);
-    this._removeAppButton.set_tooltip_text(_("Remove an existing application setting");
+    this._removeAppButton.set_tooltip_text(_("Remove an existing application setting"));
 
     this._removeAppButton.connect("clicked",
       Lang.bind(this, function() {
@@ -586,8 +588,8 @@ const PutWindowLocationWidget = new GObject.Class({
         let dialog = new Gtk.MessageDialog({
           modal: true,
           message_type: Gtk.MessageType.QUESTION,
-          title: "Delete application '" + this._selectedApp + "'?",
-          text: "Are you sure to delete the configuration for  '" + this._selectedApp + "'?"
+          title: _("Delete application '%s'?").format(this._selectedApp),
+          text: _("Are you sure to delete the configuration for  '%s'?").format(this._selectedApp)
         });
 
         dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
@@ -932,6 +934,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
 
 function init() {
+  Convenience.initTranslations();
 }
 
 function buildPrefsWidget() {

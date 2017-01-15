@@ -3,19 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-15 13:17+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2017-01-15 14:00+0100\n"
+"PO-Revision-Date: 2017-01-15 14:05+0100\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.11\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: de_DE\n"
 
 #: prefs.js:40
 msgid "Main"
@@ -39,31 +40,31 @@ msgstr ""
 
 #: prefs.js:65
 msgid "Both"
-msgstr ""
+msgstr "Beide"
 
 #: prefs.js:66
 msgid "Only height"
-msgstr ""
+msgstr "Nur Höhe"
 
 #: prefs.js:67
 msgid "Only width"
-msgstr ""
+msgstr "Nur Breite"
 
 #: prefs.js:68
 msgid "Never change size"
-msgstr ""
+msgstr "Größe nie ändern"
 
 #: prefs.js:69
 msgid "Nothing on first move, both on second"
-msgstr ""
+msgstr "Nichts beim ersten mal, beide beim Zweiten"
 
 #: prefs.js:70
 msgid "Nothing on first move, Only height on second"
-msgstr ""
+msgstr "Nichts beim ersten mal, nur Höhe beim Zweiten"
 
 #: prefs.js:71
 msgid "Nothing on first move, Only width on second"
-msgstr ""
+msgstr "Nichts beim ersten mal, nur Breite beim Zweiten"
 
 #: prefs.js:116
 msgid "Main settings"
@@ -124,11 +125,13 @@ msgstr ""
 
 #: prefs.js:207
 msgid "Moving to corner:"
-msgstr ""
+msgstr "In die Ecke verschieben"
 
 #: prefs.js:209
 msgid "Adjust window width and height when moved to corner?"
 msgstr ""
+"Soll die Breite und Höhe des Fensters geändert werden, wenn es in eine Ecke "
+"verschoben wird?"
 
 #: prefs.js:217
 msgid "Center Width &amp; Heigth"
