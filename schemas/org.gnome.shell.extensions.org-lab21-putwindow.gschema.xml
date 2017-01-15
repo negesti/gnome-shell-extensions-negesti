@@ -9,6 +9,10 @@
       <default>0</default>
       <summary>Ignore top panel height</summary>
     </key>
+    <key type="i" name="move-center-only-toggles">
+      <default>0</default>
+      <summary>Move to center onyl toggles maximize flags</summary>
+    </key>
     <key type="i" name="enable-move-workspace">
       <default>0</default>
       <summary>Enable move to workspace feature</summary>

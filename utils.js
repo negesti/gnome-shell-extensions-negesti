@@ -26,6 +26,7 @@ Utils.prototype = {
   REVERSE_MOVE_CENTER: "reverse-move-center",
 
   IGNORE_TOP_PANEL: "ignore-top-panel",
+  MOVE_CENTER_ONLY_TOGGLES: "move-center-only-toggles",
 
   ALWAYS_KEEP_WIDTH: "always-keep-width",
   ALWAYS_KEEP_HEIGHT: "always-keep-height",
@@ -76,33 +77,12 @@ Utils.prototype = {
   },
 
   loadSettings: function() {
-/*    let schema = Me.metadata['settings-schema'];
-
-    const GioSSS = Gio.SettingsSchemaSource;
-
-    let schemaDir = Me.dir.get_child('schemas');
-    let schemaSource;
-    if (schemaDir.query_exists(null)) {
-      schemaSource = GioSSS.new_from_directory(schemaDir.get_path(), GioSSS.get_default(), false);
-    } else {
-      schemaSource = GioSSS.get_default();
-    }
-
-    schema = schemaSource.lookup(schema, true);
-    if (!schema) {
-        throw new Error('Schema ' + schema + ' could not be found for extension '
-                        + Me.metadata.uuid + '. Please check your installation.');
-    }
-*/
     this._settingsObject = Convenience.getSettings();
     this._settings = {
       centerWidth: this._settingsObject.get_int("center-width"),
       centerHeight: this._settingsObject.get_int("center-height"),
       locations: JSON.parse(this._settingsObject.get_string("locations"))
-    };
-
-
-    
+    };   
   },
 
   _loadGlobalBindings: function() {
@@ -168,6 +148,10 @@ Utils.prototype = {
     } catch (e) {
       this.showErrorMessage("Error saving settings ", e);
     }
+  },
+
+  toggleMaximizeOnMoveCenter: function() {
+    return this.getBoolean("move-center-only-toggles", false);
   },
 
   // ["0", "Both"],

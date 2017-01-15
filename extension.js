@@ -596,6 +596,17 @@ MoveWindow.prototype = {
     s = this._recalculateSizes(s);
 
     if (where == "c") {
+
+      if (this._utils.toggleMaximizeOnMoveCenter()) {
+        var flags = Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL;
+        if (win.maximized_horizontally && win.maximized_vertically) {
+          win.unmaximize(flags);
+        } else {
+          win.maximize(flags);
+        }
+        return;
+      }
+
       let pos = win.get_frame_rect(),
         centerWidth = this._utils.getNumber(this._utils.CENTER_WIDTH, 50),
         centerHeight = this._utils.getNumber(this._utils.CENTER_HEIGHT, 50);

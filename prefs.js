@@ -146,6 +146,20 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
+      label: _("Move to center maximizes and restores initial window size:"),
+      tooltip_text: _("Maximize the window on first move and restore original size and position on second")
+    }), 0, row, 4, 1);
+
+    let centerToggleSwitch = new Gtk.Switch({sensitive: true, halign: Gtk.Align.END });
+    centerToggleSwitch.set_active(Utils.getBoolean(Utils.MOVE_CENTER_ONLY_TOGGLES, false));
+    centerToggleSwitch.connect("notify::active", function(obj) {
+      Utils.setParameter(Utils.MOVE_CENTER_ONLY_TOGGLES, obj.get_active());
+    });
+    ret.attach(centerToggleSwitch, 4, row++, 1, 1)
+
+    ret.attach(new Gtk.Label({
+      halign: Gtk.Align.START,
+      margin_left: 10,
       label: _("Always ignore top panel:"),
       tooltip_text: _("Enable this if you use an extension to hide the top panel")
     }), 0, row, 4, 1)
