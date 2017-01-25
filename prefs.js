@@ -345,13 +345,13 @@ const PutWindowSettingsWidget = new GObject.Class({
     let configNames = [
     Utils.MOVE_FOCUS_ENABLED,
     Utils.MOVE_FOCUS_ANIMATION,
-      _("move-focus-cycle-enabled"),
-      _("move-focus-north-enabled"),
-      _("move-focus-east-enabled"),
-      _("move-focus-south-enabled"),
-      _("move-focus-west-enabled"),
-      _("move-focus-left-screen-enabled"),
-      _("move-focus-right-screen-enabled")
+      "move-focus-cycle-enabled",
+      "move-focus-north-enabled",
+      "move-focus-east-enabled",
+      "move-focus-south-enabled",
+      "move-focus-west-enabled",
+      "move-focus-left-screen-enabled",
+      "move-focus-right-screen-enabled"
     ];
 
     for (let i=0; i<labels.length; i++) {
@@ -716,6 +716,20 @@ const PutWindowLocationWidget = new GObject.Class({
   },
 
   _getRunningApps: function(exclude) {
+
+    if (this._wnckScreen == null) {
+      var md = new Gtk.MessageDialog({
+          modal: true,
+          message_type: Gtk.MessageType.WARNING,
+          buttons:Gtk. ButtonsType.OK,
+          title: _("Error getting running apps"),
+          text: _("We were not able to get the list of running apps from Wnck. Are you running Wayland? ")
+        });
+
+        md.run();
+        md.destroy();
+        return [];
+    }
 
     let windows = this._wnckScreen.get_windows();
 

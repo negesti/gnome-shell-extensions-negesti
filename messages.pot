@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-15 14:43+0100\n"
+"POT-Creation-Date: 2017-01-25 19:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -273,34 +273,6 @@ msgstr ""
 msgid "Enable move the focus to the right screen"
 msgstr ""
 
-#: prefs.js:348
-msgid "move-focus-cycle-enabled"
-msgstr ""
-
-#: prefs.js:349
-msgid "move-focus-north-enabled"
-msgstr ""
-
-#: prefs.js:350
-msgid "move-focus-east-enabled"
-msgstr ""
-
-#: prefs.js:351
-msgid "move-focus-south-enabled"
-msgstr ""
-
-#: prefs.js:352
-msgid "move-focus-west-enabled"
-msgstr ""
-
-#: prefs.js:353
-msgid "move-focus-left-screen-enabled"
-msgstr ""
-
-#: prefs.js:354
-msgid "move-focus-right-screen-enabled"
-msgstr ""
-
 #: prefs.js:376
 msgid "Keyboard bindings"
 msgstr ""
@@ -402,34 +374,44 @@ msgstr ""
 msgid "Select an application to configure using the list on the left side."
 msgstr ""
 
-#: prefs.js:766
+#: prefs.js:725
+msgid "Error getting running apps"
+msgstr ""
+
+#: prefs.js:726
+msgid ""
+"We were not able to get the list of running apps from Wnck. Are you running "
+"Wayland? "
+msgstr ""
+
+#: prefs.js:780
 msgid "Move window to workspace when created"
 msgstr ""
 
-#: prefs.js:800
+#: prefs.js:814
 msgid "Window target workspace"
 msgstr ""
 
-#: prefs.js:811
+#: prefs.js:825
 msgid "Auto-Move window when created"
 msgstr ""
 
-#: prefs.js:886
+#: prefs.js:900
 msgid "Screen"
 msgstr ""
 
-#: prefs.js:923
+#: prefs.js:937
 msgid "Width"
 msgstr ""
 
-#: prefs.js:928
+#: prefs.js:942
 msgid "Height"
 msgstr ""
 
-#: prefs.js:933
+#: prefs.js:947
 msgid "X-Position"
 msgstr ""
 
-#: prefs.js:938
+#: prefs.js:952
 msgid "Y-Position"
 msgstr ""

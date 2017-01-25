@@ -31,55 +31,23 @@ The extension can be configured using the gnome prefs tool.
 
 Wnck
 -----
-For application base configuration the extension requires the wnck library. If wnck is not installed, you can not open
-the preferences window
+For application base configuration the extension relies on the wnck library. 
 
 * Suse: `sudo zypper in libwnck-devel`
 * Arch: `pacman -S libwnck3`
 * Fedora: 
-** `sudo yum install libwnck3` (should be installed on F19)
-** `sudo dnf install linwnck3` (dnf is the new yum since F23)
+ * `sudo yum install libwnck3` 
+ * `sudo dnf install linwnck3` 
 * Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
-Keybindings
------------
-
-__Gnome Shell >= 3.4__
-Keybindings are configured using gsettings stored in a custom schema file inside the extension directory. To
-modify the keybindings use the "gnome prefs tool".
-
-The following keys are available:
-
-* put-to-side-n
-  *  move to north edge, height: 50% width 100%
-* put-to-side-e
-  *  move to easth edge, height: 100% width 50%
-* put-to-side-s
-  *  move to south edge, height: 50% width 100%
-* put-to-side-w
-  *  move to west  edge, height: 100% width 50%
-* put-to-corner-XY   width 50% height 50%
-  *  move-to-corner-ne
-  *  move-to-corner-se
-  *  move-to-corner-sw
-  *  move-to-corner-nw
-* put-to-center
-  *  move to center of the screen, widht 50% height 50%. Press twice to maximize the window
-* put-to-location
-  *  resize to a configured location (see wiki for details)
-
-__Gnome Shell 3.2__
-
-In version 3.2 it was not possible for extension developers to add custom keybinding. This extension works (or let's better call say "worked") with v3.2 and  used pre defined global keyboard binding. 
-
-
-For details, how to configure the extension in v3.2, please check the [[wiki|https://github.com/negesti/gnome-shell-extensions-negesti/wiki/Gnome-Shell-3.2]]
+**Wayland**
+At the moment there I have problems getting Wnck to run under Wayland - [Issue 109](https://github.com/negesti/gnome-shell-extensions-negesti/issues/109)
 
 
 Multi screen setup support
 -------
 
-the extention works well with mutliple screens.
+The extention works well with mutliple screens.
 
 Moving windows from one screen to another is currently only possible in horizontal setup. e.g. a window that is a the left or right side of one screen, can be moved to the next screen using keyboard shortcuts.
 
@@ -89,10 +57,10 @@ Moving windows from one screen to another is currently only possible in horizont
 The keyboard settings can be changed using the preferences.
 
 
-License:
+License
 --------
 
-Copyright (c) 2011-2016 Clemens Eberwein
+Copyright (c) 2011-2017 Clemens Eberwein
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of VERSION 2 of the GNU General Public
