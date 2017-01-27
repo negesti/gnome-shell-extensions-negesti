@@ -127,7 +127,7 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     let alwaysSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
     alwaysSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_USE_WIDTHS, false));
-    alwaysSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active()); });    
+    alwaysSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_USE_WIDTHS, obj.get_active()); });
 
     ret.attach(alwaysSwitch, 4, row++, 1, 1);
 
@@ -306,7 +306,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       "put-to-corner-se": _("Move to bottom right corner"),
       "put-to-corner-sw": _("Move to bottom left corner"),
       "put-to-side-n": _("Move to top"),
-      "put-to-side-e": _("Move right"),
+      "put-to-side-e": _("Move to right"),
       "put-to-side-s": _("Move to bottom"),
       "put-to-side-w": _("Move to left"),
       "put-to-center": _("Move to center/maximize"),
@@ -329,7 +329,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     });
     description.set_line_wrap(true);
     ret.attach(description, 0, row++, 5, 1);
-    
+
     let labels = [
       _("Enable 'Move focus'"),
       _("Show animation when moving"),
@@ -369,10 +369,10 @@ const PutWindowSettingsWidget = new GObject.Class({
         function(obj) {
           Utils.setParameter(this.configName, obj.get_active());
         }));
-      ret.attach(enabledSwitch, 4, row++, 1, 1);  
+      ret.attach(enabledSwitch, 4, row++, 1, 1);
     }
-    
-    
+
+
     ret.attach(new Gtk.Label({label: "<b>" + _("Keyboard bindings") + "</b>", halign:Gtk.Align.START, margin_left: 4, margin_top: 5, use_markup: true}), 0, row++, 5, 1);
     ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_left: 4, margin_top: 4, margin_bottom: 4}), 0, row++, 5, 1);
 
@@ -404,7 +404,7 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     for (name in bindings) {
       let enabled = Utils.getBoolean(name + "-enabled");
-      
+
       if (!enabled) {
         Utils.set_strv(name, []);
       }
@@ -487,7 +487,7 @@ const PutWindowSettingsWidget = new GObject.Class({
         md.destroy();
         return;
       }
-      
+
       // set the active flag
       Utils.setParameter(name + "-enabled",1);
       model.set(iterator, [0], [true]);
@@ -536,7 +536,7 @@ const PutWindowLocationWidget = new GObject.Class({
     this.column_homogeneous = true;
 
     let label = new Gtk.Label({
-      label: _("Application based size and location setting, that allows you to move windows on startup or circle between multiple configured locations."), 
+      label: _("Application based size and location setting, that allows you to move windows on startup or circle between multiple configured locations."),
       halign:Gtk.Align.START,
       margin_left: 4
     });
@@ -777,14 +777,14 @@ const PutWindowLocationWidget = new GObject.Class({
       let workspaceBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
 
       workspaceBox.pack_start(new Gtk.Label({
-        label: _("Move window to workspace when created"), 
+        label: _("Move window to workspace when created"),
         xalign: 0
       }), true, true, 0);
 
       let workspacesActive = Utils.getBoolean(configLocation + "moveWorkspace", false);
 
       let btn = new Gtk.Switch({ active: workspacesActive });
-      btn.connect("notify::active", 
+      btn.connect("notify::active",
         function(sw) {
           Utils.setParameter(configLocation + "moveWorkspace", sw.get_active());
           numberButton.set_sensitive(sw.get_active());
@@ -803,7 +803,7 @@ const PutWindowLocationWidget = new GObject.Class({
           step_increment: 1
         })
       });
-      numberButton.connect("changed", 
+      numberButton.connect("changed",
         function(btn){
           Utils.setParameter(configLocation + "targetWorkspace", btn.value);
         });
