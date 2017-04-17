@@ -37,7 +37,6 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.orientation = Gtk.Orientation.VERTICAL;
     this.hexpand = true;
     this.tab_pos = Gtk.PositionType.LEFT;
-    this._wnckScreen = Wnck.Screen.get_default();
 
     this.append_page(this._generateMainSettings(), new Gtk.Label({label: "<b>" + _("Main") + "</b>",
       halign:Gtk.Align.START, margin_top: 0, use_markup: true}));
@@ -51,7 +50,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     this.append_page(this._createMoveFocusConfig(), new Gtk.Label({label: "<b>" + _("Move Focus") + "</b>",
      halign:Gtk.Align.START, use_markup: true}));
 
-    this.append_page(new PutWindowLocationWidget(this._wnckScreen), new Gtk.Label({label: "<b>" + _("Applications") + "</b>",
+    this.append_page(new PutWindowLocationWidget(), new Gtk.Label({label: "<b>" + _("Applications") + "</b>",
      halign:Gtk.Align.START, use_markup: true}));
   },
 
@@ -202,10 +201,10 @@ const PutWindowSettingsWidget = new GObject.Class({
       tooltip_text: _("Windows will not change their width when moved north or south"),
     }), 0, row, 4, 1);
 
-    let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
-    intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_WIDTH, false));
-    intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_WIDTH, obj.get_active()); });
-    ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
+    let keepHeightSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    keepHeightSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_WIDTH, false));
+    keepHeightSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_WIDTH, obj.get_active()); });
+    ret.attach(keepHeightSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
@@ -214,10 +213,10 @@ const PutWindowSettingsWidget = new GObject.Class({
       tooltip_text: _("Windows will not change their height when moved east or west"),
     }), 0, row, 4, 1);
 
-    let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
-    intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_HEIGHT, false));
-    intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_HEIGHT, obj.get_active()); });
-    ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
+    let moveToCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    moveToCornerSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_HEIGHT, false));
+    moveToCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_HEIGHT, obj.get_active()); });
+    ret.attach(moveToCornerSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       label: _("Moving to corner:"),
@@ -528,9 +527,8 @@ const PutWindowLocationWidget = new GObject.Class({
   Name: 'PutWindow.Prefs.PutWindowLocationWidget',
   GTypeName: 'PutWindowLocationWidget',
   Extends: Gtk.Grid,
-  _init: function(wnckScreen) {
+  _init: function() {
     this.parent();
-    this._wnckScreen = wnckScreen
     this.margin = 4;
     this.orientation= Gtk.Orientation.VERTICAL;
     this.column_homogeneous = true;
@@ -642,6 +640,13 @@ const PutWindowLocationWidget = new GObject.Class({
     this._addAppButton.connect("clicked",
       Lang.bind(this, function() {
 
+        let apps = this._getRunningApps(this._apps);
+        if (apps == null) {
+          return;
+        }
+
+        let appsLength = apps.length;
+
         let dialog = new Gtk.MessageDialog({
           modal: false,
           message_type: Gtk.MessageType.QUESTION,
@@ -658,9 +663,6 @@ const PutWindowLocationWidget = new GObject.Class({
         let renderer = new Gtk.CellRendererText();
         appSelector.pack_start(renderer, true);
         appSelector.add_attribute(renderer, 'text', 1);
-
-        let apps = this._getRunningApps(this._apps);
-        let appsLength = apps.length;
 
         for (let i = 0; i < appsLength; i++ ) {
           let iter = appModel.append();
@@ -689,7 +691,7 @@ const PutWindowLocationWidget = new GObject.Class({
         dialog.run();
         dialog.destroy();
       })
-      );
+    );
 
     this._saveButton = new Gtk.ToolButton({stock_id: Gtk.STOCK_SAVE});
     this._saveButton.set_tooltip_text(_("'Applications' config is not saved automatically."))
@@ -717,26 +719,47 @@ const PutWindowLocationWidget = new GObject.Class({
 
   _getRunningApps: function(exclude) {
 
-    if (this._wnckScreen == null) {
-      var md = new Gtk.MessageDialog({
-          modal: true,
-          message_type: Gtk.MessageType.WARNING,
-          buttons:Gtk. ButtonsType.OK,
-          title: _("Error getting running apps"),
-          text: _("We were not able to get the list of running apps from Wnck. Are you running Wayland? ")
-        });
-
-        md.run();
-        md.destroy();
-        return [];
+    if (this._wnckScreen != null) {
+      return this._internalGetRunningApps(exclude);
     }
 
-    let windows = this._wnckScreen.get_windows();
+    // wnckScreen will be null when using wayland ...
+    try {
+      this._wnckScreen = Wnck.Screen.get_default();
+    } catch (e) {
+      global.log(e);
+      this._wnckScreen = null;
+    }
+    if (this._wnckScreen == null) {
+      var md = new Gtk.MessageDialog({
+        modal: true,
+        message_type: Gtk.MessageType.WARNING,
+        buttons: Gtk.ButtonsType.OK,
+        title: _("Error getting running apps"),
+        text: _("We were not able to get the list of running apps from Wnck. Are you running Wayland? ")
+      });
 
+      md.run();
+      md.destroy();
+      return null;
+    }
+
+    this._wnckScreen.force_update();
+    global.log("wnck: " + this._wnckScreen);
+    global.log("wnck: " + this._wnckScreen.get_windows());
+    return this._internalGetRunningApps(exclude);
+  },
+
+  _internalGetRunningApps: function(exclude) {
+    let windows = this._wnckScreen.get_windows();
     let winSize = windows.length;
     let apps = [];
+    let name;
     for (let i=0; i < winSize; i++) {
-      apps.push( windows[i].get_class_group_name() );
+      name = windows[i].get_class_group_name();
+      if (name && name != "") {
+        apps.push( windows[i].get_class_group_name() );  
+      }
     }
     apps.push("All");
 
@@ -966,6 +989,8 @@ function init() {
 }
 
 function buildPrefsWidget() {
+  //var windows = imports.gi.Gdk.Screen.get_default().get_window_stack();
+
   let widget = new PutWindowSettingsWidget();
   widget.show_all();
   return widget;
