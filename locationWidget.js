@@ -206,32 +206,39 @@ const PutWindowLocationWidget = new GObject.Class({
       column_homogeneous: true, margin: 4});
 
     let row = 0;
+    let activeRadioButton = 1;
     this.radio = null;
     this.radio = new Gtk.RadioButton({ label: _("Rule for all applications"), group: this.radio});
     this.radio.connect("toggled", function(btn) {
       updateCheckedState(btn.get_active(), false, false);
+      activeRadioButton = 1;
     });
     grid.attach(this.radio, 0, row++, 2, 1);
+
 
     this.radio = new Gtk.RadioButton({ label: _("Manual enter application name: "), xalign: 0, group: this.radio});
     this.radio.connect("toggled", function(btn) {
       updateCheckedState(false, btn.get_active(), false);
+      activeRadioButton = 2;
     });
 
     let manualEntry = new Gtk.Entry({sensitive: false});
     grid.attach(this.radio, 0, row, 1, 1);
     grid.attach(manualEntry, 1, row++, 1, 1);
 
+     manualEntry.connect("changed", function(entry, data) {
+      updateCheckedState(entry.get_text().length > 0, true, false);
+    });
+
     this.radio = new Gtk.RadioButton({label: _("Select an App"), xalign: 0, group: this.radio});
     this.radio.connect("toggled", function(btn) {
       updateCheckedState(false, false, btn.get_active());
+      activeRadioButton = 3;
     })
     grid.attach(this.radio, 0, row++, 2, 1);
 
     let updateCheckedState = function(one, two, three) {
-      if (one) {
-        addButton.sensitive = true;
-      }
+      addButton.sensitive = one;
       manualEntry.sensitive = two;
       dialog._appChooser.sensitive = three;
     }
@@ -243,6 +250,7 @@ const PutWindowLocationWidget = new GObject.Class({
     });
     dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
     let addButton = dialog.add_button(_("Add"), Gtk.ResponseType.OK);
+
     dialog.set_default_response(Gtk.ResponseType.OK);
 
     dialog._appChooser = new Gtk.AppChooserWidget({
@@ -255,8 +263,7 @@ const PutWindowLocationWidget = new GObject.Class({
     });
     dialog._appChooser.connect('application-selected', Lang.bind(this,
       function(w, appInfo) {
-        addButton.sensitive = appInfo &&
-        this._checkName(appInfo.get_name());
+        addButton.sensitive = appInfo && this._checkName(appInfo.get_name());
       }));
     let appInfo = dialog._appChooser.get_app_info();
     addButton.sensitive = appInfo && this._checkName(appInfo.get_name());
@@ -278,26 +285,27 @@ const PutWindowLocationWidget = new GObject.Class({
         dialog.destroy();
         return;
       }
+      
+      let appName;
+      if (activeRadioButton == 1) {
+        appName = "All";
+      } else if (activeRadioButton == 2) {
+        appName = manualEntry.get_text();
+      } else if (activeRadioButton == 3) {
+        appName = dialog._appChooser.get_app_info().get_id();
+      }
 
-      let appInfo = dialog._appChooser.get_app_info();
-      if (!appInfo)
-        return;
-      let index = Math.floor(dialog._spin.value);
-      if (isNaN(index) || index < 0)
-        index = 1;
+      let suffix = appName.indexOf(".desktop");
+      if (suffix != -1) {
+        appName = appName.substring(0, suffix);
+      }
 
-      // this._changedPermitted = false;
-      // this._appendItem(appInfo.get_id(), index);
-      // this._changedPermitted = true;
-
-      // let iter = this._store.append();
-      // let adj = new Gtk.Adjustment({ lower: 1,
-      //   upper: WORKSPACE_MAX,
-      //   step_increment: 1,
-      //   value: index });
-      // this._store.set(iter,
-      //   [Columns.APPINFO, Columns.ICON, Columns.DISPLAY_NAME, Columns.WORKSPACE, Columns.ADJUSTMENT],
-      //   [appInfo, appInfo.get_icon(), appInfo.get_display_name(), index, adj]);
+      appName = appName.toLowerCase();
+      
+      let configPath = "locations." + appName;
+      Utils.setParameter(configPath, Utils.START_CONFIG);
+      this._addToTreeView(appName, true);
+      this._updateAppContainerContent(appName, this.createAppWidgets(appName));
 
       dialog.destroy();
     }));
@@ -305,8 +313,9 @@ const PutWindowLocationWidget = new GObject.Class({
 	},
 	
 	_checkName: function(id) {
-    global.log(id);
-		return !this._apps.some(function(i) { return i.name.startsWith(id + ':'); });
+		return !this._apps.some(function(i) { 
+      return i.name.startsWith(id + ':');
+    });
 	},
 
   _getRunningApps: function(exclude) {
@@ -413,7 +422,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
 
     // widgets for the positions defined for the app
-    let positions = Utils.getParameter(configLocation + "positions", { positions: []});
+    let positions = Utils.getParameter(configLocation + "positions", Utils.START_CONFIG.positions);
     let positionSize = positions.length;
 
     this.locationBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL });

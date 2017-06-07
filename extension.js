@@ -686,7 +686,7 @@ MoveWindow.prototype = {
 
     if (!win || !appName) {
       win = global.display.focus_window;
-      if (win==null) {
+      if (win == null) {
         return;
       }
 

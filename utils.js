@@ -262,6 +262,10 @@ Utils.prototype = {
         value = value[path[i]];
       }
 
+      if ((typeof value) == "undefined") {
+        return defaultValue;
+      }
+
       return value;
     } catch (e) {
       this.showErrorMessage("Error getting parameter!", "Can not get config by name " + name + " defaulting to " + defaultValue + "'" + e.message);
@@ -355,9 +359,9 @@ Utils.prototype = {
     ret.set_range(0, 100);
     ret.set_value(this.getNumber(configName, 50));
     ret.set_value_pos(Gtk.PositionType.RIGHT);
-    ret.connect("value-changed", function(obj, userData) {
+    ret.connect("value-changed", Lang.bind(this, function(obj, userData) {
       this.setParameter(configName, obj.get_value());
-    });
+    }));
     return ret;
   }
 };
