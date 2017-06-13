@@ -27,9 +27,9 @@ The extension can be configured using the gnome prefs tool.
   * move-focus-north/east/south/west using super + i/l/k/j (default)
  * Application based config (hit the save button)
 
-Wnck
+Wayland & Wnck
 -----
-For application base configuration the extension relies on the wnck library. 
+For application base configuration the extension relies on the X11 library wnck. 
 
 * Suse: `sudo zypper in libwnck-devel`
 * Arch: `pacman -S libwnck3`
@@ -38,12 +38,11 @@ For application base configuration the extension relies on the wnck library.
     * `sudo dnf install libwnck3` 
 * Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
-Wayland
-------
-Because of the libwnck dependency and the different behaviour of wayland to identify a application (wm_class vs. application_id) **Wayland is not supported**!
+Because of this dependency and the different concept of wayland and X11 to identify applications (wm_class vs. application_id) **Wayland is not supported**!
 
-As wayland is no real alternative for me until global keyboard/mouse grab is supported I don't plan to switch to wayland. 
+As wayland is no real alternative for me until global keyboard/mouse grab is supported, I don't plan to switch to wayland and will not actively work on wayland support. 
 
+For more details please check the associated issues: 
 * [Issue 109](https://github.com/negesti/gnome-shell-extensions-negesti/issues/109)
 * [Issue 124](https://github.com/negesti/gnome-shell-extensions-negesti/issues/124)
 
@@ -59,6 +58,19 @@ Moving windows from one screen to another is currently only possible in horizont
  * Move to right screen: default binding: <Super> <Shift> Right
 
 The keyboard settings can be changed using the preferences.
+
+Installation
+--------
+
+As you ended up here, I assume the installation from [extensions.gnome.org](https://extensions.gnome.org/extension/39/put-windows/) didn't work :)
+
+The easiest way to install is to download the latest release zip from the [releases](https://github.com/negesti/
+gnome-shell-extensions-negesti/releases) page and install it using the gnome-tweak-tool.
+
+
+If you are want to contribute or go the 'git way' just clone this extension and link it to the .local extension folder. This way you can always update the extension using `git pull`.
+
+     ln -s "PATH_TO_YOUR_CLONE" ~/.local/share/gnome-shell/extensions/putWindow@clemens.lab21.org
 
 
 License
