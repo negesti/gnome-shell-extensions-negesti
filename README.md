@@ -2,9 +2,7 @@ Put Window
 ==========
 
 
-An gnome-shell extension that makes window movement a lot
-easier. It can be compared with a basic version of the compiz
-grid plugin.
+An gnome-shell extension that makes window movement a lot easier.
 
 [![Friend of GNOME](http://www-old.gnome.org/friends/banners/friends-of-gnome.png)](http://www.gnome.org/friends/ "Friend of GNOME")
 
@@ -36,18 +34,24 @@ For application base configuration the extension relies on the wnck library.
 * Suse: `sudo zypper in libwnck-devel`
 * Arch: `pacman -S libwnck3`
 * Fedora: 
- * `sudo yum install libwnck3` 
- * `sudo dnf install libwnck3` 
+    * `sudo yum install libwnck3` 
+    * `sudo dnf install libwnck3` 
 * Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
-**Wayland**
-At the moment there I have problems getting Wnck to run under Wayland - [Issue 109](https://github.com/negesti/gnome-shell-extensions-negesti/issues/109)
+Wayland
+------
+Because of the libwnck dependency and the different behaviour of wayland to identify a application (wm_class vs. application_id) **Wayland is not supported**!
+
+As wayland is no real alternative for me until global keyboard/mouse grab is supported I don't plan to switch to wayland. 
+
+* [Issue 109](https://github.com/negesti/gnome-shell-extensions-negesti/issues/109)
+* [Issue 124](https://github.com/negesti/gnome-shell-extensions-negesti/issues/124)
 
 
 Multi screen setup support
 -------
 
-The extention works well with mutliple screens.
+The extension works well with mutliple screens.
 
 Moving windows from one screen to another is currently only possible in horizontal setup. e.g. a window that is a the left or right side of one screen, can be moved to the next screen using keyboard shortcuts.
 
