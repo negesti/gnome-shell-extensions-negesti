@@ -673,17 +673,21 @@ MoveWindow.prototype = {
     // move the window if a location is configured and autoMove is set to true
     let appPath = "locations." + app;
 
-    if (this._utils.getParameter(appPath, false)) {
-      if (this._utils.getBoolean(appPath + ".autoMove", false)) {
-      	this.focusListener = win.connect("focus",
-      	  Lang.bind(this, function() {
-            this._moveToConfiguredLocation(win, app);
-          })
-      	);
-        return;
-      }
+    var configExists = this._utils.getParameter(appPath, false);
+    if (!configExists) {
+      // check if there is a config for "all"
+      appPath = "locations.All";
+      configExists = this._utils.getParameter(appPath, false);
     }
-    return;
+
+    // config exists and autoMove is enabled
+    if (configExists && this._utils.getBoolean(appPath + ".autoMove", false)) {
+      this.focusListener = win.connect("focus",
+        Lang.bind(this, function() {
+          this._moveToConfiguredLocation(win, app);
+        })
+      );
+    }
   },
 
   moveToConfiguredLocation: function(win, appName) {
