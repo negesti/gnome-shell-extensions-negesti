@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-27 01:02+0000\n"
-"PO-Revision-Date: 2017-06-13 22:11+0100\n"
+"PO-Revision-Date: 2017-06-17 21:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sk_SK\n"
@@ -30,7 +30,7 @@ msgstr "Klávesové skratky"
 
 #: prefs.js:51
 msgid "Move Focus"
-msgstr "Presunúť fokus"
+msgstr "Zmena fokusu"
 
 #: prefs.js:54
 msgid "Applications"
@@ -62,7 +62,7 @@ msgstr "Bez zmeny pri prvom presune, iba výška pri druhom"
 
 #: prefs.js:73
 msgid "Nothing on first move, Only width on second"
-msgstr "Bez zmeny pri prvom presune, iba výška pri druhom"
+msgstr "Bez zmeny pri prvom presune, iba šírka pri druhom"
 
 #: prefs.js:118
 msgid "Main settings"
@@ -130,7 +130,7 @@ msgstr "Zachovať výšku pri presune na juh/západ:"
 
 #: prefs.js:214
 msgid "Windows will not change their height when moved east or west"
-msgstr "Okná si zachovajú svojú výšku pri presune na východ alebo západ"
+msgstr "Okná si zachovajú svoju výšku pri presune na východ alebo západ"
 
 #: prefs.js:223
 msgid "Moving to corner:"
@@ -147,7 +147,7 @@ msgstr "Centrovať širku &amp; výšku"
 
 #: prefs.js:239
 msgid "Don't change width when moving window from center to north or south."
-msgstr "Nemeniť širku pri presune okna zo stredu na sever alebo juh."
+msgstr "Nemeniť šírku pri presune okna zo stredu na sever alebo juh."
 
 #: prefs.js:265
 msgid ""
@@ -223,7 +223,7 @@ msgstr "Presun do stredu/maximalizovanie"
 
 #: prefs.js:313
 msgid "Move to configured location"
-msgstr "Presun do nastavej lokácie"
+msgstr "Presun do nastavenej lokácie"
 
 #: prefs.js:314
 msgid "Move to the left screen"
@@ -239,10 +239,13 @@ msgid ""
 "of the current focussed window using the keyboard and to push the currently "
 "focused window into the background to get the focus to the windows below."
 msgstr ""
+"'Zmena fokusu' umožňuje pomocou klávesnice zmeniť fokus relatívne voči aktuálne "
+"vybranému oknu a poslať aktuálne vybrané okno do pozadia a umožniť tak výber okien "
+"pod ním."
 
 #: prefs.js:334
 msgid "Enable 'Move focus'"
-msgstr ""
+msgstr "Povoliť 'Zmenu fokusu'"
 
 #: prefs.js:335
 msgid "Show animation when moving"
@@ -254,27 +257,27 @@ msgstr "Povoliť prepínanie okien na rovnakej pozícii"
 
 #: prefs.js:337
 msgid "Enable focus the window that's north of the current"
-msgstr ""
+msgstr "Povoliť zmenu fokusu na okno, ktoré je na sever od aktuálneho okna"
 
 #: prefs.js:338
 msgid "Enable focus the window that's east of the current"
-msgstr ""
+msgstr "Povoliť zmenu fokusu na okno, ktoré je na východ od aktuálneho okna"
 
 #: prefs.js:339
 msgid "Enable focus the window that's south of the current"
-msgstr ""
+msgstr "Povoliť zmenu fokusu na okno, ktoré je na juh od aktuálneho okna"
 
 #: prefs.js:340
 msgid "Enable focus the window that's west of the current"
-msgstr ""
+msgstr "Povoliť zmenu fokusu na okno, ktoré je na západ od aktuálneho okna"
 
 #: prefs.js:341
 msgid "Enable move the focus to the left screen"
-msgstr ""
+msgstr "Povoliť zmenu fokusu na ľavú obrazovku"
 
 #: prefs.js:342
 msgid "Enable move the focus to the right screen"
-msgstr ""
+msgstr "Povoliť zmenu fokusu na pravú obrazovku"
 
 #: prefs.js:376
 msgid "Keyboard bindings"
@@ -282,31 +285,31 @@ msgstr "Priradenia kláves"
 
 #: prefs.js:380
 msgid "Move the window focus up"
-msgstr ""
+msgstr "Zmena fokusu na okno hore"
 
 #: prefs.js:381
 msgid "Move the window focus right"
-msgstr ""
+msgstr "Zmena fokusu na okno vpravo"
 
 #: prefs.js:382
 msgid "Move the window focus down"
-msgstr ""
+msgstr "Zmena fokusu na okno dole"
 
 #: prefs.js:383
 msgid "Move the window focus left"
-msgstr ""
+msgstr "Zmena fokusu na okno vľavo"
 
 #: prefs.js:384
 msgid "Push focused window to the background"
-msgstr ""
+msgstr "Presunút aktívne okno do pozadia"
 
 #: prefs.js:385
 msgid "Move the focus to the left screen"
-msgstr ""
+msgstr "Fokus na ľavú obrazovku"
 
 #: prefs.js:386
 msgid "Move the focus to the right screen"
-msgstr ""
+msgstr "Fokus na pravú obrazovku"
 
 #: prefs.js:433
 msgid "Enabled"
@@ -342,10 +345,13 @@ msgid ""
 "Application based size and location setting, that allows you to move windows "
 "on startup or circle between multiple configured locations."
 msgstr ""
+"Nastavenie veľkostí a pozícii okien pre konkrétne aplikácie, ktoré vám umožní "
+"presúvať okná pri ich vytvorení alebo prepínať medzi viacerými nakonfigurovanými "
+"umiestneniami."
 
 #: prefs.js:597
 msgid "Remove an existing application setting"
-msgstr ""
+msgstr "Odstrániť existujúce nastavenie aplikácie"
 
 #: prefs.js:605
 #, javascript-format
@@ -410,7 +416,7 @@ msgstr "Šírka"
 
 #: prefs.js:942
 msgid "Height"
-msgstr "Výska"
+msgstr "Výška"
 
 #: prefs.js:947
 msgid "X-Position"
