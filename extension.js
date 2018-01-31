@@ -45,7 +45,7 @@ MoveWindow.prototype = {
   _addKeyBinding: function(key, handler) {
     this._bindings.push(key);
 
-	if (Main.wm.addKeybinding && Shell.ActionMode){ // introduced in 3.16
+    if (Main.wm.addKeybinding && Shell.ActionMode){ // introduced in 3.16
       Main.wm.addKeybinding(key,
         this._utils.getSettingsObject(), Meta.KeyBindingFlags.NONE,
         Shell.ActionMode.NORMAL,
@@ -396,12 +396,8 @@ MoveWindow.prototype = {
       }
     }
 
-    if (this._utils.getBoolean(this._utils.CENTER_KEEP_WIDTH, false) && this._isCenterWidth(screenIndex, pos)) {
-      this._resize(win, pos.x, sizes[useIndex].y, pos.width, sizes[useIndex].height);
-      return;
-    }
-
-    if (this._utils.getBoolean(this._utils.ALWAYS_KEEP_WIDTH, false)) {
+    if ((this._utils.getBoolean(this._utils.CENTER_KEEP_WIDTH, false) && this._isCenterWidth(screenIndex, pos)) ||
+        this._utils.getBoolean(this._utils.ALWAYS_KEEP_WIDTH, false)) {
       this._resize(win, pos.x, sizes[useIndex].y, pos.width, sizes[useIndex].height);
     } else {
       this._resize(win, s.x, sizes[useIndex].y, s.totalWidth * -1, sizes[useIndex].height);
