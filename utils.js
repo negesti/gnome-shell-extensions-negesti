@@ -13,13 +13,17 @@ Utils.prototype = {
 
   _filename: "",
   _settingsObject: { },
-  _settings: "",
+  _settings: { },
 
   _changeEventListeners: [],
   _gnomeBindings: null,
 
-  CENTER_WIDTH: "center-width",
-  CENTER_HEIGHT: "center-height",
+  CENTER_WIDTH_0: "center-width",  // "-0"; previously there was only 1 setting
+  CENTER_WIDTH_1: "center-width-1",
+  CENTER_WIDTH_2: "center-width-2",
+  CENTER_HEIGHT_0: "center-height",
+  CENTER_HEIGHT_1: "center-height-1",
+  CENTER_HEIGHT_2: "center-height-2",
   CENTER_KEEP_WIDTH: "center-keep-width",
   ALWAYS_USE_WIDTHS: "always-use-widths",
   CORNER_CHANGE: "corner-changes",
@@ -78,8 +82,6 @@ Utils.prototype = {
   loadSettings: function() {
     this._settingsObject = Convenience.getSettings();
     this._settings = {
-      centerWidth: this._settingsObject.get_int("center-width"),
-      centerHeight: this._settingsObject.get_int("center-height"),
       locations: JSON.parse(this._settingsObject.get_string("locations"))
     };   
   },
@@ -141,8 +143,6 @@ Utils.prototype = {
 
   saveSettings: function() {
     try {
-      this._settingsObject.set_int("center-width", this.getNumber(this.CENTER_WIDTH));
-      this._settingsObject.set_int("center-height", this.getNumber(this.CENTER_HEIGHT));
       this._settingsObject.set_string("locations", JSON.stringify(this._settings.locations));
     } catch (e) {
       this.showErrorMessage("Error saving settings ", e);

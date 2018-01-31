@@ -145,8 +145,8 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: _("Move to center maximizes and restores initial window size:"),
-      tooltip_text: _("Maximize the window on first move and restore original size and position on second")
+      label: _("Move to center maximizes and restores initial window size (first w/h only):"),
+      tooltip_text: _("Maximize the window on first move and restore original size and position on second. Only works with first width/height")
     }), 0, row, 4, 1);
 
     let centerToggleSwitch = new Gtk.Switch({sensitive: true, halign: Gtk.Align.END });
@@ -231,10 +231,20 @@ const PutWindowSettingsWidget = new GObject.Class({
     centerKeepWidthSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.CENTER_KEEP_WIDTH, obj.get_active()); });
     ret.attach(centerKeepWidthSwitch, 4, row++, 1, 1);
 
-    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_WIDTH), 1, row++, 4, 1);
-    ret.attach(new Gtk.Label({label: "Height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_HEIGHT), 1, row++, 4, 1);
+    ret.attach(new Gtk.Label({label: "First width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH_0), 1, row++, 4, 1);
+    ret.attach(new Gtk.Label({label: "First height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT_0), 1, row++, 4, 1);
+
+    ret.attach(new Gtk.Label({label: "Second width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH_1), 1, row++, 4, 1);
+    ret.attach(new Gtk.Label({label: "Second height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT_1), 1, row++, 4, 1);
+
+    ret.attach(new Gtk.Label({label: "Third width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH_2), 1, row++, 4, 1);
+    ret.attach(new Gtk.Label({label: "Third height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT_2), 1, row++, 4, 1);
 
     return ret;
   },

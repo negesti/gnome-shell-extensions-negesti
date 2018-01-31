@@ -42,11 +42,27 @@
 
     <key type="i" name="center-width">
       <default>50</default>
-      <summary>Width to use when moved to center</summary>
+      <summary>First width to use when moved to center</summary>
     </key>
     <key type="i" name="center-height">
       <default>50</default>
-      <summary>Height to use when moved to center</summary>
+      <summary>First height to use when moved to center</summary>
+    </key>
+    <key type="i" name="center-width-1">
+      <default>100</default>
+      <summary>Second width to use when moved to center</summary>
+    </key>
+    <key type="i" name="center-height-1">
+      <default>100</default>
+      <summary>Second height to use when moved to center</summary>
+    </key>
+    <key type="i" name="center-width-2">
+      <default>100</default>
+      <summary>Third width to use when moved to center</summary>
+    </key>
+    <key type="i" name="center-height-2">
+      <default>100</default>
+      <summary>Third height to use when moved to center</summary>
     </key>
     <key type="i" name="center-keep-width">
       <default>0</default>

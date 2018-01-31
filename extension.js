@@ -407,8 +407,8 @@ MoveWindow.prototype = {
   _isCenterWidth: function(screenIndex, pos) {
 
     let s = this._screens[screenIndex];
-    let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH, 50) / 100),
-      h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT, 50) / 100),
+    let w = s.totalWidth * (this._utils.getNumber(this._utils.CENTER_WIDTH_0, 50) / 100),
+      h = s.totalHeight * (this._utils.getNumber(this._utils.CENTER_HEIGHT_0, 50) / 100),
       x = s.x + (s.totalWidth - w) / 2,
       y = s.y + (s.totalHeight - h) / 2;
 
@@ -604,39 +604,58 @@ MoveWindow.prototype = {
       }
 
       let pos = win.get_frame_rect(),
-        centerWidth = this._utils.getNumber(this._utils.CENTER_WIDTH, 50),
-        centerHeight = this._utils.getNumber(this._utils.CENTER_HEIGHT, 50);
+        centerWidths = [],
+        centerHeights = [];
+      centerWidths.push(this._utils.getNumber(this._utils.CENTER_WIDTH_0, 50));
+      centerHeights.push(this._utils.getNumber(this._utils.CENTER_HEIGHT_0, 50));
+      centerWidths.push(this._utils.getNumber(this._utils.CENTER_WIDTH_1, 100));
+      centerHeights.push(this._utils.getNumber(this._utils.CENTER_HEIGHT_1, 100));
+      centerWidths.push(this._utils.getNumber(this._utils.CENTER_WIDTH_2, 100));
+      centerHeights.push(this._utils.getNumber(this._utils.CENTER_HEIGHT_2, 100));
 
-
-      let w = s.totalWidth * (centerWidth / 100),
-        h = s.totalHeight * (centerHeight / 100),
-        x = s.x + (s.totalWidth - w) / 2,
-        y = s.y + (s.totalHeight - h) / 2,
-        sameHeight = this._samePoint(h, pos.height);
-
-      if (centerWidth == 100) {
-        w *= -1;
+      if (centerWidths[1] == centerWidths[2] && centerHeights[1] == centerHeights[2]) {
+        centerWidths.pop();
+        centerHeights.pop();
       }
-      if (centerHeight == 100) {
-        h *= -1;
+
+      let ws = [],
+        hs = [],
+        xs = [],
+        ys = [],
+        sameHeights = [];
+
+      for (let i = 0; i < centerWidths.length; ++i) {
+        ws.push(s.totalWidth * (centerWidths[i] / 100));
+        hs.push(s.totalHeight * (centerHeights[i] / 100));
+        xs.push(s.x + (s.totalWidth - ws[i]) / 2);
+        ys.push(s.y + (s.totalHeight - hs[i]) / 2);
+        sameHeights.push(this._samePoint(hs[i], pos.height));
+
+        if (centerWidths[i] == 100 && centerHeights[i] == 100) {
+	  ws[i] *= -1;
+          hs[i] *= -1;
+        }
       }
 
       if (this._utils.getBoolean(this._utils.MOVE_CENTER_ONLY_TOGGLES, false)) {
         if (win.maximized_horizontally && win.maximized_vertically) {
-          this._resize(win, x, y, w, h);
+          this._resize(win, xs[0], ys[0], ws[0], hs[0]);
         } else {
           this._resize(win, s.x, s.y, s.totalWidth * -1, s.totalHeight * -1);
         }
       } else {
         // do not check window.width. until i find get_size_hint(), or min_width..
         // windows that have a min_width < our width will not be maximized (evolution for example)
-        if (this._samePoint(x, pos.x) && this._samePoint(y, pos.y) && sameHeight) {
-          // the window is alread centered -> maximize
-          this._resize(win, s.x, s.y, s.totalWidth * -1, s.totalHeight * -1);
-        } else {
-          // the window is not centered -> resize
-          this._resize(win, x, y, w, h);
+        let next_i;
+        for (next_i = 0; next_i < centerWidths.length; ++next_i) {
+          if (this._samePoint(xs[next_i], pos.x) && this._samePoint(ys[next_i], pos.y) && sameHeights[next_i]) {
+            ++next_i;
+            break;
+          }
         }
+        // next window size is i (first if we didn't match any)
+        next_i %= centerWidths.length;
+        this._resize(win, xs[next_i], ys[next_i], ws[next_i], hs[next_i]); // YYY
       }
     } else if (where == "n" || where == "s") {
       this._moveNorthSouth(win, screenIndex, where);
@@ -746,8 +765,9 @@ MoveWindow.prototype = {
     let y = (pos.y=="0.0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y/100));
 
     // _resize will maximize the window if width/height is -1
-    let width = (pos.width == 100) ? -1 : s.totalWidth * pos.width/100;
-    let height = (pos.height == 100) ? -1 : s.totalHeight * pos.height/100;
+    let maximize = (pos.width == 100 && pos.height == 100);
+    let width = maximize ? -1 * pos.width : s.totalWidth * pos.width/100;
+    let height = maximize ? -1 * pos.height : s.totalHeight * pos.height/100;
 
     this._resize(win, x, y, width, height);
   },
