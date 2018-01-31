@@ -229,7 +229,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(combo, 2, row++, 3, 1);
 
     // ------------------------------------- center ----------------------------------------
-    ret.attach(new Gtk.Label({label: "<b>" + _("Center Width &amp; Heigth") + "</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
+    ret.attach(new Gtk.Label({label: "<b>" + _("Center Width &amp; Height") + "</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
     ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 5, 1);
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
