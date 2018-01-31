@@ -621,7 +621,7 @@ MoveWindow.prototype = {
         h *= -1;
       }
 
-      if (this._utils.getBoolean(this._utils.REVERSE_MOVE_CENTER, false)) {
+      if (this._utils.getBoolean(this._utils.MOVE_CENTER_ONLY_TOGGLES, false)) {
         if (win.maximized_horizontally && win.maximized_vertically) {
           this._resize(win, x, y, w, h);
         } else {

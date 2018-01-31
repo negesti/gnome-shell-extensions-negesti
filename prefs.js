@@ -173,18 +173,6 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: _("First maximize then, move to center:"),
-      tooltip_text: _("'Move to center' maximizes the current window, and centers maximized windows"),
-    }), 0, row, 4, 1);;
-
-    let centerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
-    centerSwitch.set_active(Utils.getBoolean(Utils.REVERSE_MOVE_CENTER, false));
-    centerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.REVERSE_MOVE_CENTER, obj.get_active()); });
-    ret.attach(centerSwitch, 4, row++, 1, 1);
-
-    ret.attach(new Gtk.Label({
-      halign: Gtk.Align.START,
-      margin_left: 10,
       label: _("Intelligent corner movement:"),
       tooltip_text: _("Quite difficult to describe. Enable it and move a window from S to E, "),
     }), 0, row, 4, 1);
