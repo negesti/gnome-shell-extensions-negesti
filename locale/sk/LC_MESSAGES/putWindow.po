@@ -142,7 +142,7 @@ msgstr ""
 "Upraviť šírku a výšku okna pri presune do rohu?"
 
 #: prefs.js:233
-msgid "Center Width &amp; Heigth"
+msgid "Center Width &amp; Height"
 msgstr "Centrovať širku &amp; výšku"
 
 #: prefs.js:239

@@ -145,8 +145,8 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: _("Move to center maximizes and restores initial window size:"),
-      tooltip_text: _("Maximize the window on first move and restore original size and position on second")
+      label: _("Move to center maximizes and restores initial window size (first w/h only):"),
+      tooltip_text: _("Maximize the window on first move and restore original size and position on second. Only works with first width/height")
     }), 0, row, 4, 1);
 
     let centerToggleSwitch = new Gtk.Switch({sensitive: true, halign: Gtk.Align.END });
@@ -173,18 +173,6 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: _("First maximize then, move to center:"),
-      tooltip_text: _("'Move to center' maximizes the current window, and centers maximized windows"),
-    }), 0, row, 4, 1);;
-
-    let centerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
-    centerSwitch.set_active(Utils.getBoolean(Utils.REVERSE_MOVE_CENTER, false));
-    centerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.REVERSE_MOVE_CENTER, obj.get_active()); });
-    ret.attach(centerSwitch, 4, row++, 1, 1);
-
-    ret.attach(new Gtk.Label({
-      halign: Gtk.Align.START,
-      margin_left: 10,
       label: _("Intelligent corner movement:"),
       tooltip_text: _("Quite difficult to describe. Enable it and move a window from S to E, "),
     }), 0, row, 4, 1);
@@ -201,10 +189,10 @@ const PutWindowSettingsWidget = new GObject.Class({
       tooltip_text: _("Windows will not change their width when moved north or south"),
     }), 0, row, 4, 1);
 
-    let keepHeightSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
-    keepHeightSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_WIDTH, false));
-    keepHeightSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_WIDTH, obj.get_active()); });
-    ret.attach(keepHeightSwitch, 4, row++, 1, 1);
+    let keepWidthSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    keepWidthSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_WIDTH, false));
+    keepWidthSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_WIDTH, obj.get_active()); });
+    ret.attach(keepWidthSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
@@ -213,10 +201,10 @@ const PutWindowSettingsWidget = new GObject.Class({
       tooltip_text: _("Windows will not change their height when moved east or west"),
     }), 0, row, 4, 1);
 
-    let moveToCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
-    moveToCornerSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_HEIGHT, false));
-    moveToCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_HEIGHT, obj.get_active()); });
-    ret.attach(moveToCornerSwitch, 4, row++, 1, 1);
+    let keepHeightSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    keepHeightSwitch.set_active(Utils.getBoolean(Utils.ALWAYS_KEEP_HEIGHT, false));
+    keepHeightSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.ALWAYS_KEEP_HEIGHT, obj.get_active()); });
+    ret.attach(keepHeightSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       label: _("Moving to corner:"),
@@ -229,24 +217,34 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(combo, 2, row++, 3, 1);
 
     // ------------------------------------- center ----------------------------------------
-    ret.attach(new Gtk.Label({label: "<b>" + _("Center Width &amp; Heigth") + "</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
+    ret.attach(new Gtk.Label({label: "<b>" + _("Center Width &amp; Height") + "</b>", halign:Gtk.Align.START, margin_left: 4, use_markup: true}), 0, row++, 5, 1);
     ret.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, row++, 5, 1);
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: _("Keep width when moving north/south:"),
-      tooltip_text: _("Don't change width when moving window from center to north or south."),
+      label: _("Keep width when moving from center to south or north:"),
+      tooltip_text: _("Don't change width when moving window from center to north or south"),
     }), 0, row, 4, 1);
 
-    let keepWidthSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
-    keepWidthSwitch.set_active(Utils.getBoolean(Utils.CENTER_KEEP_WIDTH, false));
-    keepWidthSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.CENTER_KEEP_WIDTH, obj.get_active()); });
-    ret.attach(keepWidthSwitch, 4, row++, 1, 1);
+    let centerKeepWidthSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    centerKeepWidthSwitch.set_active(Utils.getBoolean(Utils.CENTER_KEEP_WIDTH, false));
+    centerKeepWidthSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.CENTER_KEEP_WIDTH, obj.get_active()); });
+    ret.attach(centerKeepWidthSwitch, 4, row++, 1, 1);
 
-    ret.attach(new Gtk.Label({label: "Width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_WIDTH), 1, row++, 4, 1);
-    ret.attach(new Gtk.Label({label: "Height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
-    ret.attach(createSlider(Utils.CENTER_HEIGHT), 1, row++, 4, 1);
+    ret.attach(new Gtk.Label({label: "First width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH_0), 1, row++, 4, 1);
+    ret.attach(new Gtk.Label({label: "First height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT_0), 1, row++, 4, 1);
+
+    ret.attach(new Gtk.Label({label: "Second width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH_1), 1, row++, 4, 1);
+    ret.attach(new Gtk.Label({label: "Second height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT_1), 1, row++, 4, 1);
+
+    ret.attach(new Gtk.Label({label: "Third width:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_WIDTH_2), 1, row++, 4, 1);
+    ret.attach(new Gtk.Label({label: "Third height:", halign: Gtk.Align.START, margin_left: 10 }), 0, ++row, 1, 1);
+    ret.attach(createSlider(Utils.CENTER_HEIGHT_2), 1, row++, 4, 1);
 
     return ret;
   },

@@ -144,7 +144,7 @@ msgstr ""
 "verschoben wird?"
 
 #: prefs.js:233
-msgid "Center Width &amp; Heigth"
+msgid "Center Width &amp; Height"
 msgstr ""
 
 #: prefs.js:239
