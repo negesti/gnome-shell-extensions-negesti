@@ -73,6 +73,7 @@ Contributors
  * airtonix - gnome-shell 3.5 support
  * zara86 - gnome-shell 3.16 support
  * cleverlycoding - gnome-shell 3.18 support
+ * wdoekes - cleanup, improve move to center
 
 License
 --------
