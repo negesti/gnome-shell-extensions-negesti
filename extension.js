@@ -805,6 +805,11 @@ MoveWindow.prototype = {
       win.unmaximize(unMaximizeFlags)
     }
 
+    if (width == 0 && height == 0) {
+      win.move_frame(false, x, y);
+      return;
+    }
+
     let targetRectangle = this._getRectangle(win, x, y, width, height);
 
     // user_operation, width, height, force
