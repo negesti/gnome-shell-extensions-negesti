@@ -368,10 +368,26 @@ MoveFocus.prototype = {
     }
 
     let currentScreenIndex = this._getCurrentScreenIndex(focusWindow);
-    let currentScreen = global.screen.get_monitor_geometry(currentScreenIndex);
-    // we can not move left
-    if (direction == "l" && currentScreen.x == 0) {
+    let rightMostScreen = 0;
+    let screenGeo;
+    do {
+      rightMostScreen++;
+      screenGeo = global.screen.get_monitor_geometry(rightMostScreen);
+    } while (screenGeo.x != 0 && screenGeo.y != 0);
+
+    // Prevent Looping
+    if (direction == "l" && currentScreenIndex == 0) {
       return;
+    }
+    if (direction == "r" && currentScreenIndex == rightMostScreen) {
+      return;
+    }
+
+    let nextScreen = 0;
+    if (direction == "l") {
+      nextScreen = currentScreenIndex - 1;
+    } else if (direction == "r") {
+      nextScreen = currentScreenIndex + 1;
     }
 
     let candidates = [];
@@ -381,16 +397,22 @@ MoveFocus.prototype = {
         continue;
       }
       let windowScreen = this._getCurrentScreenIndex(windows[i]);
-      if (currentScreenIndex != windowScreen) {
-        candidates.push({
-          window: windows[i],
-          index: i,
-          dist: this._getDistance(focusWindow, windows[i])
-        });
+      if (windowScreen != nextScreen) {
+        continue;
       }
+      candidates.push({
+        window: windows[i],
+        index: i,
+        dist: this._getDistance(focusWindow, windows[i])
+      });
+
     }
 
-    this._focusNearesCandidate(candidates);
+    this._focusNearestCandidate(candidates);
+  },
+
+  _getIndexOfScreens: function() {
+
   },
 
   _getCurrentScreenIndex: function(win) {
@@ -449,7 +471,7 @@ MoveFocus.prototype = {
       	});
       }
     } // end for windows
-    this._focusNearesCandidate(candidates);
+    this._focusNearestCandidate(candidates);
   },
 
   _getWindowList: function() {
@@ -461,7 +483,7 @@ MoveFocus.prototype = {
     }
   },
 
-  _focusNearesCandidate: function(candidates) {
+  _focusNearestCandidate: function(candidates) {
     if (candidates.length == 0)
       return;
 
