@@ -3,7 +3,7 @@
   "version": 99,
   "uuid": "putWindow@clemens.lab21.org",
   "name": "Put Windows",
-  "description": "Fully customizable replacement for the old compiz put plugin. \n * Move windows to left/right side, bottom/top, center or corner \n * Move window to other screen \n * Select focused window using the keyboard \n * Application based window placement",
+  "description": "Fully customizable replacement for the old compiz put plugin. \n * Move windows to left/right side, bottom/top, center or corner \n * Move window to other screen \n * Select focused window using the keyboard \n * Application based window placement \n\n Please check github if your gnome-shell version is not supported",
   "url": "https://github.com/negesti/gnome-shell-extensions-negesti",
   "settings-schema": "org.gnome.shell.extensions.org-lab21-putwindow",
   "gettext-domain": "putWindow"
