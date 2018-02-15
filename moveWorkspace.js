@@ -7,12 +7,11 @@ const Shell = imports.gi.Shell;
 * Based on code by Florain Müller and the auto-move-window-extension. 
 * https://git.gnome.org/browse/gnome-shell-extensions/
 * 
-
 *
 */
 function MoveWorkspace(utils) {
   this._init(utils);
-};
+}
 
 MoveWorkspace.prototype = {
 
@@ -189,5 +188,5 @@ MoveWorkspace.prototype = {
       window.change_workspace_by_index(j-1, false);
       global.screen.append_new_workspace(false, 0);
     }
-  },
-}
+  }
+};

@@ -2,3 +2,4 @@ negesti.sublime-*
 *.zip
 ThinksIcantRemember.txt
 README.html
+.idea/**

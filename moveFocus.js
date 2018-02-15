@@ -9,7 +9,7 @@ const Tweener = imports.ui.tweener;
 
 function MoveFocus(utils, screens) {
   this._init(utils, screens);
-};
+}
 
 const FLASHSPOT_ANIMATION_OUT_TIME = 2; // seconds
 
@@ -40,7 +40,7 @@ const Flashspot = new Lang.Class({
      time: 3*FLASHSPOT_ANIMATION_OUT_TIME,
      onComplete: function() {
        this.destroy();
-     },
+     }
     });
 
     this.actor.background_color = new Clutter.Color({red: 255, green: 255, blue: 255, alpha: 128})
@@ -227,10 +227,10 @@ MoveFocus.prototype = {
 		// a window is candidate if:
 		// 1. the center of the candidate window is further in the direction you want
 		//	to change to then the center of the focused window
-		// 2. the endge of the candidate window is further in the direction you want
+		// 2. the edge of the candidate window is further in the direction you want
 		//	to change to then the edge of the focused window
 		// 3. the center of the candidate ist in a 90-ish° angle to the direction
-		//	you want to change to from the center of the focussed window
+		//	you want to change to from the center of the focused window
 
 		switch (direction){
 			case "n":
@@ -491,7 +491,7 @@ MoveFocus.prototype = {
 
     candidates.sort(function(a, b) {
       // if the difference between distances is within the distance correction
-      // value we will make our decision based on recend usage
+      // value we will make our decision based on recent usage
       return (Math.abs(a.dist-b.dist) <= distance_correction) ? -1 : a.dist - b.dist;
 
     });

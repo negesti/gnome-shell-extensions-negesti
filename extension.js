@@ -1,8 +1,7 @@
+
 const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
 const Mainloop = imports.mainloop;
 const Shell = imports.gi.Shell;
 
@@ -184,7 +183,7 @@ MoveWindow.prototype = {
     }
 
     let screenIndex = this._getCurrentScreenIndex(win);
-
+    let targetIndex = screenIndex;
     let s = null;
     let old = {
       primary: this._screens[screenIndex].primary,
@@ -204,67 +203,67 @@ MoveWindow.prototype = {
       s = this._recalculateSizes(s);
     }
 
-    if (s != null) {
-
-      let wasMaximizeFlags = 0;
-      if (win.maximized_horizontally) {
-        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
-      }
-
-      if (win.maximized_vertically) {
-        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
-      }
-
-      if (wasMaximizeFlags != 0) {
-        win.unmaximize(wasMaximizeFlags);
-      }
-
-      let position = win.get_frame_rect();
-
-      let xRatio = s.totalWidth / old.totalWidth;
-      let x = s.x + (position.x - old.x) * xRatio;
-      let width = position.width * xRatio;
-      if (width >= s.totalWidth) {
-        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
-      }
-
-      let yRatio = s.totalHeight / old.totalHeight;
-
-      let height = position.height;
-      // we are moving away from the primary screen and topPanel is visible,
-      // e.g. height was max but is smaller then the totalHeight because of topPanel height
-      if (old.primary) {
-        height += this._getTopPanelHeight();
-      }
-      height *= yRatio;
-      if (s.primary) {
-        height -= this._getTopPanelHeight();
-      }
-
-      if (height >= s.totalHeight) {
-        wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
-      }
-
-      let y = s.y + (position.y - old.y) * yRatio;
-      // add/remove the top panel offset to the y position
-      if (old.primary) {
-        y -= this._getTopPanelHeight();
-      }
-      if (s.primary) {
-        y += this._getTopPanelHeight();
-      }
-      if (y < 0) {
-        y = 0;
-      }
-
-      this._resize(win, x, y, width, height);
-
-      if (wasMaximizeFlags != 0) {
-        win.maximize(wasMaximizeFlags);
-      }
-      return true;
+    if (s == null) {
+      return false;
     }
-    return false;
+
+    let wasMaximizeFlags = 0;
+    if (win.maximized_horizontally) {
+      wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
+    }
+
+    if (win.maximized_vertically) {
+      wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
+    }
+
+    if (wasMaximizeFlags != 0) {
+      win.unmaximize(wasMaximizeFlags);
+    }
+
+    let position = win.get_frame_rect();
+
+    let xRatio = s.totalWidth / old.totalWidth;
+    let x = s.x + (position.x - old.x) * xRatio;
+    let width = position.width * xRatio;
+    if (width >= s.totalWidth) {
+      wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.HORIZONTAL;
+    }
+
+    let yRatio = s.totalHeight / old.totalHeight;
+
+    let height = position.height;
+    // we are moving away from the primary screen and topPanel is visible,
+    // e.g. height was max but is smaller then the totalHeight because of topPanel height
+    if (old.primary) {
+      height += this._getTopPanelHeight();
+    }
+    height *= yRatio;
+    if (s.primary) {
+      height -= this._getTopPanelHeight();
+    }
+
+    if (height >= s.totalHeight) {
+      wasMaximizeFlags = wasMaximizeFlags | Meta.MaximizeFlags.VERTICAL;
+    }
+
+    let y = s.y + (position.y - old.y) * yRatio;
+    // add/remove the top panel offset to the y position
+    if (old.primary) {
+      y -= this._getTopPanelHeight();
+    }
+    if (s.primary) {
+      y += this._getTopPanelHeight();
+    }
+    if (y < 0) {
+      y = 0;
+    }
+
+    this._resize(win, x, y, width, height);
+
+    if (wasMaximizeFlags != 0) {
+      win.maximize(wasMaximizeFlags);
+    }
+    return true;
   },
 
 
@@ -632,7 +631,7 @@ MoveWindow.prototype = {
         sameHeights.push(this._samePoint(hs[i], pos.height));
 
         if (centerWidths[i] == 100 && centerHeights[i] == 100) {
-	  ws[i] *= -1;
+          ws[i] *= -1;
           hs[i] *= -1;
         }
       }
@@ -679,7 +678,7 @@ MoveWindow.prototype = {
         // window is not tracked yet
         Mainloop.idle_add(Lang.bind(this, function() {
           this._moveConfiguredWhenCreated(display, win, true);
-          return ;
+          return;
         }));
       }
       return;
@@ -741,7 +740,7 @@ MoveWindow.prototype = {
       }
       appName = "All";
     }
-    if (!config.lastPosition) {
+    if (config.lastPosition == undefined) {
       config.lastPositions = 0;
     }
 
@@ -758,16 +757,52 @@ MoveWindow.prototype = {
       this._utils.setParameter("locations." + appName + ".lastPosition", 0);
     }
 
-    // config may be for 2 screens but currenty only 1 is connected
-    let s = (this._screens.length > pos.screen) ? this._screens[pos.screen] : this._screens[0];
+    // config may be for 2 screens but currently only 1 is connected
+    let targetScreenIndex =  (this._screens.length > pos.screen) ? pos.screen : 0;
+    let s = this._screens[targetScreenIndex];
 
-    let x = (pos.x=="0.0") ? s.x : s.x + (s.totalWidth * pos.x/100);
-    let y = (pos.y=="0.0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y/100));
+    let disableResize = !!pos.disableResize;
+    let disableMove = !!pos.disableMove; 
+    global.log("dont resize? " + pos.disableResize + " " + disableResize);
+    global.log("dont move? " + pos.disableMove + " " + disableMove);
+    
+
+    let x = (pos.x == "0.0") ? s.x : s.x + (s.totalWidth * pos.x/100);
+    let y = (pos.y == "0.0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y/100));
 
     // _resize will maximize the window if width/height is -1
     let maximize = (pos.width == 100 && pos.height == 100);
     let width = maximize ? -1 * pos.width : s.totalWidth * pos.width/100;
     let height = maximize ? -1 * pos.height : s.totalHeight * pos.height/100;
+
+    if (disableResize) {
+      let r = win.get_frame_rect();
+      width = r.width;
+      height = r.height;
+
+    }
+    if (disableMove) {
+
+      global.log("target: " + width + " H: " + height + " x " +x + " y " + y);
+      let r = win.get_frame_rect();
+      x = r.x;
+      y = r.y;
+
+      global.log("target: " + width + " H: " + height + " x " +x + " y " + y);
+      let screenIndex = this._getCurrentScreenIndex(win);
+      global.log(targetScreenIndex + " current = " + screenIndex);
+      if (targetScreenIndex != screenIndex) {
+        let oldScreen = this._screens[screenIndex];
+
+        global.log("X " + oldScreen.x + " to " + s.x);
+        global.log("y " + oldScreen.y + " to " + s.y);
+
+        x = s.x + Math.abs(r.x - oldScreen.x);
+        y = s.y + Math.abs(r.y - oldScreen.y);
+      }
+    }
+    global.log("w: " + width + " H: " + height + " x " +x + " y " + y);
+  
 
     this._resize(win, x, y, width, height);
   },
@@ -853,7 +888,7 @@ MoveWindow.prototype = {
   counter: 0,
 
   _loadScreenData: function() {
-    // get monotor(s) geometry
+    // get monitor(s) geometry
     this._primary = global.screen.get_primary_monitor();
     let numMonitors = global.screen.get_n_monitors();
 
@@ -1008,10 +1043,10 @@ MoveWindow.prototype = {
       this._moveWorkspacePlugin.destroy();
     }
   }
-}
+};
 
 function init(meta) {
-};
+}
 
 function enable() {
   this.original_get_center = Meta.Window.prototype.get_center;
@@ -1027,9 +1062,9 @@ function enable() {
   Meta.Window.prototype.get_center = function(){
     let rect = this.get_frame_rect();
     return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
-  }
+  };
   this._moveWindow = new MoveWindow();
-};
+}
 
 function disable() {  
   // remove monkey patch, get_center
@@ -1041,4 +1076,4 @@ function disable() {
   
   
   this._moveWindow.destroy();
-};
+}

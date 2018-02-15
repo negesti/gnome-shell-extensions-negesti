@@ -25,7 +25,7 @@ let createSlider = function(configName) {
     Utils.setParameter(configName, obj.get_value());
   });
   return ret;
-}
+};
 
 const PutWindowSettingsWidget = new GObject.Class({
   Name: 'PutWindow.Prefs.PutWindowSettingsWidget',
@@ -63,14 +63,14 @@ const PutWindowSettingsWidget = new GObject.Class({
     let currentValue = Utils.getNumber(Utils.CORNER_CHANGE, 0);
 
     let values = [
-    ["0", _("Both")],
-    ["1", _("Only height")],
-    ["2", _("Only width")],
-    ["3", _("Never change size")],
-    ["4", _("Nothing on first move, both on second")],
-    ["5", _("Nothing on first move, Only height on second")],
-    ["6", _("Nothing on first move, Only width on second")]
-    ]
+      ["0", _("Both")],
+      ["1", _("Only height")],
+      ["2", _("Only width")],
+      ["3", _("Never change size")],
+      ["4", _("Nothing on first move, both on second")],
+      ["5", _("Nothing on first move, Only height on second")],
+      ["6", _("Nothing on first move, Only width on second")]
+    ];
     let selectMe = null;
     for (let i=0; i< values.length; i++) {
       let iter = this._model.append();
@@ -154,21 +154,21 @@ const PutWindowSettingsWidget = new GObject.Class({
     centerToggleSwitch.connect("notify::active", function(obj) {
       Utils.setParameter(Utils.MOVE_CENTER_ONLY_TOGGLES, obj.get_active());
     });
-    ret.attach(centerToggleSwitch, 4, row++, 1, 1)
+    ret.attach(centerToggleSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
       label: _("Always ignore top panel:"),
       tooltip_text: _("Enable this if you use an extension to hide the top panel")
-    }), 0, row, 4, 1)
+    }), 0, row, 4, 1);
 
     let ignoreTopPanelSwitch = new Gtk.Switch({sensitive: true, halign: Gtk.Align.END });
     ignoreTopPanelSwitch.set_active(Utils.getBoolean(Utils.IGNORE_TOP_PANEL, false));
     ignoreTopPanelSwitch.connect("notify::active", function(obj) {
       Utils.setParameter(Utils.IGNORE_TOP_PANEL, obj.get_active());
     });
-    ret.attach(ignoreTopPanelSwitch, 4, row++, 1, 1)
+    ret.attach(ignoreTopPanelSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
@@ -177,10 +177,10 @@ const PutWindowSettingsWidget = new GObject.Class({
       tooltip_text: _("Quite difficult to describe. Enable it and move a window from S to E, "),
     }), 0, row, 4, 1);
 
-    let intelligenCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
-    intelligenCornerSwitch.set_active(Utils.getBoolean(Utils.INTELLIGENT_CORNER_MOVEMENT, false));
-    intelligenCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.INTELLIGENT_CORNER_MOVEMENT, obj.get_active()); });
-    ret.attach(intelligenCornerSwitch, 4, row++, 1, 1);
+    let intelligentCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
+    intelligentCornerSwitch.set_active(Utils.getBoolean(Utils.INTELLIGENT_CORNER_MOVEMENT, false));
+    intelligentCornerSwitch.connect("notify::active", function(obj) { Utils.setParameter(Utils.INTELLIGENT_CORNER_MOVEMENT, obj.get_active()); });
+    ret.attach(intelligentCornerSwitch, 4, row++, 1, 1);
 
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
@@ -223,7 +223,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       halign: Gtk.Align.START,
       margin_left: 10,
       label: _("Keep width when moving from center to south or north:"),
-      tooltip_text: _("Don't change width when moving window from center to north or south"),
+      tooltip_text: _("Don't change width when moving window from center to north or south")
     }), 0, row, 4, 1);
 
     let centerKeepWidthSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -322,7 +322,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     let description = new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 4,
-      label: _("'Move Focus' allows you to change the focus based on the relative location of the current focussed window using the keyboard and to push the currently focused window into the background to get the focus to the windows below.")
+      label: _("'Move Focus' allows you to change the focus based on the relative location of the current focused window using the keyboard and to push the currently focused window into the background to get the focus to the windows below.")
     });
     description.set_line_wrap(true);
     ret.attach(description, 0, row++, 5, 1);
@@ -330,7 +330,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     let labels = [
       _("Enable 'Move focus'"),
       _("Show animation when moving"),
-      _("Enable cycle through windows at the same postition"),
+      _("Enable cycle through windows at the same position"),
       _("Enable focus the window that's north of the current"),
       _("Enable focus the window that's east of the current"),
       _("Enable focus the window that's south of the current"),
@@ -476,8 +476,8 @@ const PutWindowSettingsWidget = new GObject.Class({
           modal: true,
           message_type: Gtk.MessageType.WARNING,
           buttons:Gtk. ButtonsType.OK,
-          title: _("Keyboard binding alread defined"),
-          text: _("The binding is alread used by '%s'").format(existingBinding)
+          title: _("Keyboard binding already defined"),
+          text: _("The binding is already used by '%s'").format(existingBinding)
         });
 
         md.run();
@@ -634,7 +634,7 @@ const PutWindowLocationWidget = new GObject.Class({
       );
 
     this._addAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_ADD} );
-    this._addAppButton.set_tooltip_text(_("Add a new application (make sure it is runnging)"));
+    this._addAppButton.set_tooltip_text(_("Add a new application (make sure it is running)"));
     this._addAppButton.connect("clicked",
       Lang.bind(this, function() {
 
@@ -676,10 +676,9 @@ const PutWindowLocationWidget = new GObject.Class({
             this._addToTreeView(selection, true);
 
             this._updateAppContainerContent(selection, this.createAppWidgets(selection));
-            dialog.destroy();
+            dialog.close();
           })
-          );
-        //box.pack_start(appSelector, true, true, 2);
+        );
 
         dialog.get_action_area().add(appSelector);
         dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
@@ -687,12 +686,12 @@ const PutWindowLocationWidget = new GObject.Class({
         dialog.set_default_size(350, 100);
         dialog.show_all();
         dialog.run();
-        dialog.destroy();
+        dialog.destroy();                  
       })
     );
 
     this._saveButton = new Gtk.ToolButton({stock_id: Gtk.STOCK_SAVE});
-    this._saveButton.set_tooltip_text(_("'Applications' config is not saved automatically."))
+    this._saveButton.set_tooltip_text(_("'Applications' config is not saved automatically."));
     this._saveButton.connect("clicked", function() {
       Utils.saveSettings();
     });
@@ -743,8 +742,8 @@ const PutWindowLocationWidget = new GObject.Class({
     }
 
     this._wnckScreen.force_update();
-    global.log("wnck: " + this._wnckScreen);
-    global.log("wnck: " + this._wnckScreen.get_windows());
+    //global.log("wnck: " + this._wnckScreen);
+    //global.log("wnck: " + this._wnckScreen.get_windows());
     return this._internalGetRunningApps(exclude);
   },
 
@@ -762,13 +761,13 @@ const PutWindowLocationWidget = new GObject.Class({
     apps.push("All");
 
     let ret = [],
-    exludeLength = exclude.length;
+    excludeLength = exclude.length;
 
     for (let i=0; i < apps.length; i++) {
       let wm =  apps[i],
       found = false;
       // dont add excluded entries to the returned value
-      for (let j=0; j < exludeLength; j++) {
+      for (let j=0; j < excludeLength; j++) {
         if (exclude[j].name == wm || wm == "Update-notifier") {
           found = true;
           break;
@@ -782,7 +781,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
     ret.sort(function(a, b){
       return  a[1] < b[1] ? -1
-      : a[1]==b[1] ? 0 : 1;
+      : a[1] == b[1] ? 0 : 1;
     });
 
     return ret;
@@ -809,7 +808,7 @@ const PutWindowLocationWidget = new GObject.Class({
         function(sw) {
           Utils.setParameter(configLocation + "moveWorkspace", sw.get_active());
           numberButton.set_sensitive(sw.get_active());
-        })
+        });
       workspaceBox.pack_start(btn, false, false, 0);
       ret.pack_start(workspaceBox, false, false, 0);
 
@@ -848,7 +847,7 @@ const PutWindowLocationWidget = new GObject.Class({
     let btn = new Gtk.Switch({ active: Utils.getBoolean(configLocation + "autoMove", false) });
     btn.connect("notify::active", function(sw) {
       Utils.setParameter(configLocation + "autoMove", sw.get_active());
-    })
+    });
     autoMoveBox.pack_end(btn, false, false, 0);
 
     ret.pack_start(autoMoveBox, false, false, 0);
@@ -935,7 +934,7 @@ const PutWindowLocationWidget = new GObject.Class({
         this.locationBox.show_all();
       })
       );
-    buttonContainer.pack_end(addButton, false, false, 0)
+    buttonContainer.pack_end(addButton, false, false, 0);
 
     // don't delete the first position
     if (index > 0) {
@@ -946,13 +945,30 @@ const PutWindowLocationWidget = new GObject.Class({
           this.locationBox.remove(grid);
 
         })
-        );
+      );
       buttonContainer.pack_end(deleteButton, false, false, 0)
     }
 
     grid.attach(buttonContainer, 4, top, 1, 1);
+    
+    // sliders for width, height, x, y
 
-    // sliders for widht, height, x, y
+    top++;
+    grid.attach(new Gtk.Label({
+      label: _("Disable resize"), 
+      xalign: 0,
+      tooltip_text: _("Width and height of the window will not be changed")
+    }), 0, top, 3, 1);
+    let dontResizeSwitch = new Gtk.Switch({sensitive: true, halign: Gtk.Align.END });
+    let disableResize = Utils.getBoolean(loc + "disableResize", false);
+    dontResizeSwitch.set_active(disableResize);
+    dontResizeSwitch.connect("notify::active", function(obj) {      
+      let newValue = obj.get_active();
+      Utils.setParameter(loc + "disableResize", newValue);
+      updateWidthSliders(newValue);
+    });
+    grid.attach(dontResizeSwitch, 1, top, 4, 1);
+
     top++;
     let scaleW = createSlider(loc + "width");
     grid.attach(new Gtk.Label({label: _("Width"), xalign: 0}), 0, top, 1, 1);
@@ -962,6 +978,29 @@ const PutWindowLocationWidget = new GObject.Class({
     let scaleH = createSlider(loc + "height");
     grid.attach(new Gtk.Label({label: _("Height"), xalign: 0}), 0, top, 1, 1);
     grid.attach(scaleH, 1, top, 4, 1);
+
+    let updateWidthSliders = function(disabled) {
+      global.log(disabled + " " + (disabled == true));
+      scaleW.set_sensitive(!disabled);
+      scaleH.set_sensitive(!disabled);      
+    };
+    updateWidthSliders(disableResize);
+
+    top++;
+    grid.attach(new Gtk.Label({
+      label: _("Disable moving"),
+      xalign: 0,
+      tooltip_text: _("Relative position of the window will not be changed")
+    }), 0, top, 3, 1);
+    let dontMoveSwitch = new Gtk.Switch({sensitive: true, halign: Gtk.Align.END });
+    let disableMove = Utils.getBoolean(loc + "disableMove", false);
+    dontMoveSwitch.set_active(disableMove);
+    dontMoveSwitch.connect("notify::active", function(obj) {      
+      let newValue = obj.get_active();
+      Utils.setParameter(loc + "disableMove", newValue);
+      updatePositionSliders(newValue);
+    });
+    grid.attach(dontMoveSwitch, 1, top, 4, 1);
 
     top++;
     let scaleX = createSlider(loc + "x");
@@ -973,14 +1012,19 @@ const PutWindowLocationWidget = new GObject.Class({
     grid.attach(new Gtk.Label({label: _("Y-Position"), xalign: 0}), 0, top, 1, 1);
     grid.attach(scaleY, 1, top, 4, 1);
 
+    let updatePositionSliders = function(disabled) {
+      scaleX.set_sensitive(!disabled);
+      scaleY.set_sensitive(!disabled);      
+    };
+    updatePositionSliders(disableMove);
+
     if (index < (positionSize -1 )) {
       top++;
       grid.attach(new Gtk.Separator({orientation: Gtk.Orientation.HORIZONTAL, margin_top: 4, margin_bottom: 4}), 0, top, 6, 1);
     }
     return grid;
   }
-})
-
+});
 
 function init() {
   Convenience.initTranslations();
@@ -992,4 +1036,4 @@ function buildPrefsWidget() {
   let widget = new PutWindowSettingsWidget();
   widget.show_all();
   return widget;
-};
+}
