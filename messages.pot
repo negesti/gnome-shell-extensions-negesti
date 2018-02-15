@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-08 19:37+0100\n"
+"POT-Creation-Date: 2018-02-15 20:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -229,7 +229,7 @@ msgstr ""
 #: prefs.js:325
 msgid ""
 "'Move Focus' allows you to change the focus based on the relative location "
-"of the current focussed window using the keyboard and to push the currently "
+"of the current focused window using the keyboard and to push the currently "
 "focused window into the background to get the focus to the windows below."
 msgstr ""
 
@@ -242,7 +242,7 @@ msgid "Show animation when moving"
 msgstr ""
 
 #: prefs.js:333
-msgid "Enable cycle through windows at the same postition"
+msgid "Enable cycle through windows at the same position"
 msgstr ""
 
 #: prefs.js:334
@@ -314,12 +314,12 @@ msgid "Error updating Keybinding"
 msgstr ""
 
 #: prefs.js:479
-msgid "Keyboard binding alread defined"
+msgid "Keyboard binding already defined"
 msgstr ""
 
 #: prefs.js:480
 #, javascript-format
-msgid "The binding is alread used by '%s'"
+msgid "The binding is already used by '%s'"
 msgstr ""
 
 #: prefs.js:499
@@ -351,7 +351,7 @@ msgid "Are you sure to delete the configuration for  '%s'?"
 msgstr ""
 
 #: prefs.js:637
-msgid "Add a new application (make sure it is runnging)"
+msgid "Add a new application (make sure it is running)"
 msgstr ""
 
 #: prefs.js:651
@@ -362,52 +362,68 @@ msgstr ""
 msgid "Please select the application you want to add"
 msgstr ""
 
-#: prefs.js:695
+#: prefs.js:694
 msgid "'Applications' config is not saved automatically."
 msgstr ""
 
-#: prefs.js:710
+#: prefs.js:709
 msgid "Select an application to configure using the list on the left side."
 msgstr ""
 
-#: prefs.js:736
+#: prefs.js:735
 msgid "Error getting running apps"
 msgstr ""
 
-#: prefs.js:737
+#: prefs.js:736
 msgid ""
 "We were not able to get the list of running apps from Wnck. Are you running "
 "Wayland? "
 msgstr ""
 
-#: prefs.js:801
+#: prefs.js:800
 msgid "Move window to workspace when created"
 msgstr ""
 
-#: prefs.js:835
+#: prefs.js:834
 msgid "Window target workspace"
 msgstr ""
 
-#: prefs.js:846
+#: prefs.js:845
 msgid "Auto-Move window when created"
 msgstr ""
 
-#: prefs.js:921
+#: prefs.js:920
 msgid "Screen"
 msgstr ""
 
 #: prefs.js:958
+msgid "Disable resize"
+msgstr ""
+
+#: prefs.js:960
+msgid "Width and height of the window will not be changed"
+msgstr ""
+
+#: prefs.js:974
 msgid "Width"
 msgstr ""
 
-#: prefs.js:963
+#: prefs.js:979
 msgid "Height"
 msgstr ""
 
-#: prefs.js:968
+#: prefs.js:991
+msgid "Disable moving"
+msgstr ""
+
+#: prefs.js:993
+msgid "Relative position of the window will not be changed"
+msgstr ""
+
+#: prefs.js:1007
 msgid "X-Position"
 msgstr ""
 
-#: prefs.js:973
+#: prefs.js:1012
 msgid "Y-Position"
 msgstr ""

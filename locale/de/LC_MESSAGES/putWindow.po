@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-08 19:37+0100\n"
-"PO-Revision-Date: 2018-02-08 20:02+0100\n"
+"POT-Creation-Date: 2018-02-15 20:55+0100\n"
+"PO-Revision-Date: 2018-02-15 21:01+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -236,20 +236,20 @@ msgstr "Auf den rechten Bildschirm verschieben"
 #: prefs.js:325
 msgid ""
 "'Move Focus' allows you to change the focus based on the relative location "
-"of the current focussed window using the keyboard and to push the currently "
+"of the current focused window using the keyboard and to push the currently "
 "focused window into the background to get the focus to the windows below."
 msgstr ""
 
 #: prefs.js:331
 msgid "Enable 'Move focus'"
-msgstr ""
+msgstr "'Move Focus' aktivieren"
 
 #: prefs.js:332
 msgid "Show animation when moving"
 msgstr ""
 
 #: prefs.js:333
-msgid "Enable cycle through windows at the same postition"
+msgid "Enable cycle through windows at the same position"
 msgstr ""
 
 #: prefs.js:334
@@ -321,12 +321,13 @@ msgid "Error updating Keybinding"
 msgstr "Fehler beim Aktualisieren der Tastenkombination"
 
 #: prefs.js:479
-msgid "Keyboard binding alread defined"
-msgstr "Tastenkombination bereits definiert"
+#| msgid "Keyboard binding alread defined"
+msgid "Keyboard binding already defined"
+msgstr "Tastenkombination bereits definiert\t"
 
 #: prefs.js:480
 #, javascript-format
-msgid "The binding is alread used by '%s'"
+msgid "The binding is already used by '%s'"
 msgstr "Tastenkombination wird bereits von '%s' verwendet"
 
 #: prefs.js:499
@@ -360,7 +361,7 @@ msgid "Are you sure to delete the configuration for  '%s'?"
 msgstr "Möchtest du die Einstellungen für '%s' wirklich löschen?"
 
 #: prefs.js:637
-msgid "Add a new application (make sure it is runnging)"
+msgid "Add a new application (make sure it is running)"
 msgstr "Neue Anwendung hinzufügen (muss aktiv sein)"
 
 #: prefs.js:651
@@ -371,52 +372,68 @@ msgstr "Anwendung hinzufügen"
 msgid "Please select the application you want to add"
 msgstr "Wähle bitte eine Anwendung aus"
 
-#: prefs.js:695
+#: prefs.js:694
 msgid "'Applications' config is not saved automatically."
 msgstr "Einstellungen werden nicht automatisch gespeichert."
 
-#: prefs.js:710
+#: prefs.js:709
 msgid "Select an application to configure using the list on the left side."
 msgstr "Wähle eine Anwendung aus der Liste."
 
-#: prefs.js:736
+#: prefs.js:735
 msgid "Error getting running apps"
 msgstr "Aktive Anwendungen konnten nicht geladen werden"
 
-#: prefs.js:737
+#: prefs.js:736
 msgid ""
 "We were not able to get the list of running apps from Wnck. Are you running "
 "Wayland? "
 msgstr ""
 
-#: prefs.js:801
+#: prefs.js:800
 msgid "Move window to workspace when created"
 msgstr "Neues Fenster automatisch auf Workspace verschiebe"
 
-#: prefs.js:835
+#: prefs.js:834
 msgid "Window target workspace"
 msgstr "Ziel Workspace des Fensters"
 
-#: prefs.js:846
+#: prefs.js:845
 msgid "Auto-Move window when created"
 msgstr "Neue Fenster automatisch verschieben"
 
-#: prefs.js:921
+#: prefs.js:920
 msgid "Screen"
 msgstr "Bildschirm"
 
 #: prefs.js:958
+msgid "Disable resize"
+msgstr "Größe nicht ändern"
+
+#: prefs.js:960
+msgid "Width and height of the window will not be changed"
+msgstr "Breite und Höhe des Fensters wird nicht geändert"
+
+#: prefs.js:974
 msgid "Width"
 msgstr "Breite"
 
-#: prefs.js:963
+#: prefs.js:979
 msgid "Height"
 msgstr "Höhe"
 
-#: prefs.js:968
+#: prefs.js:991
+msgid "Disable moving"
+msgstr "Position nicht ändern"
+
+#: prefs.js:993
+msgid "Relative position of the window will not be changed"
+msgstr "Relative Position des Fensters wird nicht geändert"
+
+#: prefs.js:1007
 msgid "X-Position"
 msgstr "X-Position"
 
-#: prefs.js:973
+#: prefs.js:1012
 msgid "Y-Position"
 msgstr "Y-Position"
