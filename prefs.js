@@ -980,7 +980,6 @@ const PutWindowLocationWidget = new GObject.Class({
     grid.attach(scaleH, 1, top, 4, 1);
 
     let updateWidthSliders = function(disabled) {
-      global.log(disabled + " " + (disabled == true));
       scaleW.set_sensitive(!disabled);
       scaleH.set_sensitive(!disabled);      
     };

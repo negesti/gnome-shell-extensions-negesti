@@ -762,10 +762,7 @@ MoveWindow.prototype = {
     let s = this._screens[targetScreenIndex];
 
     let disableResize = !!pos.disableResize;
-    let disableMove = !!pos.disableMove; 
-    global.log("dont resize? " + pos.disableResize + " " + disableResize);
-    global.log("dont move? " + pos.disableMove + " " + disableMove);
-    
+    let disableMove = !!pos.disableMove;        
 
     let x = (pos.x == "0.0") ? s.x : s.x + (s.totalWidth * pos.x/100);
     let y = (pos.y == "0.0") ? s.y : s.totalHeight - (s.totalHeight * (1-pos.y/100));
@@ -782,27 +779,18 @@ MoveWindow.prototype = {
 
     }
     if (disableMove) {
-
-      global.log("target: " + width + " H: " + height + " x " +x + " y " + y);
       let r = win.get_frame_rect();
       x = r.x;
       y = r.y;
 
-      global.log("target: " + width + " H: " + height + " x " +x + " y " + y);
       let screenIndex = this._getCurrentScreenIndex(win);
-      global.log(targetScreenIndex + " current = " + screenIndex);
       if (targetScreenIndex != screenIndex) {
         let oldScreen = this._screens[screenIndex];
-
-        global.log("X " + oldScreen.x + " to " + s.x);
-        global.log("y " + oldScreen.y + " to " + s.y);
 
         x = s.x + Math.abs(r.x - oldScreen.x);
         y = s.y + Math.abs(r.y - oldScreen.y);
       }
-    }
-    global.log("w: " + width + " H: " + height + " x " +x + " y " + y);
-  
+    }  
 
     this._resize(win, x, y, width, height);
   },
