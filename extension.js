@@ -877,8 +877,8 @@ MoveWindow.prototype = {
 
   _loadScreenData: function() {
     // get monitor(s) geometry
-    this._primary = global.screen.get_primary_monitor();
-    let numMonitors = global.screen.get_n_monitors();
+    this._primary = this._utils.getScreen().get_primary_monitor();
+    let numMonitors = this._utils.getScreen().get_n_monitors();
 
     this._screens = [];
     // only tested with 2 screen setup
@@ -890,7 +890,7 @@ MoveWindow.prototype = {
       if (Main.layoutManager.getWorkAreaForMonitor) {
         geom = Main.layoutManager.getWorkAreaForMonitor(i);
       } else {
-        geom = global.screen.get_monitor_geometry(i)
+        geom = this._utils.getScreen().get_monitor_geometry(i)
       }
 
       let primary = (i == this._primary);
@@ -931,13 +931,14 @@ MoveWindow.prototype = {
 
     this._loadScreenData();
 
-    this._screenListener = global.screen.connect("monitors-changed",
+    this._screenListener = this._utils.getMonitorManager().connect("monitors-changed",
       Lang.bind(this, this._loadScreenData));
 
-    this._workaresChangedListener = global.screen.connect("workareas-changed",
+    this._workaresChangedListener = this._utils.getScreen().connect("workareas-changed",
       Lang.bind(this, this._loadScreenData));
 
-    this._windowCreatedListener = global.screen.get_display().connect_after('window-created',
+    // this._windowCreatedListener = global.screen.get_display().connect_after('window-created',
+    this._windowCreatedListener = global.display.connect_after('window-created',
       Lang.bind(this, this._moveConfiguredWhenCreated)
     );
 
@@ -997,17 +998,17 @@ MoveWindow.prototype = {
   destroy: function() {
 
     if (this._windowCreatedListener) {
-      global.screen.get_display().disconnect(this._windowCreatedListener);
+      global.display.disconnect(this._windowCreatedListener);
       this._windowCreatedListener = false;
     }
 
     if (this._screenListener) {
-      global.screen.disconnect(this._screenListener);
+      this._utils.getScreen().disconnect(this._screenListener);
       this._screenListener = false;
     }
 
     if (this.__workaresChangedListener) {
-      global.screen.disconnect(this._workaresChangedListener);
+      this._utils.getScreen().disconnect(this._workaresChangedListener);
       this._workaresChangedListener = false;
     }
 

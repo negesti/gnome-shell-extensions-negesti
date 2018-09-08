@@ -55,7 +55,7 @@ MoveWorkspace.prototype = {
     Main.wm._workspaceTracker._checkWorkspaces = this._myCheckWorkspaces;
 
     // Connect after so the handler from ShellWindowTracker has already run
-    let display = global.screen.get_display();
+    let display = global.display;
     this._windowCreatedId = display.connect_after('window-created', Lang.bind(this, this._findAndMove));
   },
 
@@ -69,7 +69,7 @@ MoveWorkspace.prototype = {
     }
 
     if (this._windowCreatedId) {
-      global.screen.get_display().disconnect(this._windowCreatedId);
+      global.display.disconnect(this._windowCreatedId);
       this._windowCreatedId = 0;
     }
   },
@@ -98,7 +98,7 @@ MoveWorkspace.prototype = {
     let sequences = Shell.WindowTracker.get_default().get_startup_sequences();
     for (i = 0; i < sequences.length; i++) {
       let index = sequences[i].get_workspace();
-      if (index >= 0 && index <= global.screen.n_workspaces) {
+      if (index >= 0 && index <= Utils.getWorkspaceManager().n_workspaces) {
         emptyWorkspaces[index] = false;
       }
     }
@@ -117,17 +117,17 @@ MoveWorkspace.prototype = {
 
     // If we don't have an empty workspace at the end, add one
     if (!emptyWorkspaces[emptyWorkspaces.length -1]) {
-      global.screen.append_new_workspace(false, global.get_current_time());
+      Utils.getWorkspaceManager().append_new_workspace(false, global.get_current_time());
       emptyWorkspaces.push(false);
     }
 
-    let activeWorkspaceIndex = global.screen.get_active_workspace_index();
+    let activeWorkspaceIndex = Utils.getWorkspaceManager().get_active_workspace_index();
     emptyWorkspaces[activeWorkspaceIndex] = false;
 
     // Delete other empty workspaces; do it from the end to avoid index changes
     for (i = emptyWorkspaces.length - 2; i >= 0; i--) {
       if (emptyWorkspaces[i]) {
-        global.screen.remove_workspace(this._workspaces[i], global.get_current_time());
+        Utils.getWorkspaceManager().remove_workspace(this._workspaces[i], global.get_current_time());
       } else {
         break;
       }
@@ -162,7 +162,7 @@ MoveWorkspace.prototype = {
       if (this._utils.getBoolean(appPath + ".moveWorkspace", false)) {
         let targetWorkspace = this._utils.getNumber(appPath + ".targetWorkspace", 1) - 1;
 
-        if (targetWorkspace >= global.screen.n_workspaces) {
+        if (targetWorkspace >= Utils.getWorkspaceManager().n_workspaces) {
           this._ensureAtLeastWorkspaces(targetWorkspace, window);
         }
 
@@ -184,9 +184,9 @@ MoveWorkspace.prototype = {
 
 
   _ensureAtLeastWorkspaces: function(num, window) {
-    for (let j = global.screen.n_workspaces; j <= num; j++) {
+    for (let j = Utils.getWorkspaceManager().n_workspaces; j <= num; j++) {
       window.change_workspace_by_index(j-1, false);
-      global.screen.append_new_workspace(false, 0);
+      Utils.getWorkspaceManager().append_new_workspace(false, 0);
     }
   }
 };
