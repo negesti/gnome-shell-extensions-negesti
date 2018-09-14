@@ -335,5 +335,20 @@ Utils.prototype = {
   showErrorMessage: function(title, message) {
     global.log("ERROR: " + title + " " + message);
     //throw new Error(title + ' ' message);
+  },
+
+  getScreen() {
+    return global.screen || global.display;
+  },
+
+  getWorkspaceManager() {
+    return global.screen || global.workspace_manager;
+  },
+
+  getMonitorManager() {
+    // imported here since prefs.js cannot import Meta
+    const Meta = imports.gi.Meta;
+    return global.screen || Meta.MonitorManager.get();
   }
+
 };

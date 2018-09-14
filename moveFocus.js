@@ -7,6 +7,9 @@ const Clutter = imports.gi.Clutter;
 const Lightbox = imports.ui.lightbox;
 const Tweener = imports.ui.tweener;
 
+const Extension = imports.misc.extensionUtils.getCurrentExtension();
+const Utils = Extension.imports.utils;
+
 function MoveFocus(utils, screens) {
   this._init(utils, screens);
 }
@@ -293,14 +296,14 @@ MoveFocus.prototype = {
       return;
     }
 
-		let screen = global.screen;
-    let display = screen.get_display();
+    let screen = this._utils.getWorkspaceManager();
+    let display = global.display;
 
     let allWin;
      if (this._isVersion14) {
       allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen.get_active_workspace()));
     } else {
-      allWin = display.sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace()));
+      allWin = screen.get_display().sort_windows_by_stacking(display.get_tab_list(Meta.TabList.NORMAL_ALL, screen, screen.get_active_workspace()));
     }
 
 		focusWin.lower();
@@ -372,7 +375,7 @@ MoveFocus.prototype = {
     let screenGeo;
     do {
       rightMostScreen++;
-      screenGeo = global.screen.get_monitor_geometry(rightMostScreen);
+      screenGeo = this._utils.getScreen().get_monitor_geometry(rightMostScreen);
     } while (screenGeo.x != 0 && screenGeo.y != 0);
 
     // Prevent Looping
@@ -416,8 +419,8 @@ MoveFocus.prototype = {
   },
 
   _getCurrentScreenIndex: function(win) {
-    if (global.screen.get_monitor_index_for_rect) {
-      return global.screen.get_monitor_index_for_rect(win.get_frame_rect());
+    if (this._utils.getScreen().get_monitor_index_for_rect) {
+      return this._utils.getScreen().get_monitor_index_for_rect(win.get_frame_rect());
     }
 
     let screenLen = this._screens.length;
@@ -477,7 +480,7 @@ MoveFocus.prototype = {
   _getWindowList: function() {
     let display = global.screen.get_display();
     if (this._isVersion14) {
-      return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen.get_active_workspace());
+      return display.get_tab_list(Meta.TabList.NORMAL_ALL, this._utils.getWorkspaceManager().get_active_workspace());
     } else {
       return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen, global.screen.get_active_workspace());
     }
