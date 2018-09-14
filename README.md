@@ -74,6 +74,7 @@ Contributors
  * zara86 - gnome-shell 3.16 support
  * cleverlycoding - gnome-shell 3.18 support
  * wdoekes - cleanup, improve move to center
+ * eddy-geek - gnome-shell 3.30 support 
 
 License
 --------
