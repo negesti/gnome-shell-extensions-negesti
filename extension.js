@@ -741,7 +741,7 @@ MoveWindow.prototype = {
       appName = "All";
     }
     if (config.lastPosition == undefined) {
-      config.lastPositions = 0;
+      config.lastPosition= 0;
     }
 
     let pos = config.positions[config.lastPosition];
