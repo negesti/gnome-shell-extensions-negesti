@@ -532,7 +532,7 @@ MoveWindow.prototype = {
     if (direction.indexOf("s") == -1) {
       y = s.y;
     } else {
-      y = (s.totalHeight - pos.height);
+      y = s.y + (s.totalHeight - pos.height);
     }
 
     if (direction.indexOf("w") == -1) {
