@@ -174,7 +174,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       halign: Gtk.Align.START,
       margin_left: 10,
       label: _("Intelligent corner movement:"),
-      tooltip_text: _("Quite difficult to describe. Enable it and move a window from S to E, "),
+      tooltip_text: _("Moving from E to S moves to SE not S"),
     }), 0, row, 4, 1);
 
     let intelligentCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });

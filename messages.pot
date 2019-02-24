@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-21 19:16+0100\n"
+"POT-Creation-Date: 2019-02-24 15:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,7 +105,7 @@ msgid "Intelligent corner movement:"
 msgstr ""
 
 #: prefs.js:177
-msgid "Quite difficult to describe. Enable it and move a window from S to E, "
+msgid "Moving from E to S moves to SE not S"
 msgstr ""
 
 #: prefs.js:188
