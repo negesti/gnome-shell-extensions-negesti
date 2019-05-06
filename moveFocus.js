@@ -478,11 +478,11 @@ MoveFocus.prototype = {
   },
 
   _getWindowList: function() {
-    let display = global.screen.get_display();
+    let display = this._utils.getScreen();
     if (this._isVersion14) {
       return display.get_tab_list(Meta.TabList.NORMAL_ALL, this._utils.getWorkspaceManager().get_active_workspace());
     } else {
-      return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen, global.screen.get_active_workspace());
+      return display.get_tab_list(Meta.TabList.NORMAL_ALL, display, display.get_active_workspace());
     }
   },
 
