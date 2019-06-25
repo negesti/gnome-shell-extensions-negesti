@@ -179,6 +179,11 @@ Utils.prototype = {
     return this.getNumber(this.CORNER_CHANGE, 0) == 3;
   },
 
+  changeCornerBoth: function() {
+    let val = this.getNumber(this.CORNER_CHANGE, 0);
+    return val == 0 || val == 4;
+  },
+
   getNorthHeights: function() {
     let ret = this._addToArray([], this.getNumber("north-height-0", 50) / 100);
     ret = this._addToArray(ret, this.getNumber("north-height-1", 66) / 100);
