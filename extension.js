@@ -495,6 +495,10 @@ MoveWindow.prototype = {
       return;
     }
 
+    if (this._utils.changeCornerBoth()) {
+      useWidth = useHeight = Math.min(useWidth, useHeight);
+    }
+
     let x, y, width, height;
     if (this._utils.changeCornerWidth()) {
       x = widths[useWidth].x;
