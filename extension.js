@@ -96,9 +96,6 @@ MoveWindow.prototype = {
       s.y = s.geomY;
     }
     
-
-    tbHeight = tbHeight / 2;
-
     let i = 0;
     let widths  = this._utils.getWestWidths();
     s.west = [];
@@ -120,22 +117,24 @@ MoveWindow.prototype = {
     }
 
     let heights = this._utils.getNorthHeights();
+    let absoluteHeight = s.totalHeight + tbHeight;
+
     s.north = [];
     for ( i=0; i < heights.length; i++) {
       s.north[i] = {
-        height: s.totalHeight * heights[i] - tbHeight,
+        height: absoluteHeight * heights[i] - tbHeight * heights[i],
         y: s.y
-      }
+      };
     }
 
     heights = this._utils.getSouthHeights();
     s.south = [];
     for (i=0; i < heights.length; i++) {
-      let h = s.totalHeight * heights[i] - tbHeight;
+      let h = absoluteHeight * heights[i] - tbHeight * heights[i];
       s.south[i] = {
         height: h,
-        y: s.totalHeight - h + s.geomY
-      }
+        y: absoluteHeight - h + s.geomY
+      };
     }
 
     return s;
@@ -748,6 +747,10 @@ MoveWindow.prototype = {
     if (!pos) {
       pos = config.positions[0];
       config.lastPosition = 0;
+      // undefined on first load
+      if (pos.screen) {
+        pos.screen = 0;
+      }
       this._utils.setParameter("locations." + appName + ".lastPosition", 1);
     } else {
       config.lastPosition++;
