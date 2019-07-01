@@ -22,7 +22,7 @@ const MoveWorkspace = Extension.imports.moveWorkspace;
  **/
 function MoveWindow() {
   this._init();
-};
+}
 
 MoveWindow.prototype = {
 
@@ -86,12 +86,12 @@ MoveWindow.prototype = {
 
   _recalculateSizes: function(s) {
 
-    let tbHeight = s.primary ? this._getTopPanelHeight() : 0;
-    if (Math.abs(tbHeight) <= 2) {
-      tbHeight = 0;
+    let topPanelHeight = s.primary ? this._getTopPanelHeight() : 0;
+    if (Math.abs(topPanelHeight) <= 2) {
+      topPanelHeight = 0;
     }
-    if (s.geomY != tbHeight) {
-      s.y = s.geomY + tbHeight;  
+    if (s.geomY != topPanelHeight) {
+      s.y = s.geomY + topPanelHeight;
     } else {
       s.y = s.geomY;
     }
@@ -117,12 +117,12 @@ MoveWindow.prototype = {
     }
 
     let heights = this._utils.getNorthHeights();
-    let absoluteHeight = s.totalHeight + tbHeight;
+    let absoluteHeight = s.totalHeight + topPanelHeight;
 
     s.north = [];
     for ( i=0; i < heights.length; i++) {
       s.north[i] = {
-        height: absoluteHeight * heights[i] - tbHeight * heights[i],
+        height: absoluteHeight * heights[i] - topPanelHeight * heights[i],
         y: s.y
       };
     }
@@ -130,7 +130,7 @@ MoveWindow.prototype = {
     heights = this._utils.getSouthHeights();
     s.south = [];
     for (i=0; i < heights.length; i++) {
-      let h = absoluteHeight * heights[i] - tbHeight * heights[i];
+      let h = absoluteHeight * heights[i] - topPanelHeight * heights[i];
       s.south[i] = {
         height: h,
         y: absoluteHeight - h + s.geomY
@@ -608,11 +608,13 @@ MoveWindow.prototype = {
       let pos = win.get_frame_rect(),
         centerWidths = [],
         centerHeights = [];
+
       centerWidths.push(this._utils.getNumber(this._utils.CENTER_WIDTH_0, 50));
-      centerHeights.push(this._utils.getNumber(this._utils.CENTER_HEIGHT_0, 50));
       centerWidths.push(this._utils.getNumber(this._utils.CENTER_WIDTH_1, 100));
-      centerHeights.push(this._utils.getNumber(this._utils.CENTER_HEIGHT_1, 100));
       centerWidths.push(this._utils.getNumber(this._utils.CENTER_WIDTH_2, 100));
+
+      centerHeights.push(this._utils.getNumber(this._utils.CENTER_HEIGHT_0, 50));
+      centerHeights.push(this._utils.getNumber(this._utils.CENTER_HEIGHT_1, 100));
       centerHeights.push(this._utils.getNumber(this._utils.CENTER_HEIGHT_2, 100));
 
       if (centerWidths[1] == centerWidths[2] && centerHeights[1] == centerHeights[2]) {
@@ -891,7 +893,7 @@ MoveWindow.prototype = {
     // only tested with 2 screen setup
     let sumX = 0,sumY = 0;
 
-    for (let i=0; i<numMonitors; i++) {
+    for (let i=0; i < numMonitors; i++) {
 
       let geom;
       if (Main.layoutManager.getWorkAreaForMonitor) {
@@ -941,7 +943,7 @@ MoveWindow.prototype = {
     this._screenListener = this._utils.getMonitorManager().connect("monitors-changed",
       Lang.bind(this, this._loadScreenData));
 
-    this._workaresChangedListener = this._utils.getScreen().connect("workareas-changed",
+    this._workareasChangedListener = this._utils.getScreen().connect("workareas-changed",
       Lang.bind(this, this._loadScreenData));
 
     // this._windowCreatedListener = global.screen.get_display().connect_after('window-created',
@@ -1014,9 +1016,9 @@ MoveWindow.prototype = {
       this._screenListener = false;
     }
 
-    if (this.__workaresChangedListener) {
-      this._utils.getScreen().disconnect(this._workaresChangedListener);
-      this._workaresChangedListener = false;
+    if (this._workareasChangedListener) {
+      this._utils.getScreen().disconnect(this._workareasChangedListener);
+      this._workareasChangedListener = false;
     }
 
     let size = this._bindings.length;

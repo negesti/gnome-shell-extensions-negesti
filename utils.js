@@ -1,9 +1,7 @@
 const Lang = imports.lang;
 const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-
-const Convenience = Me.imports.convenience;
+const extensionUtils = imports.misc.extensionUtils;
 
 function Utils() {
   this._init();
@@ -37,7 +35,7 @@ Utils.prototype = {
   MOVE_FOCUS_ENABLED: "move-focus-enabled",
   MOVE_FOCUS_ANIMATION: "move-focus-animation",
 
-  ENABLE_MOVE_WORKSPACE: "enable-move-workspace", 
+  ENABLE_MOVE_WORKSPACE: "enable-move-workspace",
 
   INTELLIGENT_CORNER_MOVEMENT: "intelligent-corner-movement",
 
@@ -80,7 +78,7 @@ Utils.prototype = {
   },
 
   loadSettings: function() {
-    this._settingsObject = Convenience.getSettings();
+    this._settingsObject = extensionUtils.getSettings();
     this._settings = {
       locations: JSON.parse(this._settingsObject.get_string("locations"))
     };   
@@ -153,13 +151,17 @@ Utils.prototype = {
     return this.getBoolean("move-center-only-toggles", false);
   },
 
-  // ["0", "Both"],
-  // ["1", "Only height"],
-  // ["2", "Only width"],
-  // ["3", "Never change size"]
-  // ["4", "Nothing on first move, both on second"],
-  // ["5", "Nothing on first move, Only height on second"],
-  // ["6", "Nothing on first move, Only width on second"]["4", "Keep size on first move"],
+  /**
+   * ["0", "Both"],
+   * ["1", "Only height"],
+   * ["2", "Only width"],
+   * ["3", "Never change size"]
+   * ["4", "Nothing on first move, both on second"],
+   * ["5", "Nothing on first move, Only height on second"],
+   * ["6", "Nothing on first move, Only width on second"]["4", "Keep size on first move"],
+   *
+   * @returns {boolean}
+   */
   changeCornerHeight: function() {
     let val = this.getNumber(this.CORNER_CHANGE, 1);
     return val == 0 || val == 1 || val == 4 || val == 5;
@@ -342,15 +344,15 @@ Utils.prototype = {
     //throw new Error(title + ' ' message);
   },
 
-  getScreen() {
+  getScreen: function() {
     return global.screen || global.display;
   },
 
-  getWorkspaceManager() {
+  getWorkspaceManager: function() {
     return global.screen || global.workspace_manager;
   },
 
-  getMonitorManager() {
+  getMonitorManager: function() {
     // imported here since prefs.js cannot import Meta
     const Meta = imports.gi.Meta;
     return global.screen || Meta.MonitorManager.get();
