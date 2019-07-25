@@ -479,7 +479,7 @@ MoveWindow.prototype = {
 
 
     // no special handling for first time move
-    if (ignoreCornerSettings || !this._utils.changeCornerFirstTime()) {
+    if (ignoreCornerSettings) { // || !this._utils.changeCornerFirstTime()) {
       // window was moved to an other corner
       if ((!keepHeight && !keepWidth) && (!sameWidth || !sameHeight)) {
         useWidth = 0;
@@ -491,7 +491,7 @@ MoveWindow.prototype = {
     }
 
     // moveToCornerKeepSize returns true, if the window must be moved (not already in the given corner)
-    if (this._moveToCornerKeepSize(win, screenIndex, direction)) {
+    if (this._moveToCornerKeepSize(win, screenIndex, direction) && !this._utils.changeCornerFirstTime()) {
       return;
     }
 

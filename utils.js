@@ -174,7 +174,7 @@ Utils.prototype = {
 
   changeCornerFirstTime: function() {
     let val = this.getNumber(this.CORNER_CHANGE, 0);
-    return val == 0 || val == 4 || val == 5 || val == 6;
+    return val < 4;
   },
 
   changeCornerNever: function() {
