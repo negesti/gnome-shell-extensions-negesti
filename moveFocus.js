@@ -414,10 +414,6 @@ MoveFocus.prototype = {
     this._focusNearestCandidate(candidates);
   },
 
-  _getIndexOfScreens: function() {
-
-  },
-
   _getCurrentScreenIndex: function(win) {
     if (this._utils.getScreen().get_monitor_index_for_rect) {
       return this._utils.getScreen().get_monitor_index_for_rect(win.get_frame_rect());
@@ -478,11 +474,11 @@ MoveFocus.prototype = {
   },
 
   _getWindowList: function() {
-    let display = global.screen.get_display();
+    let display = global.display;
     if (this._isVersion14) {
       return display.get_tab_list(Meta.TabList.NORMAL_ALL, this._utils.getWorkspaceManager().get_active_workspace());
     } else {
-      return display.get_tab_list(Meta.TabList.NORMAL_ALL, global.screen, global.screen.get_active_workspace());
+      return display.get_tab_list(Meta.TabList.NORMAL_ALL, this._utils.getScreen(), this._utils.getWorkspaceManager().get_active_workspace());
     }
   },
 

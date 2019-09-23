@@ -9,7 +9,6 @@ const Wnck = imports.gi.Wnck;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
-const Convenience = Me.imports.convenience;
 const Utils = new Me.imports.utils.Utils();
 
 const Lang = imports.lang;
@@ -120,7 +119,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     ret.attach(new Gtk.Label({
       halign: Gtk.Align.START,
       margin_left: 10,
-      label: _("Always use multiple widths/heights:"),
+      label: _("Keep window on current screen:"),
       tooltip_text: _("Disable this option to move to other screen if possible"),
     }), 0, row, 4, 1);
 
@@ -174,7 +173,7 @@ const PutWindowSettingsWidget = new GObject.Class({
       halign: Gtk.Align.START,
       margin_left: 10,
       label: _("Intelligent corner movement:"),
-      tooltip_text: _("Quite difficult to describe. Enable it and move a window from S to E, "),
+      tooltip_text: _("Moving from E to S moves to SE not S"),
     }), 0, row, 4, 1);
 
     let intelligentCornerSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END });
@@ -432,7 +431,7 @@ const PutWindowSettingsWidget = new GObject.Class({
     col.add_attribute(cellrend, 'active', 0);
 
     cellrend.connect("toggled", function(toggle, iter) {
-      let [succ, iterator ] = model.get_iter_from_string(iter);
+      let [success, iterator ] = model.get_iter_from_string(iter);
       var value = !model.get_value(iterator, 0);
       model.set(iterator, [0], [value]);
       toggle.set_active(value);
@@ -463,9 +462,9 @@ const PutWindowSettingsWidget = new GObject.Class({
 
     cellrend.connect('accel-edited', function(rend, iter, key, mods) {
       let value = Gtk.accelerator_name(key, mods);
-      let [succ, iterator ] = model.get_iter_from_string(iter);
+      let [success, iterator ] = model.get_iter_from_string(iter);
 
-      if(!succ) {
+      if(!success) {
         throw new Error(_("Error updating Keybinding"));
       }
 
@@ -493,9 +492,9 @@ const PutWindowSettingsWidget = new GObject.Class({
       Utils.set_strv(name, [value]);
     });
     cellrend.connect('accel-cleared', function(rend, iter, key, mods) {
-      let [succ, iterator] = model.get_iter_from_string(iter);
+      let [success, iterator] = model.get_iter_from_string(iter);
 
-      if (!succ) {
+      if (!success) {
         throw new Error(_("Error clearing keybinding"));
       }
       let name = model.get_value(iterator, 1);
@@ -1026,7 +1025,7 @@ const PutWindowLocationWidget = new GObject.Class({
 });
 
 function init() {
-  Convenience.initTranslations();
+  ExtensionUtils.initTranslations();
 }
 
 function buildPrefsWidget() {

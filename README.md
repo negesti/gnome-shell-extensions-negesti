@@ -21,7 +21,7 @@ If you are want to contribute or go the 'git way' just clone this extension and 
 
 Wayland & Wnck
 -----
-For application base configuration the extension relies on the X11 library wnck. 
+For application based configuration the extension relies on the X11 library wnck. 
 
 * Suse: `sudo zypper in libwnck-devel`
 * Arch: `pacman -S libwnck3`
@@ -30,7 +30,7 @@ For application base configuration the extension relies on the X11 library wnck.
     * `sudo dnf install libwnck3` 
 * Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
 
-Because of this dependency and the different concept of wayland and X11 to identify applications (wm_class vs. application_id) **Wayland is not supported**!
+Because of this dependency and the different concepts of wayland and X11 to identify applications (wm_class vs. application_id) **Wayland is not supported**!
 
 As wayland is no real alternative for me until global keyboard/mouse grab is supported, I don't plan to switch to wayland and will not actively work on wayland support. 
 
@@ -78,7 +78,7 @@ Contributors
 
 License
 --------
-Copyright (c) 2011-2017 Clemens Eberwein
+Copyright (c) 2011-2018 Clemens Eberwein
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of VERSION 3 of the GNU General Public

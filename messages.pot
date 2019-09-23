@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-02-15 20:55+0100\n"
+"POT-Creation-Date: 2019-02-24 15:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,7 +70,7 @@ msgid "Main settings"
 msgstr ""
 
 #: prefs.js:123
-msgid "Always use multiple widths/heights:"
+msgid "Keep window on current screen:"
 msgstr ""
 
 #: prefs.js:124
@@ -105,7 +105,7 @@ msgid "Intelligent corner movement:"
 msgstr ""
 
 #: prefs.js:177
-msgid "Quite difficult to describe. Enable it and move a window from S to E, "
+msgid "Moving from E to S moves to SE not S"
 msgstr ""
 
 #: prefs.js:188
@@ -412,18 +412,18 @@ msgstr ""
 msgid "Height"
 msgstr ""
 
-#: prefs.js:991
+#: prefs.js:990
 msgid "Disable moving"
 msgstr ""
 
-#: prefs.js:993
+#: prefs.js:992
 msgid "Relative position of the window will not be changed"
 msgstr ""
 
-#: prefs.js:1007
+#: prefs.js:1006
 msgid "X-Position"
 msgstr ""
 
-#: prefs.js:1012
+#: prefs.js:1011
 msgid "Y-Position"
 msgstr ""
