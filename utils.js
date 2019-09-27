@@ -78,7 +78,7 @@ Utils.prototype = {
   },
 
   loadSettings: function() {
-    if (false && extensionUtils.getSettings) {
+    if (extensionUtils.getSettings) {
       this._settingsObject = extensionUtils.getSettings();
     } else {
       this._settingsObject = this._getSettingsPre30();
