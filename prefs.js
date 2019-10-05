@@ -307,6 +307,8 @@ const PutWindowSettingsWidget = new GObject.Class({
       "put-to-location": _("Move to configured location"),
       "put-to-left-screen": _("Move to the left screen"),
       "put-to-right-screen": _("Move to the right screen"),
+      "put-to-left-wrap-screen": _("Move to left screen, wrapping around to the rightmost"),
+      "put-to-right-wrap-screen": _("Move to right screen, wrapping around to the leftmost"),
     });
   },
 

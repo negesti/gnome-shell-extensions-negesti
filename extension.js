@@ -175,7 +175,7 @@ MoveWindow.prototype = {
 
   /**
    * Move the focused window to the screen on the "direction" side
-   * @param direction left, e, right and w are supported
+   * @param direction left, e, right, w, left-wrap and right-wrap are supported
    * @return true, if it was possible to move the focused window in the given direction
    */
   _moveToScreen: function(direction) {
@@ -186,7 +186,6 @@ MoveWindow.prototype = {
     }
 
     let screenIndex = this._getCurrentScreenIndex(win);
-    let targetIndex = screenIndex;
     let s = null;
     let old = {
       primary: this._screens[screenIndex].primary,
@@ -203,6 +202,16 @@ MoveWindow.prototype = {
 
     if ((direction == "left" || direction == "w") && screenIndex > 0) {
       s = this._screens[screenIndex - 1];
+      s = this._recalculateSizes(s);
+    }
+
+    if ((direction == "left-wrap") && this._screens.length > 1) {
+      s = this._screens[(screenIndex + this._screens.length - 1) % this._screens.length];
+      s = this._recalculateSizes(s);
+    }
+
+    if ((direction == "right-wrap") && this._screens.length > 1) {
+      s = this._screens[(screenIndex + 1) % this._screens.length];
       s = this._recalculateSizes(s);
     }
 
@@ -999,6 +1008,14 @@ MoveWindow.prototype = {
 
     this._addKeyBinding("put-to-right-screen",
       Lang.bind(this, function() { this.moveToScreen("right");} )
+    );
+
+    this._addKeyBinding("put-to-left-wrap-screen",
+      Lang.bind(this, function() { this.moveToScreen("left-wrap");} )
+    );
+
+    this._addKeyBinding("put-to-right-wrap-screen",
+      Lang.bind(this, function() { this.moveToScreen("right-wrap");} )
     );
 
     this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils, this._screens);
