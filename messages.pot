@@ -237,10 +237,6 @@ msgstr ""
 msgid "Enable 'Move focus'"
 msgstr ""
 
-#: prefs.js:332
-msgid "Show animation when moving"
-msgstr ""
-
 #: prefs.js:333
 msgid "Enable cycle through windows at the same position"
 msgstr ""
