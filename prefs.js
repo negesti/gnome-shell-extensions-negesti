@@ -1,7 +1,5 @@
 const Gtk = imports.gi.Gtk;
-const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
-const Gio = imports.gi.Gio;
 
 const Gdk = imports.gi.Gdk;
 const Wnck = imports.gi.Wnck;
@@ -1025,7 +1023,11 @@ const PutWindowLocationWidget = new GObject.Class({
 });
 
 function init() {
-  ExtensionUtils.initTranslations();
+  if (!ExtensionUtils.___initTranslations) {
+    ExtensionUtils.initTranslations();
+  } else {
+    Me.imports.convenience.initTranslations();
+  }
 }
 
 function buildPrefsWidget() {
