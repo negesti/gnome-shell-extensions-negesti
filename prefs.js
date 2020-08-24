@@ -1023,7 +1023,7 @@ const PutWindowLocationWidget = new GObject.Class({
 });
 
 function init() {
-  if (!ExtensionUtils.initTranslations) {
+  if (ExtensionUtils.initTranslations) {
     ExtensionUtils.initTranslations();
   } else {
     // gnome <= 3.28 dont support ExtensionUtils.initTranslations
