@@ -1,7 +1,5 @@
 const Gtk = imports.gi.Gtk;
-const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
-const Gio = imports.gi.Gio;
 
 const Gdk = imports.gi.Gdk;
 const Wnck = imports.gi.Wnck;
@@ -1023,7 +1021,12 @@ const PutWindowLocationWidget = new GObject.Class({
 });
 
 function init() {
-  ExtensionUtils.initTranslations();
+  if (ExtensionUtils.initTranslations) {
+    ExtensionUtils.initTranslations();
+  } else {
+    // gnome <= 3.28 dont support ExtensionUtils.initTranslations
+    Me.imports.convenience.initTranslations();
+  }
 }
 
 function buildPrefsWidget() {

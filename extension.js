@@ -81,7 +81,11 @@ MoveWindow.prototype = {
       return 0;
     }
 
-    return Main.panel.actor.y + Main.panel.actor.height;
+    if (Main.panel.get_y) {
+      return Main.panel.get_y() + Main.panel.get_height();
+    } else {
+      return Main.panel.actor.y + Main.panel.actor.height;
+    }
   },
 
   _recalculateSizes: function(s) {
