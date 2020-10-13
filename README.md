@@ -78,7 +78,7 @@ Contributors
 
 License
 --------
-Copyright (c) 2011-2018 Clemens Eberwein
+Copyright (c) 2011-2020 Clemens Eberwein
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of VERSION 3 of the GNU General Public
