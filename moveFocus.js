@@ -5,7 +5,7 @@ const Shell = imports.gi.Shell;
 
 const Clutter = imports.gi.Clutter;
 const Lightbox = imports.ui.lightbox;
-const Tweener = imports.ui.tweener;
+const Tweener = imports.tweener || imports.ui.tweener;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
@@ -27,7 +27,7 @@ const Flashspot = new Lang.Class({
     this.actor.set_position(area.x, area.y);
     this.pactor = windowMeta.get_compositor_private();
     if (this.actor.set_pivot_point) {
-      this.actor.set_pivot_point(0.5, 0.5);  
+      this.actor.set_pivot_point(0.5, 0.5);
     } else {
       this.actor.scale_center_x =  0.5;
       this.actor.scale_center_y =  0.5;
@@ -149,7 +149,7 @@ MoveFocus.prototype = {
       this._settingObject.disconnect(this._animationSettingListener.handlerId);
     }
   },
-  
+
   _flashWindow: function(window){
     let actor = window.get_compositor_private();
     let dimension = window.get_frame_rect();
@@ -160,7 +160,7 @@ MoveFocus.prototype = {
     }
     Tweener.addTween(actor, {opacity: 255, time: 1});
   },
-  
+
   _activateWindow: function(window) {
     if (this._animationEnabled) {
       this._flashWindow(window);
@@ -342,7 +342,7 @@ MoveFocus.prototype = {
     }
 
     if (direction == "r") {
-     return this._utils.getBoolean("move-focus-right-screen-enabled", true); 
+     return this._utils.getBoolean("move-focus-right-screen-enabled", true);
     }
 
     if (direction == "cycle") {
