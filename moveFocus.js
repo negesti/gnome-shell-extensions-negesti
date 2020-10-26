@@ -5,7 +5,7 @@ const Shell = imports.gi.Shell;
 
 const Clutter = imports.gi.Clutter;
 const Lightbox = imports.ui.lightbox;
-const Tweener = imports.tweener || imports.ui.tweener;
+const Tweener = imports.tweener.tweener || imports.ui.tweener;
 
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;

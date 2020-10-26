@@ -337,8 +337,8 @@ const PutWindowSettingsWidget = new GObject.Class({
     ];
 
     let configNames = [
-    Utils.MOVE_FOCUS_ENABLED,
-    Utils.MOVE_FOCUS_ANIMATION,
+      Utils.MOVE_FOCUS_ENABLED,
+      Utils.MOVE_FOCUS_ANIMATION,
       "move-focus-cycle-enabled",
       "move-focus-north-enabled",
       "move-focus-east-enabled",

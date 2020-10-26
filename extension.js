@@ -72,7 +72,13 @@ MoveWindow.prototype = {
       return 0;
     }
     // 0 means hidden, 255 is visible
-    let opacity = Main.panel.actor.get_paint_opacity();
+    let opacity;
+    if (Main.panel.get_paint_opacity) {
+      opacity = Main.panel.get_paint_opacity();
+    } else {
+      let opacity = Main.panel.actor.get_paint_opacity();
+    }
+
     if (opacity == 0) {
       return 0;
     }
