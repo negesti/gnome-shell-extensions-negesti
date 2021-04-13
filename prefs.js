@@ -2,7 +2,7 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 
 const Gdk = imports.gi.Gdk;
-const Wnck = imports.gi.Wnck;
+//const Wnck = imports.gi.Wnck;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -719,7 +719,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
     // wnckScreen will be null when using wayland ...
     try {
-      this._wnckScreen = Wnck.Screen.get_default();
+      this._wnckScreen = imports.gi.Wnck.Screen.get_default();
     } catch (e) {
       global.log(e);
       this._wnckScreen = null;
