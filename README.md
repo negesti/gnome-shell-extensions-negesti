@@ -58,10 +58,12 @@ Multi screen setup support
 
 The extension works well with mutliple screens.
 
-Moving windows from one screen to another is currently only possible in horizontal setup. e.g. a window that is a the left or right side of one screen, can be moved to the next screen using keyboard shortcuts.
+Moving windows from one screen to another is currently only possible in horizontal setup. e.g. a window that is on the left or right side of one screen, can be moved to this next screen using keyboard shortcuts.
 
- * Move to left screen: default binding: <Super> <Shift> Left 
- * Move to right screen: default binding: <Super> <Shift> Right
+ * Move to left screen: default binding: \<Super> \<Shift> Left
+ * Move to right screen: default binding: \<Super> \<Shift> Right
+ * Move to left screen, wrapping around to the rightmost screen if already on the leftmost screen: default binding: \<Ctrl> \<Alt> \<Shift> \<Super> Space
+ * Move to right screen, wrapping around to the leftmost screen if already on the rightmost screen: default binding: \<Ctrl> \<Alt> \<Super> Space
 
 The keyboard settings can be changed using the preferences.
 

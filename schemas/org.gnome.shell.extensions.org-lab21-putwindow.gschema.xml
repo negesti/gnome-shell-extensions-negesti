@@ -159,15 +159,23 @@
     </key>
     <key type="as" name="put-to-location">
       <default><![CDATA[['<Super>KP_0']]]></default>
-      <summary>Move to a predifined location</summary>
+      <summary>Move to a predefined location</summary>
     </key>
     <key type="as" name="put-to-left-screen">
       <default><![CDATA[['<Super><Shift>Left']]]></default>
-      <summary>Move to the screen on the left site</summary>
+      <summary>Move to the screen on the left side</summary>
     </key>
     <key type="as" name="put-to-right-screen">
       <default><![CDATA[['<Super><Shift>Right']]]></default>
-      <summary>Move to the screen on the right site</summary>
+      <summary>Move to the screen on the right side</summary>
+    </key>
+    <key type="as" name="put-to-left-wrap-screen">
+      <default><![CDATA[['<Primary><Shift><Alt><Super>space']]]></default>
+      <summary>Move to left screen, wrapping around to the rightmost</summary>
+    </key>
+    <key type="as" name="put-to-right-wrap-screen">
+      <default><![CDATA[['<Primary><Alt><Super>space']]]></default>
+      <summary>Move to right screen, wrapping around to the leftmost</summary>
     </key>
 
     <key type="i" name="put-to-corner-ne-enabled">
@@ -208,15 +216,23 @@
     </key>
     <key type="i" name="put-to-location-enabled">
       <default>1</default>
-      <summary>Enable/Disable move to a predifined location</summary>
+      <summary>Enable/Disable move to a predefined location</summary>
     </key>
     <key type="i" name="put-to-left-screen-enabled">
       <default>1</default>
-      <summary>Enable/Disable move to a predifined location</summary>
+      <summary>Enable/Disable move to the left screen</summary>
     </key>
     <key type="i" name="put-to-right-screen-enabled">
       <default>1</default>
-      <summary>Enable/Disable move to a predifined location</summary>
+      <summary>Enable/Disable move to the right screen</summary>
+    </key>
+    <key type="i" name="put-to-left-wrap-screen-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to left screen, wrapping around to the rightmost</summary>
+    </key>
+    <key type="i" name="put-to-right-wrap-screen-enabled">
+      <default>1</default>
+      <summary>Enable/Disable move to right screen, wrapping around to the leftmost</summary>
     </key>
 
 
