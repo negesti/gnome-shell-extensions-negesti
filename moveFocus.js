@@ -10,45 +10,48 @@ const Tweener = imports.tweener.tweener || imports.ui.tweener;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
 
+const GObject = imports.gi.GObject;
+
 function MoveFocus(utils, screens) {
   this._init(utils, screens);
 }
 
 const FLASHSPOT_ANIMATION_OUT_TIME = 2; // seconds
 
-const Flashspot = new Lang.Class({
-  Name: 'Flashspot',
-  Extends: Lightbox.Lightbox,
-  _init: function(area, windowMeta) {
-    this.parent(Main.uiGroup, { inhibitEvents: false,
-                                width: area.width,
-                                height: area.height });
-    this.actor.style_class = 'focusflash';
-    this.actor.set_position(area.x, area.y);
-    this.pactor = windowMeta.get_compositor_private();
-    if (this.actor.set_pivot_point) {
-      this.actor.set_pivot_point(0.5, 0.5);
-    } else {
-      this.actor.scale_center_x =  0.5;
-      this.actor.scale_center_y =  0.5;
-    }
-    let constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.X, 0.0);
-    this.actor.add_constraint_with_name("x-bind", constraint);
-    constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.Y, 0.0);
-    this.actor.add_constraint_with_name("y-bind", constraint);
-    constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.SIZE, 0.0);
-    this.actor.add_constraint_with_name("size-bind", constraint);
-    Tweener.addTween(this.actor, {
-     opacity: 0,
-     time: 3*FLASHSPOT_ANIMATION_OUT_TIME,
-     onComplete: function() {
-       this.destroy();
-     }
-    });
+const Flashspot = GObject.registerClass(
+class Flashspot extends Lightbox.Lightbox {
+    _init (area, windowMeta) {
+      super._init(0.0, _('Flashspot'));
 
-    this.actor.background_color = new Clutter.Color({red: 255, green: 255, blue: 255, alpha: 128})
-  },
-  fire: function() {
+      this.parent(Main.uiGroup, { inhibitEvents: false,
+                                  width: area.width,
+                                  height: area.height });
+      this.actor.style_class = 'focusflash';
+      this.actor.set_position(area.x, area.y);
+      this.pactor = windowMeta.get_compositor_private();
+      if (this.actor.set_pivot_point) {
+        this.actor.set_pivot_point(0.5, 0.5);
+      } else {
+        this.actor.scale_center_x =  0.5;
+        this.actor.scale_center_y =  0.5;
+      }
+      let constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.X, 0.0);
+      this.actor.add_constraint_with_name("x-bind", constraint);
+      constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.Y, 0.0);
+      this.actor.add_constraint_with_name("y-bind", constraint);
+      constraint = Clutter.BindConstraint.new(this.pactor, Clutter.BindCoordinate.SIZE, 0.0);
+      this.actor.add_constraint_with_name("size-bind", constraint);
+      Tweener.addTween(this.actor, {
+        opacity: 0,
+        time: 3*FLASHSPOT_ANIMATION_OUT_TIME,
+        onComplete: function() {
+          this.destroy();
+        }
+      })
+      this.actor.background_color = new Clutter.Color({red: 255, green: 255, blue: 255, alpha: 128})
+    }
+
+  fire () {
     this.actor.show();
     this.actor.opacity = 255;
   }
