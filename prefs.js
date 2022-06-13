@@ -9,8 +9,6 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 const Utils = new Me.imports.utils.Utils();
 
-const Lang = imports.lang;
-
 const _ = imports.gettext.domain(Me.metadata['gettext-domain']).gettext;
 
 let createSlider = function(configName) {
@@ -84,14 +82,13 @@ const PutWindowSettingsWidget = GObject.registerClass({
         let renderer = new Gtk.CellRendererText();
         combo.pack_start(renderer, true);
         combo.add_attribute(renderer, 'text', 1);
-        combo.connect("changed", Lang.bind(this,
-            function(obj) {
+        combo.connect("changed", (obj) => {
               let[success, iter] = obj.get_active_iter();
               if (!success) {
                 return;
               }
               Utils.setParameter(Utils.CORNER_CHANGE, this._model.get_value(iter, 0));
-            })
+            }
         );
         return combo;
       }
@@ -347,11 +344,12 @@ const PutWindowSettingsWidget = GObject.registerClass({
           let enabledSwitch = new Gtk.Switch({ sensitive: true, halign: Gtk.Align.END, vexpand: false});
           enabledSwitch.set_active(Utils.getBoolean(configNames[i], true));
 
-          enabledSwitch.connect("notify::active", Lang.bind(
-              {configName: configNames[i]}, // funny scope, but works :)
-              function(obj) {
-                Utils.setParameter(this.configName, obj.get_active());
-              }));
+          let setParamFunction = function(obj) {
+            Utils.setParameter(this.configName, obj.get_active());
+          };
+
+          // funny scope, but works :)
+          enabledSwitch.connect("notify::active", setParamFunction.bind({configName: configNames[i]}));
           ret.attach(enabledSwitch, 4, row++, 1, 1);
         }
 
@@ -461,12 +459,12 @@ const PutWindowSettingsWidget = GObject.registerClass({
             var md = new Gtk.MessageDialog({
               modal: true,
               message_type: Gtk.MessageType.WARNING,
-              buttons:Gtk. ButtonsType.OK,
-              title: _("Keyboard binding already defined"),
-              text: _("The binding is already used by '%s'").format(existingBinding)
+              buttons: Gtk.ButtonsType.OK,
+              text: _("Keyboard binding already defined"),
+              secondary_text: _("The binding is already used by '%s'").format(existingBinding)
             });
 
-            md.run();
+            md.show();
             md.destroy();
             return;
           }
@@ -553,7 +551,7 @@ const PutWindowLocationWidget = new GObject.Class({
     this.treeView.append_column(column);
 
     this.treeView.get_selection().connect("changed",
-        Lang.bind(this, function(selection) {
+        (selection) => {
           let s = selection.get_selected();
           // no new selection
           if (!s[0]) {
@@ -566,125 +564,129 @@ const PutWindowLocationWidget = new GObject.Class({
 
           this._removeAppButton.set_sensitive(true);
           this._updateAppContainerContent(selectedValue, this.createAppWidgets(selectedValue));
-        })
+        }
     );
 
-    // this._removeAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_REMOVE} );
-    // this._removeAppButton.set_sensitive(false);
-    // this._removeAppButton.set_tooltip_text(_("Remove an existing application setting"));
-    //
-    // this._removeAppButton.connect("clicked",
-    //     Lang.bind(this, function() {
-    //
-    //       let dialog = new Gtk.MessageDialog({
-    //         modal: true,
-    //         message_type: Gtk.MessageType.QUESTION,
-    //         title: _("Delete application '%s'?").format(this._selectedApp),
-    //         text: _("Are you sure to delete the configuration for  '%s'?").format(this._selectedApp)
-    //       });
-    //
-    //       dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
-    //       dialog.add_button(Gtk.STOCK_DELETE, Gtk.ResponseType.DELETE_EVENT);
-    //
-    //       dialog.connect("response",
-    //           Lang.bind(this, function(dialog, responseType) {
-    //             if (responseType == Gtk.ResponseType.DELETE_EVENT) {
-    //               for (let i=0; i< this._apps.length; i++) {
-    //                 if (this._apps[i].name != this._selectedApp) {
-    //                   continue;
-    //                 }
-    //                 // remove the widget
-    //                 if (this._appContainer.get_child()) {
-    //                   this._appContainer.get_child().destroy();
-    //                 }
-    //                 // remove the list entry
-    //                 this.treeModel.remove(this._apps[i].listElement);
-    //                 // unset the parameter
-    //                 Utils.unsetParameter("locations." + this._apps[i].name);
-    //                 // remove the entry from _apps array
-    //                 this._apps.pop(this._apps[i]);
-    //                 break;
-    //               }
-    //             }
-    //           })
-    //       );
-    //       dialog.run();
-    //       dialog.destroy();
-    //
-    //     })
-    // );
-    //
-    // this._addAppButton = new Gtk.ToolButton( {stock_id: Gtk.STOCK_ADD} );
-    // this._addAppButton.set_tooltip_text(_("Add a new application (make sure it is running)"));
-    // this._addAppButton.connect("clicked",
-    //     Lang.bind(this, function() {
-    //
-    //       let apps = this._getRunningApps(this._apps);
-    //       if (apps == null) {
-    //         return;
-    //       }
-    //
-    //       let appsLength = apps.length;
-    //
-    //       let dialog = new Gtk.MessageDialog({
-    //         modal: false,
-    //         message_type: Gtk.MessageType.QUESTION,
-    //         title: _("Add application"),
-    //         text: _("Please select the application you want to add")
-    //       });
-    //
-    //       let appModel = new Gtk.ListStore();
-    //       appModel.set_column_types([ GObject.TYPE_INT, GObject.TYPE_STRING ]);
-    //
-    //       let appSelector = new Gtk.ComboBox({ model: appModel, hexpand: true });
-    //       appSelector.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
-    //
-    //       let renderer = new Gtk.CellRendererText();
-    //       appSelector.pack_start(renderer, true);
-    //       appSelector.add_attribute(renderer, 'text', 1);
-    //
-    //       for (let i = 0; i < appsLength; i++ ) {
-    //         let iter = appModel.append();
-    //         appModel.set(iter, [0, 1], apps[i] );
-    //       }
-    //
-    //       appSelector.connect('changed',
-    //           Lang.bind(this, function(combo) {
-    //             let selection = combo.get_model().get_value(combo.get_active_iter()[1], 1);
-    //             let configPath = "locations." + selection;
-    //             Utils.setParameter(configPath, Utils.START_CONFIG);
-    //
-    //             this._addToTreeView(selection, true);
-    //
-    //             this._updateAppContainerContent(selection, this.createAppWidgets(selection));
-    //             dialog.close();
-    //           })
-    //       );
-    //
-    //       dialog.get_action_area().add(appSelector);
-    //       dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
-    //
-    //       dialog.set_default_size(350, 100);
-    //       dialog.show_all();
-    //       dialog.run();
-    //       dialog.destroy();
-    //     })
-    // );
-    //
-    // this._saveButton = new Gtk.ToolButton({stock_id: Gtk.STOCK_SAVE});
-    // this._saveButton.set_tooltip_text(_("'Applications' config is not saved automatically."));
-    // this._saveButton.connect("clicked", function() {
-    //   Utils.saveSettings();
-    // });
+
+    this._removeAppButton = new Gtk.Button();
+    this._removeAppButton.set_icon_name("user-trash-symbolic");
+    this._removeAppButton.set_sensitive(false);
+    this._removeAppButton.set_tooltip_text(_("Remove an existing application setting"));
+
+    this._removeAppButton.connect("clicked",
+        () => {
+
+          let dialog = new Gtk.MessageDialog({
+            modal: true,
+            message_type: Gtk.MessageType.QUESTION,
+            title: _("Delete application '%s'?").format(this._selectedApp),
+            text: _("Are you sure to delete the configuration for  '%s'?").format(this._selectedApp)
+          });
+
+          dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
+          dialog.add_button(Gtk.STOCK_DELETE, Gtk.ResponseType.DELETE_EVENT);
+
+          dialog.connect("response",
+              (dialog, responseType) => {
+                if (responseType == Gtk.ResponseType.DELETE_EVENT) {
+                  for (let i=0; i< this._apps.length; i++) {
+                    if (this._apps[i].name != this._selectedApp) {
+                      continue;
+                    }
+                    // remove the widget
+                    if (this._appContainer.get_child()) {
+                      this._appContainer.get_child().destroy();
+                    }
+                    // remove the list entry
+                    this.treeModel.remove(this._apps[i].listElement);
+                    // unset the parameter
+                    Utils.unsetParameter("locations." + this._apps[i].name);
+                    // remove the entry from _apps array
+                    this._apps.pop(this._apps[i]);
+                    break;
+                  }
+                }
+              }
+          );
+          dialog.run();
+          dialog.destroy();
+
+        }
+    );
+
+    this._addAppButton = new Gtk.Button();
+    this._addAppButton.set_icon_name("list-add-symbolic");
+    this._addAppButton.set_tooltip_text(_("Add a new application (make sure it is running)"));
+    this._addAppButton.connect("clicked",
+        () => {
+
+          let apps = this._getRunningApps(this._apps);
+          if (apps == null) {
+            return;
+          }
+
+          let appsLength = apps.length;
+
+          let dialog = new Gtk.MessageDialog({
+            modal: false,
+            message_type: Gtk.MessageType.QUESTION,
+            title: _("Add application"),
+            text: _("Please select the application you want to add")
+          });
+
+          let appModel = new Gtk.ListStore();
+          appModel.set_column_types([ GObject.TYPE_INT, GObject.TYPE_STRING ]);
+
+          let appSelector = new Gtk.ComboBox({ model: appModel, hexpand: true });
+          //appSelector.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
+
+          let renderer = new Gtk.CellRendererText();
+          appSelector.pack_start(renderer, true);
+          appSelector.add_attribute(renderer, 'text', 1);
+
+          for (let i = 0; i < appsLength; i++ ) {
+            let iter = appModel.append();
+            appModel.set(iter, [0, 1], apps[i] );
+          }
+
+          appSelector.connect('changed',
+              (combo) => {
+                let selection = combo.get_model().get_value(combo.get_active_iter()[1], 1);
+                let configPath = "locations." + selection;
+                Utils.setParameter(configPath, Utils.START_CONFIG);
+
+                this._addToTreeView(selection, true);
+
+                this._updateAppContainerContent(selection, this.createAppWidgets(selection));
+                dialog.close();
+              }
+          );
+
+          dialog.get_action_area().add(appSelector);
+          dialog.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL);
+
+          dialog.set_default_size(350, 100);
+          dialog.show_all();
+          dialog.run();
+          dialog.destroy();
+        }
+    );
+
+    this._saveButton = new Gtk.Button();
+    this._saveButton.set_icon_name("document-save-symbolic");
+    this._saveButton.set_tooltip_text(_("'Applications' config is not saved automatically."));
+    this._saveButton.connect("clicked", function() {
+      Utils.saveSettings();
+    });
 
     let toolbar = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL});
-    // toolbar.set_icon_size(Gtk.IconSize.MENU);
-    // toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR)
+    //toolbar.set_icon_size(Gtk.IconSize.MENU);
+    //toolbar.get_style_context().add_class(Gtk.STYLE_CLASS_INLINE_TOOLBAR)
 
-    //
-    // toolbar.pack_start(this._removeAppButton, true, true, 0);
-    // toolbar.pack_start(this._addAppButton, true, true, 0);
-    // toolbar.pack_start(this._saveButton, true, true, 0);
+
+    toolbar.append(this._removeAppButton);
+    toolbar.append(this._addAppButton);
+    toolbar.append(this._saveButton);
 
     let leftPanel = new Gtk.Box({orientation: Gtk.Orientation.VERTICAL});
     leftPanel.append(this.treeView, true, true, 0);
@@ -711,7 +713,7 @@ const PutWindowLocationWidget = new GObject.Class({
     try {
       this._wnckScreen = imports.gi.Wnck.Screen.get_default();
     } catch (e) {
-      global.log(e);
+      console.log(e);
       this._wnckScreen = null;
     }
     if (this._wnckScreen == null) {
@@ -829,15 +831,15 @@ const PutWindowLocationWidget = new GObject.Class({
     }
 
     let autoMoveBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL});
-    autoMoveBox.pack_start(new Gtk.Label({label: _("Auto-Move window when created"), xalign: 0}), true, true, 0);
+    autoMoveBox.append(new Gtk.Label({label: _("Auto-Move window when created"), xalign: 0}));
 
     let btn = new Gtk.Switch({ active: Utils.getBoolean(configLocation + "autoMove", false) });
     btn.connect("notify::active", function(sw) {
       Utils.setParameter(configLocation + "autoMove", sw.get_active());
     });
-    autoMoveBox.pack_end(btn, false, false, 0);
+    autoMoveBox.append(btn, false, false, 0);
 
-    ret.pack_start(autoMoveBox, false, false, 0);
+    ret.append(autoMoveBox, false, false, 0);
 
 
     // widgets for the positions defined for the app
@@ -846,7 +848,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
     this.locationBox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL });
     for (let i = 0; i < positionSize; i++) {
-      this.locationBox.pack_start(this._generateOnePositionWidgets(configLocation, i, positionSize), false, false, 0);
+      this.locationBox.append(this._generateOnePositionWidgets(configLocation, i, positionSize), false, false, 0);
     }
     ret.pack_start(this.locationBox, false, false, 0);
 
@@ -885,7 +887,7 @@ const PutWindowLocationWidget = new GObject.Class({
     screenModel.set_column_types([GObject.TYPE_STRING, GObject.TYPE_INT]);
 
     let screenSelector = new Gtk.ComboBox({ model: screenModel, hexpand: true});
-    screenSelector.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
+    //screenSelector.get_style_context().add_class(Gtk.STYLE_CLASS_RAISED);
 
     let screenSelectRenderer = new Gtk.CellRendererText();
     screenSelector.pack_start(screenSelectRenderer, true);
@@ -899,9 +901,9 @@ const PutWindowLocationWidget = new GObject.Class({
 
     screenSelector.set_active(Utils.getNumber(loc + "screen", 0));
     screenSelector.connect('changed',
-        Lang.bind(this, function(combo) {
+        (combo) => {
           Utils.setParameter(loc + "screen", combo.get_model().get_value(combo.get_active_iter()[1], 1));
-        })
+        }
     );
 
     grid.attach(new Gtk.Label({label: _("Screen"), xalign: 0}), 0, top, 3, 1);
@@ -911,7 +913,7 @@ const PutWindowLocationWidget = new GObject.Class({
     let buttonContainer = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL });
     let addButton = new Gtk.Button({ stock_id: Gtk.STOCK_ADD });
     addButton.connect("clicked",
-        Lang.bind(this, function() {
+        () => {
 
           let length = Utils.getParameter(configLocation + "positions", []).length;
           let newLocation = configLocation + "positions." + length;
@@ -919,7 +921,7 @@ const PutWindowLocationWidget = new GObject.Class({
 
           this.locationBox.pack_start(this._generateOnePositionWidgets(configLocation, length, length), false, false, 0);
           this.locationBox.show_all();
-        })
+        }
     );
     buttonContainer.pack_end(addButton, false, false, 0);
 
@@ -927,11 +929,10 @@ const PutWindowLocationWidget = new GObject.Class({
     if (index > 0) {
       let deleteButton = new Gtk.Button({ stock_id: Gtk.STOCK_REMOVE });
       deleteButton.connect("clicked",
-          Lang.bind(this, function() {
+          () => {
             Utils.unsetParameter(configLocation + "positions." + index);
             this.locationBox.remove(grid);
-
-          })
+          }
       );
       buttonContainer.pack_end(deleteButton, false, false, 0)
     }
@@ -1013,19 +1014,9 @@ const PutWindowLocationWidget = new GObject.Class({
 });
 
 function init() {
-  if (ExtensionUtils.initTranslations) {
-    ExtensionUtils.initTranslations();
-  } else {
-    // gnome <= 3.28 dont support ExtensionUtils.initTranslations
-    Me.imports.convenience.initTranslations();
-  }
+  ExtensionUtils.initTranslations();
 }
 
 function buildPrefsWidget() {
-  //var windows = imports.gi.Gdk.Screen.get_default().get_window_stack();
-
-  let widget = new PutWindowSettingsWidget();
-  console.log(widget);
-  console.log("wtf");
-  return widget;
+  return new PutWindowSettingsWidget();
 }

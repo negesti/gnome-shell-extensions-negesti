@@ -1,13 +1,15 @@
 #!/bin/bash
 TARGET="putWindow@clemens.lab21.org.zip"
 
+rm $TARGET
+
 echo "recompiling schema file..."
 cd schemas
 make
 cd ..
 
 echo "Zip it"
-zip -r $TARGET *.js metadata.json schemas/gschemas.compiled locale messages.pot 
+zip -r $TARGET *.js metadata.json schemas/gschemas.compiled schemas/org.gnome.shell.extensions.org-lab21-putwindow.gschema.xml locale/*/LC_MESSAGES/*.mo
 
 # http://whatthecommit.com/0e0c1a4060a298158f3c4ef526f03f86
 echo "
