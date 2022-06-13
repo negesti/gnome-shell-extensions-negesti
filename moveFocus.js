@@ -1,4 +1,3 @@
-const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
@@ -81,14 +80,14 @@ MoveFocus.prototype = {
     this._settingObject = this._utils.getSettingsObject();
     this._settingsChangedListener = {
       name: this._utils.MOVE_FOCUS_ENABLED,
-      fn: Lang.bind(this, function() {
+      fn: () => {
         let enabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ENABLED, false);
         if (enabled) {
           this._enable();
         } else {
           this._disable();
         }
-      })
+      }
     };
 
     this._settingsChangedListener.handlerId = this._settingObject.connect(
@@ -98,9 +97,9 @@ MoveFocus.prototype = {
 
     this._animationSettingListener = {
       name: this._utils.MOVE_FOCUS_ANIMATION,
-      fn: Lang.bind(this, function() {
+      fn: () => {
         this._animationEnabled = this._utils.getBoolean(this._utils.MOVE_FOCUS_ANIMATION, true);
-      })
+      }
     };
     this._animationSettingListener.handlerId = this._settingObject.connect(
       'changed::' + this._utils.MOVE_FOCUS_ANIMATION,
@@ -173,26 +172,26 @@ MoveFocus.prototype = {
 
   _enable: function() {
     this._addKeyBinding("move-focus-north",
-      Lang.bind(this, function() { this._moveFocus("n"); })
+      () => { this._moveFocus("n"); }
     );
     this._addKeyBinding("move-focus-east",
-      Lang.bind(this, function() { this._moveFocus("e"); })
+      () => { this._moveFocus("e"); }
     );
     this._addKeyBinding("move-focus-south",
-      Lang.bind(this, function() { this._moveFocus("s"); })
+      () => { this._moveFocus("s"); }
     );
     this._addKeyBinding("move-focus-west",
-      Lang.bind(this, function() { this._moveFocus("w"); })
+      () => { this._moveFocus("w"); }
     );
     this._addKeyBinding("move-focus-left-screen",
-      Lang.bind(this, function() { this._moveFocusToScreen("l"); })
+      () => { this._moveFocusToScreen("l"); }
     );
     this._addKeyBinding("move-focus-right-screen",
-      Lang.bind(this, function() { this._moveFocusToScreen("r"); })
+      () => { this._moveFocusToScreen("r"); }
     );
 
     this._addKeyBinding("move-focus-cycle",
-      Lang.bind(this, function() { this._cycle(); })
+      () => { this._cycle(); }
     );
   },
 

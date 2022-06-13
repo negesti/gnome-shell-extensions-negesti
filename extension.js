@@ -1,5 +1,4 @@
 
-const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const Mainloop = imports.mainloop;
@@ -9,6 +8,8 @@ const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Utils = Extension.imports.utils;
 const MoveFocus = Extension.imports.moveFocus;
 const MoveWorkspace = Extension.imports.moveWorkspace;
+
+let _moveWindow = null;
 
 /**
  * Thanks to:
@@ -691,10 +692,10 @@ MoveWindow.prototype = {
     if (!app) {
       if (!noRecurse) {
         // window is not tracked yet
-        Mainloop.idle_add(Lang.bind(this, function() {
+        Mainloop.idle_add(() => {
           this._moveConfiguredWhenCreated(display, win, true);
           return;
-        }));
+        });
       }
       return;
     }
@@ -712,9 +713,9 @@ MoveWindow.prototype = {
     // config exists and autoMove is enabled
     if (configExists && this._utils.getBoolean(appPath + ".autoMove", false)) {
       this.focusListener = win.connect("focus",
-        Lang.bind(this, function() {
+        () => {
           this._moveToConfiguredLocation(win, app);
-        })
+        }
       );
     }
   },
@@ -950,61 +951,60 @@ MoveWindow.prototype = {
 
     this._loadScreenData();
 
-    this._screenListener = this._utils.getMonitorManager().connect("monitors-changed",
-      Lang.bind(this, this._loadScreenData));
+    this._screenListener = this._utils.getMonitorManager()
+        .connect("monitors-changed", this._loadScreenData.bind(this));
 
-    this._workareasChangedListener = this._utils.getScreen().connect("workareas-changed",
-      Lang.bind(this, this._loadScreenData));
+    this._workareasChangedListener = this._utils.getScreen()
+        .connect("workareas-changed", this._loadScreenData.bind(this));
 
     // this._windowCreatedListener = global.screen.get_display().connect_after('window-created',
-    this._windowCreatedListener = global.display.connect_after('window-created',
-      Lang.bind(this, this._moveConfiguredWhenCreated)
-    );
+    this._windowCreatedListener = global.display
+        .connect_after('window-created', this._moveConfiguredWhenCreated.bind(this));
 
     this._bindings = [];
     // move to n, e, s an w
     this._addKeyBinding("put-to-side-n",
-      Lang.bind(this, function(){ this.moveFocused("n");})
+        () => { this.moveFocused("n");}
     );
     this._addKeyBinding("put-to-side-e",
-      Lang.bind(this, function(){ this.moveFocused("e");})
+        () => { this.moveFocused("e");}
     );
     this._addKeyBinding("put-to-side-s",
-      Lang.bind(this, function(){ this.moveFocused("s");})
+        () => { this.moveFocused("s");}
     );
     this._addKeyBinding("put-to-side-w",
-      Lang.bind(this, function(){ this.moveFocused("w");})
+        () => { this.moveFocused("w");}
     );
 
     // move to  nw, se, sw, nw
     this._addKeyBinding("put-to-corner-ne",
-      Lang.bind(this, function(){ this.moveFocused("ne");})
+        () => { this.moveFocused("ne");}
     );
     this._addKeyBinding("put-to-corner-se",
-      Lang.bind(this, function(){ this.moveFocused("se");})
+        () => { this.moveFocused("se");}
     );
     this._addKeyBinding("put-to-corner-sw",
-      Lang.bind(this, function(){ this.moveFocused("sw");})
+        () => { this.moveFocused("sw");}
     );
     this._addKeyBinding("put-to-corner-nw",
-      Lang.bind(this, function(){ this.moveFocused("nw");})
+        () => { this.moveFocused("nw");}
     );
 
     // move to center. fix 2 screen setup and resize to 50% 50%
     this._addKeyBinding("put-to-center",
-      Lang.bind(this, function(){ this.moveFocused("c");})
+        () => { this.moveFocused("c");}
     );
 
     this._addKeyBinding("put-to-location",
-      Lang.bind(this, function() { this.moveToConfiguredLocation();} )
+        () => { this.moveToConfiguredLocation();} 
     );
 
     this._addKeyBinding("put-to-left-screen",
-      Lang.bind(this, function() { this.moveToScreen("left");} )
+        () => { this.moveToScreen("left");} 
     );
 
     this._addKeyBinding("put-to-right-screen",
-      Lang.bind(this, function() { this.moveToScreen("right");} )
+        () => { this.moveToScreen("right");} 
     );
 
     this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils, this._screens);
@@ -1071,7 +1071,7 @@ function enable() {
     let rect = this.get_frame_rect();
     return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
   };
-  this._moveWindow = new MoveWindow();
+  _moveWindow = new MoveWindow();
 }
 
 function disable() {  
@@ -1083,5 +1083,6 @@ function disable() {
   }
   
   
-  this._moveWindow.destroy();
+  _moveWindow.destroy();
+  _moveWindow = null;
 }

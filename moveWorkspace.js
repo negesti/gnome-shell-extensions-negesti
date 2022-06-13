@@ -1,4 +1,3 @@
-const Lang = imports.lang;
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
@@ -27,14 +26,14 @@ MoveWorkspace.prototype = {
     this._settingObject = this._utils.getSettingsObject();
     this._settingsChangedListener = {
       name: this._utils.ENABLE_MOVE_WORKSPACE,
-      fn: Lang.bind(this, function() {
+      fn: () => {
         let enabled = this._utils.getBoolean(this._utils.ENABLE_MOVE_WORKSPACE, false);
         if (enabled) {
           this.enable();
         } else {
           this.disable();
         }
-      })
+      }
     };
 
     this._settingsChangedListener.handlerId = this._settingObject.connect(
@@ -56,7 +55,7 @@ MoveWorkspace.prototype = {
 
     // Connect after so the handler from ShellWindowTracker has already run
     let display = global.display;
-    this._windowCreatedId = display.connect_after('window-created', Lang.bind(this, this._findAndMove));
+    this._windowCreatedId = display.connect_after('window-created', this._findAndMove.bind(this));
   },
 
   destroy: function() {
@@ -145,10 +144,10 @@ MoveWorkspace.prototype = {
     if (!app) {
       if (!noRecurse) {
         // window is not tracked yet
-        Mainloop.idle_add(Lang.bind(this, function() {
+        Mainloop.idle_add(() => {
           this._findAndMove(display, window, true);
           return false;
-        }));
+        });
       } else
         global.log ('Cannot find application for window');
       return;
@@ -168,7 +167,7 @@ MoveWorkspace.prototype = {
 
         // wait until we focus the new window e.g. it really exists and then move it
         this.moveWorkspaceListener = window.connect("focus",
-          Lang.bind(this, function() {
+          () => {
 
             if (this.moveWorkspaceListener != null) {
               window.disconnect(this.moveWorkspaceListener);
@@ -176,7 +175,7 @@ MoveWorkspace.prototype = {
             }
 
             window.change_workspace_by_index(targetWorkspace, false);
-          })
+          }
         );
       }
     }
