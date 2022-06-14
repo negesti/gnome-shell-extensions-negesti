@@ -77,7 +77,7 @@ Utils.prototype = {
   },
 
   loadSettings: function() {
-    this._settingsObject = extensionUtils.getSettings();
+    this._settingsObject = extensionUtils.getSettings("org.gnome.shell.extensions.org-lab21-putwindow");
     this._settings = {
       locations: JSON.parse(this._settingsObject.get_string("locations"))
     };   
