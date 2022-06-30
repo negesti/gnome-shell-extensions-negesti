@@ -74,8 +74,12 @@ MoveFocus.prototype = {
     // quite dirty
     let version = imports.misc.config.PACKAGE_VERSION;
     version = version.split(".");
-    version = new Number(version[1]);
-    this._isVersion14 = version >= 14;
+    let majorVersion = new Number(version[0]);
+    if (majorVersion === 3) {
+      this._isVersion14 = new Number(version[1]) >= 14;
+    } else {
+      this._isVersion14 = true;
+    }
 
     this._settingObject = this._utils.getSettingsObject();
     this._settingsChangedListener = {
