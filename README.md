@@ -11,10 +11,7 @@ Installation
 
 As you ended up here, I assume the installation from [extensions.gnome.org](https://extensions.gnome.org/extension/39/put-windows/) didn't work :)
 
-The easiest way to install is to download the latest release zip from the [releases](https://github.com/negesti/gnome-shell-extensions-negesti/releases) page and install it using the gnome-tweak-tool.
-
-
-If you are want to contribute or go the 'git way' just clone this extension and link it to the .local extension folder. This way you can always update the extension using `git pull`.
+If you want to contribute or go the 'git way' just clone this extension and link it to the .local extension folder. This way you can always update the extension using `git pull`.
 
      ln -s "PATH_TO_YOUR_CLONE" ~/.local/share/gnome-shell/extensions/putWindow@clemens.lab21.org
 
@@ -78,7 +75,7 @@ Contributors
 
 License
 --------
-Copyright (c) 2011-2020 Clemens Eberwein
+Copyright (c) 2011-2022 [negesti](https://github.com/negesti/)
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of VERSION 3 of the GNU General Public
