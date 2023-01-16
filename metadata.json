@@ -1,6 +1,6 @@
 {
-  "shell-version": ["40", "41", "42"],
-  "version": 99,
+  "shell-version": ["40", "41", "42", "43"],
+  "version": 33,
   "uuid": "putWindow@clemens.lab21.org",
   "name": "Put Windows",
   "description": "Fully customizable replacement for the old compiz put plugin. \n * Move windows to left/right side, bottom/top, center or corner \n * Move window to other screen \n * Select focused window using the keyboard \n * Application based window placement \n\n Please check github if your gnome-shell version is not supported",
