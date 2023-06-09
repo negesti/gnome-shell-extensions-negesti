@@ -354,12 +354,13 @@ Utils.prototype = {
   getMonitorManager: function() {
     // imported here since prefs.js cannot import Meta
     const Meta = imports.gi.Meta;
-    var mm;
-    if (Meta.MonitorManager.get) {
-      mm = Meta.MonitorManager.get();
+
+    if (global.screen) {
+      return global.screen;
+    } if (Meta.MonitorManager.get) {
+      return Meta.MonitorManager.get();
     } else {
-      mm = global.backend.get_monitor_manager();
+      return global.backend.get_monitor_manager();
     }
-    return global.screen || mm;
   }
 };
