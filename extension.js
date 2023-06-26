@@ -215,7 +215,24 @@ MoveWindow.prototype = {
       s = this._screens[screenIndex - 1];
       s = this._recalculateSizes(s);
     }
-
+    if (direction == "next") {
+      if (screenIndex == this._screens.length - 1) {
+        s = this._screens[0]
+      }
+      else {
+        s = this._screens[screenIndex + 1];
+        s = this._recalculateSizes(s);
+      }
+    } 
+    if (direction == "previous") {
+      if (screenIndex == 0) {
+        s = this._screens[this._screens.length - 1]
+      }
+      else {
+        s = this._screens[screenIndex - 1];
+        s = this._recalculateSizes(s);
+      }
+    }  
     if (s == null) {
       return false;
     }
@@ -1008,6 +1025,12 @@ MoveWindow.prototype = {
 
     this._addKeyBinding("put-to-right-screen",
         () => { this.moveToScreen("right");} 
+    );
+    this._addKeyBinding("put-to-previous-screen",
+        () => { this.moveToScreen("previous");} 
+    );
+    this._addKeyBinding("put-to-next-screen",
+        () => { this.moveToScreen("next");} 
     );
 
     this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils, this._screens);
