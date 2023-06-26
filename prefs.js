@@ -335,6 +335,8 @@ const PutWindowSettingsWidget = GObject.registerClass({
           "put-to-location": _("Move to configured location"),
           "put-to-left-screen": _("Move to the left screen"),
           "put-to-right-screen": _("Move to the right screen"),
+          "put-to-previous-screen": _("Move to the previous screen"),
+          "put-to-next-screen": _("Move to the next screen"),
         });
       }
 
