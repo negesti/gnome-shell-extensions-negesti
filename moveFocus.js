@@ -22,9 +22,11 @@ class Flashspot extends Lightbox.Lightbox {
     _init (area, windowMeta) {
       super._init(0.0, _('Flashspot'));
 
-      this.parent(Main.uiGroup, { inhibitEvents: false,
-                                  width: area.width,
-                                  height: area.height });
+      this.parent(Main.uiGroup, {
+        inhibitEvents: false,
+        width: area.width,
+        height: area.height,
+      });
       this.actor.style_class = 'focusflash';
       this.actor.set_position(area.x, area.y);
       this.pactor = windowMeta.get_compositor_private();
