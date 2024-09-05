@@ -1,0 +1,33 @@
+ignorePatterns:
+  - _build/**
+
+extends:
+  - ./lint/eslintrc-gjs.yml
+  - ./lint/eslintrc-shell.yml
+
+overrides:
+  - files: ./*.js
+    globals:
+      global: readonly
+      _: readonly
+      C_: readonly
+      N_: readonly
+      ngettext: readonly
+
+    rules:
+      prefer-const: error
+      guard-for-in: error
+      curly:
+        - error
+        - all
+      max-len:
+        - error
+        - code: 120
+          ignoreUrls: true
+          ignoreTemplateLiterals: true
+      indent:
+        - error
+        - 2           
+
+parserOptions:
+  sourceType: module
