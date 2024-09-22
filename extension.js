@@ -52,12 +52,6 @@ class MoveWindow {
 
     this._bindings = [];
 
-    this._addKeyBinding('put-to-side-n', settings,
-      () => {
-        this.moveFocused('n');
-      }
-    );
-
     // move to n, e, s an w
     let directions = ['n', 'e', 's', 'w'];
     for (let i = 0; i < directions.length; i++) {
@@ -131,9 +125,12 @@ class MoveWindow {
   _addKeyBinding(key, settings, handler) {
     this._bindings.push(key);
 
+    const mode = Shell.hasOwnProperty('ActionMode') ? Shell.ActionMode : Shell.KeyBindingMode;
+
     Main.wm.addKeybinding(key,
-      settings, Meta.KeyBindingFlags.NONE,
-      Shell.ActionMode.NORMAL,
+      settings,
+      Meta.KeyBindingFlags.NONE,
+      mode.ALL,
       handler
     );
   }

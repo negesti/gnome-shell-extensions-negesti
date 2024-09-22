@@ -201,7 +201,7 @@ export default class PutWindowUtils {
     } else {
       ret = this.getParameter(name);
     }
-    return ret == 1 || ret === true || ret === 'true' || ret === '1';
+    return ret === true || ret === 'true' || ret === '1' || ret === 1;
   }
 
   getNumber(name, defaultValue) {

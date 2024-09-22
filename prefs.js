@@ -450,7 +450,6 @@ class PutWindowSettingsWidget extends Gtk.Notebook {
         [unusedOk, key, mods] = [0, 0];
       }
 
-
       const row = model.insert(10);
       if (mods === undefined) {
         mods = null;
@@ -507,10 +506,8 @@ class PutWindowSettingsWidget extends Gtk.Notebook {
       'accel-mode': Gtk.CellRendererAccelMode.GTK,
     });
 
-
-    function accelEdited(rend, iter, key, mods) {
-      const value = Gtk.accelerator_name(key, mods);
-      const [success, iterator] = model.get_iter_from_string(iter);
+    function accelEdited(renderer, path, accelKey, accelMods) {
+      const [success, iterator] = model.get_iter_from_string(path);
 
       if (!success) {
         throw new Error(_('Error updating Keybinding'));
@@ -541,7 +538,8 @@ class PutWindowSettingsWidget extends Gtk.Notebook {
       this._utils.setParameter(`${configName}-enabled`, 1);
       model.set(iterator, [0], [true]);
 
-      model.set(iterator, [3, 4], [mods, key]);
+      model.set(iterator, [3, 4], [accelMods, accelKey]);
+      const value = Gtk.accelerator_name(accelKey, accelMods);
       // eslint-disable-next-line no-invalid-this
       this._utils.set_strv(configName, [value]);
     }
