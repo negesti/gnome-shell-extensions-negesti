@@ -514,6 +514,7 @@ class PutWindowSettingsWidget extends Gtk.Notebook {
       }
 
       const configName = model.get_value(iterator, 1);
+      const value = Gtk.accelerator_name(accelKey, accelMods);
       // eslint-disable-next-line no-invalid-this
       const existingBinding = this._utils.keyboardBindingExists(configName, value);
       if (existingBinding) {
@@ -539,7 +540,6 @@ class PutWindowSettingsWidget extends Gtk.Notebook {
       model.set(iterator, [0], [true]);
 
       model.set(iterator, [3, 4], [accelMods, accelKey]);
-      const value = Gtk.accelerator_name(accelKey, accelMods);
       // eslint-disable-next-line no-invalid-this
       this._utils.set_strv(configName, [value]);
     }

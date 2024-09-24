@@ -747,7 +747,6 @@ class MoveWindow {
    * @param {string} where
    */
   _moveFocused(where) {
-    console.log(`_moveFocused ${where}`);
     const win = global.display.focus_window;
     if (win === null) {
       return;
