@@ -3,3 +3,4 @@ negesti.sublime-*
 ThinksIcantRemember.txt
 README.html
 .idea/**
+node_modules/**
