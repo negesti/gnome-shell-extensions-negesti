@@ -5,38 +5,38 @@
       <summary>Application based configuration</summary>
     </key>
 
-    <key type="i" name="ignore-top-panel">
-      <default>0</default>
+    <key type="b" name="ignore-top-panel">
+      <default>false</default>
       <summary>Ignore top panel height</summary>
     </key>
-    <key type="i" name="move-center-only-toggles">
-      <default>0</default>
+    <key type="b" name="move-center-only-toggles">
+      <default>false</default>
       <summary>Move to center onyl toggles maximize flags</summary>
     </key>
-    <key type="i" name="enable-move-workspace">
-      <default>0</default>
+    <key type="b" name="enable-move-workspace">
+      <default>false</default>
       <summary>Enable move to workspace feature</summary>
     </key>
     <key type="i" name="corner-changes">
       <default>0</default>
       <summary>Change width and height when moving to corner (Always, only height, only width)</summary>
     </key>
-    <key type="i" name="always-use-widths">
-      <default>0</default>
+    <key type="b" name="always-use-widths">
+      <default>false</default>
       <summary>Use multiple widths even if moveing to other screen is possible</summary>
     </key>
-    <key type="i" name="intelligent-corner-movement">
-      <default>0</default>
+    <key type="b" name="intelligent-corner-movement">
+      <default>false</default>
       <summary>Moving from E to S moves to SE not S</summary>
     </key>
 
-    <key type="i" name="always-keep-width">
-      <default>0</default>
+    <key type="b" name="always-keep-width">
+      <default>false</default>
       <summary>Keep width when moving a window to south or north</summary>
     </key>
 
-    <key type="i" name="always-keep-height">
-      <default>0</default>
+    <key type="b" name="always-keep-height">
+      <default>false</default>
       <summary>Keep width when moving a window to the east or west</summary>
     </key>
 
@@ -64,8 +64,8 @@
       <default>100</default>
       <summary>Third height to use when moved to center</summary>
     </key>
-    <key type="i" name="center-keep-width">
-      <default>0</default>
+    <key type="b" name="center-keep-width">
+      <default>false</default>
       <summary>Keep width when moving from center to south or north</summary>
     </key>
 
@@ -177,70 +177,69 @@
       <default><![CDATA[['<Super><Shift>X']]]></default>
       <summary>Move to the next screen</summary>
     </key>
-    <key type="i" name="put-to-corner-ne-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-corner-ne-enabled">
+      <default>true</default>
       <summary>Move to the top right corner</summary>
     </key>
-    <key type="i" name="put-to-corner-nw-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-corner-nw-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to the top left corner</summary>
     </key>
-    <key type="i" name="put-to-corner-se-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-corner-se-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to the bottom right corner</summary>
     </key>
-    <key type="i" name="put-to-corner-sw-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-corner-sw-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to the bottom left corner</summary>
     </key>
-    <key type="i" name="put-to-side-n-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-side-n-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to the top</summary>
     </key>
-    <key type="i" name="put-to-side-e-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-side-e-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to the right side</summary>
     </key>
-    <key type="i" name="put-to-side-s-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-side-s-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to bottom</summary>
     </key>
-    <key type="i" name="put-to-side-w-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-side-w-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to the left side</summary>
     </key>
-    <key type="i" name="put-to-center-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-center-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to center/maximize</summary>
     </key>
-    <key type="i" name="put-to-location-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-location-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to a predifined location</summary>
     </key>
-    <key type="i" name="put-to-left-screen-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-left-screen-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to a predifined location</summary>
     </key>
-    <key type="i" name="put-to-right-screen-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-right-screen-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to a predifined location</summary>
     </key>
-    <key type="i" name="put-to-previous-screen-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-previous-screen-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to a predifined location</summary>
     </key>
-    <key type="i" name="put-to-next-screen-enabled">
-      <default>1</default>
+    <key type="b" name="put-to-next-screen-enabled">
+      <default>true</default>
       <summary>Enable/Disable move to a predifined location</summary>
     </key>
 
-
-    <key type="i" name="move-focus-enabled">
-      <default>1</default>
+    <key type="b" name="move-focus-enabled">
+      <default>true</default>
       <summary>Enable/Disable the MoveFocus feature</summary>
     </key>
-    <key type="i" name="move-focus-animation">
-      <default>1</default>
+    <key type="b" name="move-focus-animation">
+      <default>true</default>
       <summary>Enable/Disable the MoveFocus animation</summary>
     </key>
     <key type="as" name="move-focus-cycle">
@@ -272,32 +271,32 @@
       <summary>Move the focus to the right screen</summary>
     </key>
 
-    <key type="i" name="move-focus-cycle-enabled">
-      <default>1</default>
+    <key type="b" name="move-focus-cycle-enabled">
+      <default>true</default>
       <summary>Enable/Disable cycle through windows at the same postition</summary>
     </key>
-    <key type="i" name="move-focus-north-enabled">
-      <default>1</default>
+    <key type="b" name="move-focus-north-enabled">
+      <default>true</default>
       <summary>Enable/Disable focus the window that's north of the current</summary>
     </key>
-    <key type="i" name="move-focus-east-enabled">
-      <default>1</default>
+    <key type="b" name="move-focus-east-enabled">
+      <default>true</default>
       <summary>Enable/Disable focus the window that's east of the current</summary>
     </key>
-    <key type="i" name="move-focus-south-enabled">
-      <default>1</default>
+    <key type="b" name="move-focus-south-enabled">
+      <default>true</default>
       <summary>Enable/Disable focus the window that's south of the current</summary>
     </key>
-    <key type="i" name="move-focus-west-enabled">
-      <default>1</default>
+    <key type="b" name="move-focus-west-enabled">
+      <default>true</default>
       <summary>Enable/Disable focus the window that's west of the current</summary>
     </key>
-    <key type="i" name="move-focus-left-screen-enabled">
-      <default>1</default>
+    <key type="b" name="move-focus-left-screen-enabled">
+      <default>true</default>
       <summary>Enable/Disable left the focus to the left screen</summary>
     </key>
-    <key type="i" name="move-focus-right-screen-enabled">
-      <default>1</default>
+    <key type="b" name="move-focus-right-screen-enabled">
+      <default>true</default>
       <summary>Enable/Disable move the focus to the right screen</summary>
     </key>
   </schema>

@@ -1,3 +1,5 @@
+import PutWindowUtils from "./utils";
+
 const Meta = imports.gi.Meta;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
@@ -295,9 +297,6 @@ MoveFocus.prototype = {
   },
 
   _cycle: function() {
-    if (!this._moveToIsEnabled("cycle")) {
-      return;
-    }
 
 		let focusWin = global.display.focus_window;
     if (focusWin == null) {
@@ -328,43 +327,7 @@ MoveFocus.prototype = {
 		}
   },
 
-  _moveToIsEnabled: function(direction) {
-    if (direction == "n") {
-      return this._utils.getBoolean("move-focus-north-enabled", true);
-    }
-
-    if (direction == "e") {
-      return this._utils.getBoolean("move-focus-east-enabled", true);
-    }
-
-    if (direction == "s") {
-      return this._utils.getBoolean("move-focus-south-enabled", true);
-    }
-
-    if (direction == "w") {
-      return this._utils.getBoolean("move-focus-west-enabled", true);
-    }
-
-    if (direction == "l") {
-      return this._utils.getBoolean("move-focus-left-screen-enabled", true);
-    }
-
-    if (direction == "r") {
-     return this._utils.getBoolean("move-focus-right-screen-enabled", true);
-    }
-
-    if (direction == "cycle") {
-      return this._utils.getBoolean("move-focus-cycle-enabled", true);
-    }
-
-    return true;
-  },
-
   _moveFocusToScreen: function(direction) {
-
-    if ( !this._moveToIsEnabled(direction)) {
-      return;
-    }
 
     let focusWindow = global.display.focus_window;
     if (focusWindow == null) {
@@ -441,10 +404,6 @@ MoveFocus.prototype = {
   },
 
   _moveFocus: function(direction) {
-
-    if ( !this._moveToIsEnabled(direction)) {
-      return;
-    }
 
     let win = global.display.focus_window;
     if (win == null) {

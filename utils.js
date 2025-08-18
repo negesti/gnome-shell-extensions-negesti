@@ -14,11 +14,12 @@ export default class PutWindowUtils {
   static MOVE_CENTER_ONLY_TOGGLES = 'move-center-only-toggles';
   static ALWAYS_KEEP_WIDTH = 'always-keep-width';
   static ALWAYS_KEEP_HEIGHT = 'always-keep-height';
-  static MOVE_FOCUS_ENABLED = 'move-focus-enabled';
-  static MOVE_FOCUS_ANIMATION = 'move-focus-animation';
   static ENABLE_MOVE_WORKSPACE = 'enable-move-workspace';
   static INTELLIGENT_CORNER_MOVEMENT = 'intelligent-corner-movement';
 
+  static MOVE_FOCUS_ENABLED = 'move-focus-enabled';
+  static MOVE_FOCUS_ANIMATION = 'move-focus-animation';
+  
   constructor(settingsObject) {
     this._changeEventListeners = [];
     this._gnomeBindings = null;
@@ -34,10 +35,28 @@ export default class PutWindowUtils {
 
     for (let i = 0; i < this._changeEventListeners.length; i++) {
       this._changeEventListeners[i].handlerId = this._settingsObject.connect(
-        `changed::${this._changeEventListeners[i].name}`,
-        this._changeEventListeners[i].fn
+          `changed::${this._changeEventListeners[i].name}`,
+          this._changeEventListeners[i].fn
       );
     }
+  }
+
+  getMainSettings() {
+    return [
+      PutWindowUtils.ALWAYS_USE_WIDTHS,
+      PutWindowUtils.ALWAYS_KEEP_WIDTH,
+      PutWindowUtils.ALWAYS_KEEP_HEIGHT,
+      PutWindowUtils.ENABLE_MOVE_WORKSPACE,
+      PutWindowUtils.IGNORE_TOP_PANEL,
+      PutWindowUtils.INTELLIGENT_CORNER_MOVEMENT
+    ]
+  }
+
+  getMoveFocusSettings() {
+    return [
+      PutWindowUtils.MOVE_FOCUS_ENABLED,
+      PutWindowUtils.MOVE_FOCUS_ANIMATION
+    ]
   }
 
   destroy() {
@@ -197,11 +216,12 @@ export default class PutWindowUtils {
   getBoolean(name, defaultValue) {
     let ret = defaultValue;
     if (name.indexOf('locations') === -1) {
-      ret = this._settingsObject.get_int(name);
+      ret = this._settingsObject.get_boolean(name);
     } else {
       ret = this.getParameter(name);
     }
-    return ret === true || ret === 'true' || ret === '1' || ret === 1;
+
+    return ret === 'true' || ret === true || ret === '1' || ret === 1;
   }
 
   getNumber(name, defaultValue) {
@@ -295,8 +315,8 @@ export default class PutWindowUtils {
     }
 
     return !isNaN(value)
-      ? Number(value)
-      : defaultValue;
+        ? Number(value)
+        : defaultValue;
   }
 
   logErrorMessage(title, message) {

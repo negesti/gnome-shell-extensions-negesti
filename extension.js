@@ -726,6 +726,7 @@ class MoveWindow {
   moveFocused(where) {
     if ('e,s,w,n'.indexOf(where) !== -1) {
       if (!this._utils.getBoolean(`put-to-side-${where}-enabled`, true)) {
+
         return;
       }
     } else if ('ne,se,sw,nw'.indexOf(where) !== -1) {
