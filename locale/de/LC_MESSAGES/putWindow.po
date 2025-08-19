@@ -227,11 +227,11 @@ msgstr "Auf den rechten Bildschirm verschieben"
 
 #: prefs.js:357
 msgid "Move to the previous screen"
-msgstr "Auf den rechten Bildschirm verschieben"
+msgstr "Auf den vorherigen Bildschirm verschieben"
 
 #: prefs.js:358
 msgid "Move to the next screen"
-msgstr "Auf den linken Bildschirm verschieben"
+msgstr "Auf den nächsten Bildschirm verschieben"
 
 #: prefs.js:367
 msgid ""

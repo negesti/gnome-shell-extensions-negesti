@@ -157,10 +157,6 @@
       <default><![CDATA[['<Super>KP_5']]]></default>
       <summary>Move to center/maximize</summary>
     </key>
-    <key type="as" name="put-to-location">
-      <default><![CDATA[['<Super>KP_0']]]></default>
-      <summary>Move to a predifined location</summary>
-    </key>
     <key type="as" name="put-to-left-screen">
       <default><![CDATA[['<Super><Shift>Left']]]></default>
       <summary>Move to the screen on the left site</summary>
@@ -212,10 +208,6 @@
     <key type="b" name="put-to-center-enabled">
       <default>true</default>
       <summary>Enable/Disable move to center/maximize</summary>
-    </key>
-    <key type="b" name="put-to-location-enabled">
-      <default>true</default>
-      <summary>Enable/Disable move to a predifined location</summary>
     </key>
     <key type="b" name="put-to-left-screen-enabled">
       <default>true</default>

@@ -1,12 +1,11 @@
 import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-import PutWindowUtils from "./utils.js";
-import {createSlider, createBindingList, IdValueComboItem} from "./src/prefsHelper.js"
+import PutWindowUtils from './utils.js';
+import {createSlider, createKeyboardBindings, IdValueComboItem} from './prefsHelper.js';
 
 class MainPage extends Adw.PreferencesPage {
   static {
@@ -16,9 +15,11 @@ class MainPage extends Adw.PreferencesPage {
   clear() {
     this._combo_model = null;
   }
+
   constructor(settings, utils) {
     super({
-      title: _('Main')
+      title: _('Main'),
+      icon_name: 'applications-system-symbolic',
     });
 
     this._actionGroup = new Gio.SimpleActionGroup();
@@ -29,38 +30,38 @@ class MainPage extends Adw.PreferencesPage {
     }
 
     const group = new Adw.PreferencesGroup({
-      title: 'Main settings'
-    })
+      title: 'Main settings',
+    });
 
     group.add(new Adw.SwitchRow({
       title: _('Keep window on current screen'),
       tooltip_text: _('Disable this option to move to other screen if possible'),
-      action_name: 'put-windows.' + PutWindowUtils.ALWAYS_USE_WIDTHS
+      action_name: `put-windows.${PutWindowUtils.ALWAYS_USE_WIDTHS}`,
 
     }));
 
     group.add(new Adw.SwitchRow({
       title: _('Always ignore top panel'),
       tooltip_text: _('Enable this if you use an extension to hide the top panel'),
-      action_name: 'put-windows.' + PutWindowUtils.IGNORE_TOP_PANEL
+      action_name: `put-windows.${PutWindowUtils.IGNORE_TOP_PANEL}`,
     }));
 
     group.add(new Adw.SwitchRow({
       title: _('Intelligent corner movement'),
       tooltip_text: _('Moving from E to S moves to SE not S'),
-      action_name: 'put-windows.' + PutWindowUtils.INTELLIGENT_CORNER_MOVEMENT
+      action_name: `put-windows.${PutWindowUtils.INTELLIGENT_CORNER_MOVEMENT}`,
     }));
 
     group.add(new Adw.SwitchRow({
       title: _('Keep width when moving north/south'),
       tooltip_text: _('Windows will not change their width when moved north or south'),
-      action_name: 'put-windows.' + PutWindowUtils.ALWAYS_KEEP_WIDTH
+      action_name: `put-windows.${PutWindowUtils.ALWAYS_KEEP_WIDTH}`,
     }));
 
     group.add(new Adw.SwitchRow({
       title: _('Keep height when moving east/west'),
       tooltip_text: _('Windows will not change their height when moved east or west'),
-      action_name: 'put-windows.' + PutWindowUtils.ALWAYS_KEEP_HEIGHT
+      action_name: `put-windows.${PutWindowUtils.ALWAYS_KEEP_HEIGHT}`,
     }));
 
 
@@ -69,8 +70,7 @@ class MainPage extends Adw.PreferencesPage {
     this.add(group);
   }
 
-  createCornerChangeCombo(settings, utils)  {
-
+  createCornerChangeCombo(settings, utils) {
     this._combo_model = new Gio.ListStore();
 
     const currentValue = utils.getNumber(PutWindowUtils.CORNER_CHANGE, 0);
@@ -87,7 +87,7 @@ class MainPage extends Adw.PreferencesPage {
 
     let selectMe = 0;
     for (let i = 0; i < values.length; i++) {
-      let addMe = new IdValueComboItem();
+      const addMe = new IdValueComboItem();
       addMe.id_property = values[i][0];
       addMe.name_property = values[i][1];
       this._combo_model.append(addMe);
@@ -100,13 +100,12 @@ class MainPage extends Adw.PreferencesPage {
       title: _('Moving to corner:'),
       tooltip_text: _('Adjust window width and height when moved to corner?'),
       model: this._combo_model,
-      expression: Gtk.PropertyExpression.new(IdValueComboItem, null, "name-property"),
-      selected: selectMe
+      expression: Gtk.PropertyExpression.new(IdValueComboItem, null, 'name-property'),
+      selected: selectMe,
     });
 
 
     comboRow.connect('notify::selected', () => {
-      const selectedIndex = comboRow.selected;
       const selectedItem = comboRow.selected_item;
 
       if (selectedItem) {
@@ -126,7 +125,7 @@ class CenterPage extends Adw.PreferencesPage {
   constructor(settings, utils) {
     super({
       title: _('Center Width & Height'),
-      icon_name: 'focus-windows-symbolic'
+      icon_name: 'format-justify-center-symbolic',
     });
 
     this._actionGroup = new Gio.SimpleActionGroup();
@@ -135,22 +134,21 @@ class CenterPage extends Adw.PreferencesPage {
     this._actionGroup.add_action(settings.create_action(PutWindowUtils.MOVE_CENTER_ONLY_TOGGLES));
 
     const group = new Adw.PreferencesGroup({
-      title: _('Width and height to use if window is moved to the center')
+      title: _('Width and height to use if window is moved to the center'),
     });
 
 
     group.add(new Adw.SwitchRow({
       title: _('Move to center maximizes and restores initial window size (first w/h only)'),
-      tooltip_text: _(
-          'Maximize the window on first move and restore original size ' +
+      tooltip_text: _('Maximize the window on first move and restore original size ' +
           'and position on second. Only works with first width/height'),
-      action_name: 'put-windows.' + PutWindowUtils.MOVE_CENTER_ONLY_TOGGLES
+      action_name: `put-windows.${PutWindowUtils.MOVE_CENTER_ONLY_TOGGLES}`,
     }));
 
     group.add(new Adw.SwitchRow({
       title: _('Keep width when moving from center to south or north:'),
       tooltip_text: _("Don't change width when moving window from center to north or south"),
-      action_name: 'put-windows.' + PutWindowUtils.CENTER_KEEP_WIDTH
+      action_name: `put-windows.${PutWindowUtils.CENTER_KEEP_WIDTH}`,
 
     }));
 
@@ -173,42 +171,42 @@ class PositionPage extends Adw.PreferencesPage {
 
   constructor(settings, utils) {
     super({
-      title: _('Width & Height')
+      title: _('Width & Height'),
+      icon_name: 'view-grid-symbolic',
     });
 
     const groups = [
       {
         title: 'North height',
-        config: 'north-height-'
+        config: 'north-height-',
       }, {
         title: 'South height',
-        config: 'south-height-'
+        config: 'south-height-',
       }, {
         title: 'West width',
-        config: 'left-side-widths-'
+        config: 'left-side-widths-',
       }, {
         title: 'West height',
-        config: 'right-side-widths-'
-      }
+        config: 'right-side-widths-',
+      },
     ];
 
     const labels = [_('First:'), _('Second:'), _('Third:')];
 
-    const evenMarks = [ 50, 66, 34];
-    const oddMarks = [ 50, 34, 66];
+    const evenMarks = [50, 66, 34];
+    const oddMarks = [50, 34, 66];
 
     for (let i = 0; i < groups.length; i++) {
-
       const group = new Adw.PreferencesGroup({
-        title: groups[i].title
+        title: groups[i].title,
       });
       this.add(group);
 
-      let marks = (i % 2 == 0) ? evenMarks : oddMarks;
+      const marks = i % 2 === 0 ? evenMarks : oddMarks;
 
       for (let j = 0; j < labels.length; j++) {
         group.add(
-            createSlider(utils, (groups[i].config + j), labels[j], marks[j])
+          createSlider(utils, groups[i].config + j, labels[j], marks[j])
         );
       }
     }
@@ -223,24 +221,30 @@ class KeyboardSettings extends Adw.PreferencesPage {
   constructor(utils) {
     super({
       title: _('Keyboard Shortcuts'),
-      icon_name: 'focus-windows-symbolic',
+      icon_name: 'input-keyboard-symbolic',
     });
 
 
     const group = new Adw.PreferencesGroup({
-      title: _('Width and height to use if window is moved to the center')
+      title: _('Width and height to use if window is moved to the center'),
     });
 
     this.add(group);
 
-    group.add(createBindingList(utils, {
-      'move-focus-north': _('Move the window focus up'),
-      'move-focus-east': _('Move the window focus right'),
-      'move-focus-south': _('Move the window focus down'),
-      'move-focus-west': _('Move the window focus left'),
-      'move-focus-cycle': _('Push focused window to the background'),
-      'move-focus-left-screen': _('Move the focus to the left screen'),
-      'move-focus-right-screen': _('Move the focus to the right screen'),
+    group.add(createKeyboardBindings(utils, {
+      'put-to-corner-ne': _('Move to top right corner'),
+      'put-to-corner-nw': _('Move to top left corner'),
+      'put-to-corner-se': _('Move to bottom right corner'),
+      'put-to-corner-sw': _('Move to bottom left corner'),
+      'put-to-side-n': _('Move to top'),
+      'put-to-side-e': _('Move to right'),
+      'put-to-side-s': _('Move to bottom'),
+      'put-to-side-w': _('Move to left'),
+      'put-to-center': _('Move to center/maximize'),
+      'put-to-left-screen': _('Move to the left screen'),
+      'put-to-right-screen': _('Move to the right screen'),
+      'put-to-previous-screen': _('Move to the previous screen'),
+      'put-to-next-screen': _('Move to the next screen'),
     }));
   }
 }
@@ -260,7 +264,7 @@ class MoveFocusSettings extends Adw.PreferencesPage {
       title: 'Move Focus',
       description: _("'Move Focus' allows you to change the focus based on " +
           'the relative location of the current focused window using the keyboard and to push the currently focused' +
-          ' window into the background to get the focus to the windows below.')
+          ' window into the background to get the focus to the windows below.'),
     });
     this.add(group);
 
@@ -273,22 +277,22 @@ class MoveFocusSettings extends Adw.PreferencesPage {
 
     group.add(new Adw.SwitchRow({
       title: _("Enable 'Move focus'"),
-      action_name: 'move-focus.' + PutWindowUtils.MOVE_FOCUS_ENABLED
+      action_name: `move-focus.${PutWindowUtils.MOVE_FOCUS_ENABLED}`,
     }));
 
     group.add(new Adw.SwitchRow({
       title: _('Show animation when moving'),
-      action_name: 'move-focus.' + PutWindowUtils.MOVE_FOCUS_ANIMATION
+      action_name: `move-focus.${PutWindowUtils.MOVE_FOCUS_ANIMATION}`,
     }));
 
-    group.add(createBindingList(utils, {
+    group.add(createKeyboardBindings(utils, {
       'move-focus-north': _('Move the window focus up'),
       'move-focus-east': _('Move the window focus right'),
       'move-focus-south': _('Move the window focus down'),
       'move-focus-west': _('Move the window focus left'),
       'move-focus-cycle': _('Push focused window to the background'),
       'move-focus-left-screen': _('Move the focus to the left screen'),
-      'move-focus-right-screen': _('Move the focus to the right screen')
+      'move-focus-right-screen': _('Move the focus to the right screen'),
     }));
   }
 }

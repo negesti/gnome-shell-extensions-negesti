@@ -123,6 +123,7 @@ class MoveWindow {
    * @param {Function} handler
    */
   _addKeyBinding(key, settings, handler) {
+    console.log(key);
     this._bindings.push(key);
 
     const mode = Shell.hasOwnProperty('ActionMode') ? Shell.ActionMode : Shell.KeyBindingMode;
@@ -726,7 +727,6 @@ class MoveWindow {
   moveFocused(where) {
     if ('e,s,w,n'.indexOf(where) !== -1) {
       if (!this._utils.getBoolean(`put-to-side-${where}-enabled`, true)) {
-
         return;
       }
     } else if ('ne,se,sw,nw'.indexOf(where) !== -1) {

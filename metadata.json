@@ -1,5 +1,5 @@
 {
-  "shell-version": ["46"],
+  "shell-version": ["46", "48"],
   "version": 33,
   "uuid": "putWindow@clemens.lab21.org",
   "name": "Put Windows",
