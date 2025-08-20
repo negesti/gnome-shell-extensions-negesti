@@ -75,8 +75,6 @@ class MoveWindow {
         this.moveFocused('c');
       }
     );
-
-    // this._moveFocusPlugin = new MoveFocus.MoveFocus(this._utils, this._screens);
   }
 
   /**
@@ -110,9 +108,6 @@ class MoveWindow {
     this._bindings = [];
 
     this._utils.destroy();
-    if (this._moveFocusPlugin) {
-      this._moveFocusPlugin.destroy();
-    }
   }
 
   /**
@@ -123,10 +118,9 @@ class MoveWindow {
    * @param {Function} handler
    */
   _addKeyBinding(key, settings, handler) {
-    console.log(key);
     this._bindings.push(key);
 
-    const mode = Shell.hasOwnProperty('ActionMode') ? Shell.ActionMode : Shell.KeyBindingMode;
+    const mode = Object.prototype.hasOwnProperty.call(Shell, 'ActionMode') ? Shell.ActionMode : Shell.KeyBindingMode;
 
     Main.wm.addKeybinding(key,
       settings,
@@ -274,21 +268,17 @@ class MoveWindow {
     if ((direction === 'right' || direction === 'e') && screenIndex < (this._screens.length - 1)) {
       s = this._screens[screenIndex + 1];
       s = this._recalculateSizes(s);
-    }
-
-    if ((direction === 'left' || direction === 'w') && screenIndex > 0) {
+    } else if ((direction === 'left' || direction === 'w') && screenIndex > 0) {
       s = this._screens[screenIndex - 1];
       s = this._recalculateSizes(s);
-    }
-    if (direction === 'next') {
+    } else if (direction === 'next') {
       if (screenIndex === this._screens.length - 1) {
         s = this._screens[0];
       } else {
         s = this._screens[screenIndex + 1];
         s = this._recalculateSizes(s);
       }
-    }
-    if (direction === 'previous') {
+    } else if (direction === 'previous') {
       if (screenIndex === 0) {
         s = this._screens[this._screens.length - 1];
       } else {
@@ -449,8 +439,7 @@ class MoveWindow {
     const pos = win.get_frame_rect();
     const sizes = direction === 'n' ? s.north : s.south;
 
-    if (win.maximized_vertically &&
-        !win.maximized_horizontally &&
+    if (win.maximized_vertically && !win.maximized_horizontally &&
         this._utils.getBoolean(PutWindowUtils.INTELLIGENT_CORNER_MOVEMENT, false)) {
       // currently at the left side (WEST)
       if (pos.x === s.x) {
@@ -589,7 +578,8 @@ class MoveWindow {
     }
 
     if (this._utils.changeCornerBoth()) {
-      useWidth = useHeight = Math.min(useWidth, useHeight);
+      useHeight = Math.min(useWidth, useHeight);
+      useWidth = useHeight;
     }
 
     let x, y, width, height;
@@ -650,7 +640,7 @@ class MoveWindow {
     const screenSize = this._screens[screenIndex];
 
     if (this._utils.toggleMaximizeOnMoveCenter()) {
-      var flags = Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL;
+      const flags = Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL;
       if (win.maximized_horizontally && win.maximized_vertically) {
         win.unmaximize(flags);
       } else {
@@ -726,6 +716,7 @@ class MoveWindow {
    */
   moveFocused(where) {
     if ('e,s,w,n'.indexOf(where) !== -1) {
+      console.log("move focused enabled?" + this._utils.getBoolean(`put-to-side-${where}`));
       if (!this._utils.getBoolean(`put-to-side-${where}-enabled`, true)) {
         return;
       }

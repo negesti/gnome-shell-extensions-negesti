@@ -15,9 +15,6 @@ export default class PutWindowUtils {
   static ENABLE_MOVE_WORKSPACE = 'enable-move-workspace';
   static INTELLIGENT_CORNER_MOVEMENT = 'intelligent-corner-movement';
 
-  static MOVE_FOCUS_ENABLED = 'move-focus-enabled';
-  static MOVE_FOCUS_ANIMATION = 'move-focus-animation';
-
   constructor(settingsObject) {
     this._changeEventListeners = [];
     this._gnomeBindings = null;
@@ -33,13 +30,6 @@ export default class PutWindowUtils {
       PutWindowUtils.ENABLE_MOVE_WORKSPACE,
       PutWindowUtils.IGNORE_TOP_PANEL,
       PutWindowUtils.INTELLIGENT_CORNER_MOVEMENT,
-    ];
-  }
-
-  getMoveFocusSettings() {
-    return [
-      PutWindowUtils.MOVE_FOCUS_ENABLED,
-      PutWindowUtils.MOVE_FOCUS_ANIMATION,
     ];
   }
 
@@ -133,7 +123,7 @@ export default class PutWindowUtils {
     if (ret === undefined || ret === null) {
       ret = defaultValue;
     }
-    return ret === 'true' || ret === true || ret === '1' || ret === 1;
+    return ret === true || ret === 'true' ||  ret === '1' || ret === 1;
   }
 
   getNumber(name, defaultValue) {

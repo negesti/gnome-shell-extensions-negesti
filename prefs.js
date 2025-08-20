@@ -2,10 +2,11 @@ import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
+import Gdk from 'gi://Gdk';
 
 import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import PutWindowUtils from './utils.js';
-import {createSlider, createKeyboardBindings, IdValueComboItem} from './prefsHelper.js';
+import {createSlider, IdValueComboItem} from './prefsHelper.js';
 
 class MainPage extends Adw.PreferencesPage {
   static {
@@ -97,7 +98,7 @@ class MainPage extends Adw.PreferencesPage {
     }
 
     const comboRow = new Adw.ComboRow({
-      title: _('Moving to corner:'),
+      title: _('Moving to corner'),
       tooltip_text: _('Adjust window width and height when moved to corner?'),
       model: this._combo_model,
       expression: Gtk.PropertyExpression.new(IdValueComboItem, null, 'name-property'),
@@ -139,15 +140,12 @@ class CenterPage extends Adw.PreferencesPage {
 
 
     group.add(new Adw.SwitchRow({
-      title: _('Move to center maximizes and restores initial window size (first w/h only)'),
-      tooltip_text: _('Maximize the window on first move and restore original size ' +
-          'and position on second. Only works with first width/height'),
+      title: _('Maximize the window on first move and restore original size and position on second.'),
       action_name: `put-windows.${PutWindowUtils.MOVE_CENTER_ONLY_TOGGLES}`,
     }));
 
     group.add(new Adw.SwitchRow({
-      title: _('Keep width when moving from center to south or north:'),
-      tooltip_text: _("Don't change width when moving window from center to north or south"),
+      title: _('Keep width when moving from center to south or north'),
       action_name: `put-windows.${PutWindowUtils.CENTER_KEEP_WIDTH}`,
 
     }));
@@ -191,7 +189,7 @@ class PositionPage extends Adw.PreferencesPage {
       },
     ];
 
-    const labels = [_('First:'), _('Second:'), _('Third:')];
+    const labels = [_('First'), _('Second'), _('Third')];
 
     const evenMarks = [50, 66, 34];
     const oddMarks = [50, 34, 66];
@@ -224,6 +222,9 @@ class KeyboardSettings extends Adw.PreferencesPage {
       icon_name: 'input-keyboard-symbolic',
     });
 
+    this.recording = false;
+    this.keyController = null;
+    this.keyPressedHandler = null;
 
     const group = new Adw.PreferencesGroup({
       title: _('Width and height to use if window is moved to the center'),
@@ -231,7 +232,14 @@ class KeyboardSettings extends Adw.PreferencesPage {
 
     this.add(group);
 
-    group.add(createKeyboardBindings(utils, {
+    const keyboardGroup = new Adw.PreferencesGroup({
+      title: _('Keyboard Shortcuts'),
+      description: _('Click “Edit”, then press a key combination. Press Backspace or Escape to clear.'),
+    });
+
+    group.add(keyboardGroup);
+
+    const bindings = {
       'put-to-corner-ne': _('Move to top right corner'),
       'put-to-corner-nw': _('Move to top left corner'),
       'put-to-corner-se': _('Move to bottom right corner'),
@@ -245,55 +253,130 @@ class KeyboardSettings extends Adw.PreferencesPage {
       'put-to-right-screen': _('Move to the right screen'),
       'put-to-previous-screen': _('Move to the previous screen'),
       'put-to-next-screen': _('Move to the next screen'),
-    }));
-  }
-}
+    };
 
-class MoveFocusSettings extends Adw.PreferencesPage {
-  static {
-    GObject.registerClass(this);
+    Object.entries(bindings).forEach(([name, label]) => {
+      keyboardGroup.add(this._createKeyboardBinding(utils, name, label));
+    });
   }
 
-  constructor(settings, utils) {
-    super({
-      title: _('Move Focus'),
-      icon_name: 'focus-windows-symbolic',
+  /**
+   *
+   * @param {PutWindowUtils} utils
+   * @param {string} name
+   * @param {string} label
+   * @returns {Adw.ActionRow}
+   */
+  _createKeyboardBinding(utils, name, label) {
+    const current = utils.get_strv(name, null)[0] || '';
+
+    const row = new Adw.ActionRow({
+      title: _(label),
     });
 
-    const group = new Adw.PreferencesGroup({
-      title: 'Move Focus',
-      description: _("'Move Focus' allows you to change the focus based on " +
-          'the relative location of the current focused window using the keyboard and to push the currently focused' +
-          ' window into the background to get the focus to the windows below.'),
+    const shortcutLabel = new Gtk.ShortcutLabel({
+      accelerator: current,
+      hexpand: false,
+      halign: Gtk.Align.END,
     });
-    this.add(group);
 
-    this._actionGroup = new Gio.SimpleActionGroup();
-    this.insert_action_group('move-focus', this._actionGroup);
+    const setBtn = new Gtk.Button({
+      label: _('Edit'),
+      valign: Gtk.Align.CENTER,
+    });
 
-    for (const key of utils.getMoveFocusSettings()) {
-      this._actionGroup.add_action(settings.create_action(key));
+
+    const shortcutBox = new Gtk.Box({
+      spacing: 6,
+      halign: Gtk.Align.END,
+    });
+
+
+    setBtn.connect('clicked', () => {
+      if (!this.recording) {
+        this.startRecording(utils, row, setBtn, name, shortcutLabel);
+      } else {
+        this.stopRecording(setBtn);
+      }
+    });
+    shortcutBox.append(shortcutLabel);
+    shortcutBox.append(setBtn);
+    row.add_suffix(shortcutBox);
+
+    return row;
+  }
+
+  stopRecording(setBtn) {
+    this.recording = false;
+    setBtn.label = _('Edit');
+    setBtn.sensitive = true;
+    if (this.keyController) {
+      if (this.keyPressedHandler !== null) {
+        this.keyController.disconnect(this.keyPressedHandler);
+      }
+      this.keyController = null;
+    }
+  }
+
+  startRecording(utils, row, setBtn, name, shortcutLabel) {
+    if (this.recording) {
+      return;
+    }
+    this.recording = true;
+    setBtn.label = _('Press keys…');
+    // Prevent accidental clicks while recording
+    setBtn.sensitive = false;
+
+    const toplevel = row.get_root();
+    if (!toplevel) {
+      this.stopRecording(setBtn);
+      return;
     }
 
-    group.add(new Adw.SwitchRow({
-      title: _("Enable 'Move focus'"),
-      action_name: `move-focus.${PutWindowUtils.MOVE_FOCUS_ENABLED}`,
-    }));
+    // Capture at the window level, in CAPTURE phase to reliably get modifiers (including Super)
+    this.keyController = new Gtk.EventControllerKey();
+    this.keyController.propagation_phase = Gtk.PropagationPhase.CAPTURE;
 
-    group.add(new Adw.SwitchRow({
-      title: _('Show animation when moving'),
-      action_name: `move-focus.${PutWindowUtils.MOVE_FOCUS_ANIMATION}`,
-    }));
+    this.keyPressedHandler = this.keyController.connect('key-pressed', (_ctrl, keyval, _keycode, state) => {
+      // Clear on ESC or Backspace
+      if (keyval === Gdk.KEY_Escape || keyval === Gdk.KEY_BackSpace) {
+        utils.set_strv(name, []);
+        shortcutLabel.accelerator = '';
+        this.stopRecording(setBtn);
+        return Gdk.EVENT_STOP;
+      }
 
-    group.add(createKeyboardBindings(utils, {
-      'move-focus-north': _('Move the window focus up'),
-      'move-focus-east': _('Move the window focus right'),
-      'move-focus-south': _('Move the window focus down'),
-      'move-focus-west': _('Move the window focus left'),
-      'move-focus-cycle': _('Push focused window to the background'),
-      'move-focus-left-screen': _('Move the focus to the left screen'),
-      'move-focus-right-screen': _('Move the focus to the right screen'),
-    }));
+      // Ignore pure modifiers
+      if (keyval === 0 ||
+          keyval === Gdk.KEY_Shift_L || keyval === Gdk.KEY_Shift_R ||
+          keyval === Gdk.KEY_Control_L || keyval === Gdk.KEY_Control_R ||
+          keyval === Gdk.KEY_Alt_L || keyval === Gdk.KEY_Alt_R ||
+          keyval === Gdk.KEY_Super_L || keyval === Gdk.KEY_Super_R ||
+          keyval === Gdk.KEY_Meta_L || keyval === Gdk.KEY_Meta_R) {
+        return Gdk.EVENT_STOP;
+      }
+
+      // Only keep standard accelerator modifiers
+      const mods = state & (
+        Gdk.ModifierType.SHIFT_MASK |
+        Gdk.ModifierType.CONTROL_MASK |
+        Gdk.ModifierType.MOD1_MASK |     // Alt
+        Gdk.ModifierType.SUPER_MASK |
+        Gdk.ModifierType.META_MASK
+      );
+
+      const accelName = Gtk.accelerator_name(keyval, mods);
+
+      // Save and update label
+      utils.set_strv(name, [accelName]);
+      shortcutLabel.accelerator = accelName;
+
+      this.stopRecording(setBtn);
+      return Gdk.EVENT_STOP;
+    });
+
+    // Attach controller to the toplevel window so it sees all key events
+    toplevel.add_controller(this.keyController);
   }
 }
 
@@ -307,6 +390,5 @@ export default class PutWindowPrefs extends ExtensionPreferences {
     window.add(new CenterPage(settings, utils));
     window.add(new PositionPage(settings, utils));
     window.add(new KeyboardSettings(utils));
-    window.add(new MoveFocusSettings(settings, utils));
   }
 }
