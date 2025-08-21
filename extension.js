@@ -238,7 +238,7 @@ class MoveWindow {
   }
 
   moveToScreen(direction) {
-    if (this._utils.getBoolean(`put-to-${direction}-screen-enabled`, true)) {
+    if (this._utils.get_strv(`put-to-${direction}-screen`) !== '') {
       this._moveToScreen(direction);
     }
   }
@@ -715,22 +715,22 @@ class MoveWindow {
    * @param {string} where
    */
   moveFocused(where) {
+    let config = '';
+
     if ('e,s,w,n'.indexOf(where) !== -1) {
-      console.log("move focused enabled?" + this._utils.getBoolean(`put-to-side-${where}`));
-      if (!this._utils.getBoolean(`put-to-side-${where}-enabled`, true)) {
-        return;
-      }
+      config = `put-to-side-${where}`;
     } else if ('ne,se,sw,nw'.indexOf(where) !== -1) {
-      if (!this._utils.getBoolean(`put-to-corner-${where}-enabled`, true)) {
-        return;
-      }
+      config = `put-to-corner-${where}`;
     } else if (where === 'c') {
-      if (!this._utils.getBoolean('put-to-center-enabled', true)) {
-        return;
-      }
+      config = 'put-to-center';
+    } else {
+      console.log("Unknown direction " + where);
+      return;
     }
 
-    this._moveFocused(where);
+    if (config !== '' && this._utils.get_strv(config) !== '') {
+      this._moveFocused(where);
+    }
   }
 
   /**

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-20 11:57+0200\n"
+"POT-Creation-Date: 2025-08-21 09:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,15 +78,15 @@ msgid "Never change size"
 msgstr ""
 
 #: prefs.js:84
-msgid "Nothing on first move, both on second"
+msgid "Both on second second move"
 msgstr ""
 
 #: prefs.js:85
-msgid "Nothing on first move, Only height on second"
+msgid "Height on second move"
 msgstr ""
 
 #: prefs.js:86
-msgid "Nothing on first move, Only width on second"
+msgid "Wiidth on second move"
 msgstr ""
 
 #: prefs.js:101
@@ -98,7 +98,7 @@ msgid "Adjust window width and height when moved to corner?"
 msgstr ""
 
 #: prefs.js:128
-msgid "Center Width & Height"
+msgid "Center"
 msgstr ""
 
 #: prefs.js:138 prefs.js:230

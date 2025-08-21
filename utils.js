@@ -12,7 +12,6 @@ export default class PutWindowUtils {
   static MOVE_CENTER_ONLY_TOGGLES = 'move-center-only-toggles';
   static ALWAYS_KEEP_WIDTH = 'always-keep-width';
   static ALWAYS_KEEP_HEIGHT = 'always-keep-height';
-  static ENABLE_MOVE_WORKSPACE = 'enable-move-workspace';
   static INTELLIGENT_CORNER_MOVEMENT = 'intelligent-corner-movement';
 
   constructor(settingsObject) {
@@ -27,7 +26,6 @@ export default class PutWindowUtils {
       PutWindowUtils.ALWAYS_USE_WIDTHS,
       PutWindowUtils.ALWAYS_KEEP_WIDTH,
       PutWindowUtils.ALWAYS_KEEP_HEIGHT,
-      PutWindowUtils.ENABLE_MOVE_WORKSPACE,
       PutWindowUtils.IGNORE_TOP_PANEL,
       PutWindowUtils.INTELLIGENT_CORNER_MOVEMENT,
     ];

@@ -81,9 +81,9 @@ class MainPage extends Adw.PreferencesPage {
       [1, _('Only height')],
       [2, _('Only width')],
       [3, _('Never change size')],
-      [4, _('Nothing on first move, both on second')],
-      [5, _('Nothing on first move, Only height on second')],
-      [6, _('Nothing on first move, Only width on second')],
+      [4, _('Both on second second move')],
+      [5, _('Height on second move')],
+      [6, _('Wiidth on second move')],
     ];
 
     let selectMe = 0;
@@ -102,9 +102,8 @@ class MainPage extends Adw.PreferencesPage {
       tooltip_text: _('Adjust window width and height when moved to corner?'),
       model: this._combo_model,
       expression: Gtk.PropertyExpression.new(IdValueComboItem, null, 'name-property'),
-      selected: selectMe,
+      selected: selectMe
     });
-
 
     comboRow.connect('notify::selected', () => {
       const selectedItem = comboRow.selected_item;
@@ -125,7 +124,7 @@ class CenterPage extends Adw.PreferencesPage {
 
   constructor(settings, utils) {
     super({
-      title: _('Center Width & Height'),
+      title: _('Center'),
       icon_name: 'format-justify-center-symbolic',
     });
 

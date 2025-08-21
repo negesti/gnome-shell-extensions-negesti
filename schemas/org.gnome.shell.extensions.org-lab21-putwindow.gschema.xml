@@ -11,22 +11,18 @@
     </key>
     <key type="b" name="move-center-only-toggles">
       <default>false</default>
-      <summary>Move to center onyl toggles maximize flags</summary>
-    </key>
-    <key type="b" name="enable-move-workspace">
-      <default>false</default>
-      <summary>Enable move to workspace feature</summary>
+      <summary>Move to center only toggles maximize flags</summary>
     </key>
     <key type="i" name="corner-changes">
       <default>0</default>
       <summary>Change width and height when moving to corner (Always, only height, only width)</summary>
     </key>
     <key type="b" name="always-use-widths">
-      <default>false</default>
-      <summary>Use multiple widths even if moveing to other screen is possible</summary>
+      <default>true</default>
+      <summary>Use multiple widths even if moving to other screen is possible</summary>
     </key>
     <key type="b" name="intelligent-corner-movement">
-      <default>false</default>
+      <default>true</default>
       <summary>Moving from E to S moves to SE not S</summary>
     </key>
 

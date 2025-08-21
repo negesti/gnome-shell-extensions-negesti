@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-20 11:57+0200\n"
-"PO-Revision-Date: 2025-08-20 11:58+0200\n"
+"POT-Creation-Date: 2025-08-21 09:13+0200\n"
+"PO-Revision-Date: 2025-08-21 09:15+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -80,16 +80,16 @@ msgid "Never change size"
 msgstr "Größe nie ändern"
 
 #: prefs.js:84
-msgid "Nothing on first move, both on second"
-msgstr "Nichts beim ersten mal, beide beim Zweiten"
+msgid "Both on second second move"
+msgstr "Beides beim zweiten Mal"
 
 #: prefs.js:85
-msgid "Nothing on first move, Only height on second"
-msgstr "Nichts beim ersten mal, nur Höhe beim Zweiten"
+msgid "Height on second move"
+msgstr "Höhe beim zweiten Mal"
 
 #: prefs.js:86
-msgid "Nothing on first move, Only width on second"
-msgstr "Nichts beim ersten mal, nur Breite beim Zweiten"
+msgid "Wiidth on second move"
+msgstr "Breite beim zweiten Mal"
 
 #: prefs.js:101
 msgid "Moving to corner"
@@ -102,8 +102,8 @@ msgstr ""
 "verschoben wird?"
 
 #: prefs.js:128
-msgid "Center Width & Height"
-msgstr "Zentriert Breite & Höhe"
+msgid "Center"
+msgstr "Zentrum"
 
 #: prefs.js:138 prefs.js:230
 msgid "Width and height to use if window is moved to the center"
@@ -115,7 +115,7 @@ msgid ""
 "second."
 msgstr ""
 "Fenster beim ersten mal maximieren und beim zweiten mal die originale Größe "
-"und Position wiederherstellen"
+"und Position wiederherstellen."
 
 #: prefs.js:148
 msgid "Keep width when moving from center to south or north"
@@ -210,6 +210,18 @@ msgstr "Ändern"
 #: prefs.js:326
 msgid "Press keys…"
 msgstr "Tasten drücken..."
+
+#~ msgid "Nothing on first move, both on second"
+#~ msgstr "Nichts beim ersten mal, beide beim Zweiten"
+
+#~ msgid "Nothing on first move, Only height on second"
+#~ msgstr "Nichts beim ersten mal, nur Höhe beim Zweiten"
+
+#~ msgid "Nothing on first move, Only width on second"
+#~ msgstr "Nichts beim ersten mal, nur Breite beim Zweiten"
+
+#~ msgid "Center Width & Height"
+#~ msgstr "Zentriert Breite & Höhe"
 
 #~ msgid "Don't change width when moving window from center to north or south"
 #~ msgstr ""
