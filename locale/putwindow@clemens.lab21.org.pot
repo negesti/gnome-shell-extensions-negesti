@@ -1,0 +1,202 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-21 09:17+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: prefs.js:22
+msgid "Main"
+msgstr ""
+
+#: prefs.js:38
+msgid "Keep window on current screen"
+msgstr ""
+
+#: prefs.js:39
+msgid "Disable this option to move to other screen if possible"
+msgstr ""
+
+#: prefs.js:45
+msgid "Always ignore top panel"
+msgstr ""
+
+#: prefs.js:46
+msgid "Enable this if you use an extension to hide the top panel"
+msgstr ""
+
+#: prefs.js:51
+msgid "Intelligent corner movement"
+msgstr ""
+
+#: prefs.js:52
+msgid "Moving from E to S moves to SE not S"
+msgstr ""
+
+#: prefs.js:57
+msgid "Keep width when moving north/south"
+msgstr ""
+
+#: prefs.js:58
+msgid "Windows will not change their width when moved north or south"
+msgstr ""
+
+#: prefs.js:63
+msgid "Keep height when moving east/west"
+msgstr ""
+
+#: prefs.js:64
+msgid "Windows will not change their height when moved east or west"
+msgstr ""
+
+#: prefs.js:80
+msgid "Both"
+msgstr ""
+
+#: prefs.js:81
+msgid "Only height"
+msgstr ""
+
+#: prefs.js:82
+msgid "Only width"
+msgstr ""
+
+#: prefs.js:83
+msgid "Never change size"
+msgstr ""
+
+#: prefs.js:84
+msgid "Both on second second move"
+msgstr ""
+
+#: prefs.js:85
+msgid "Height on second move"
+msgstr ""
+
+#: prefs.js:86
+msgid "Wiidth on second move"
+msgstr ""
+
+#: prefs.js:101
+msgid "Moving to corner"
+msgstr ""
+
+#: prefs.js:102
+msgid "Adjust window width and height when moved to corner?"
+msgstr ""
+
+#: prefs.js:128
+msgid "Center"
+msgstr ""
+
+#: prefs.js:138 prefs.js:230
+msgid "Width and height to use if window is moved to the center"
+msgstr ""
+
+#: prefs.js:143
+msgid ""
+"Maximize the window on first move and restore original size and position on "
+"second."
+msgstr ""
+
+#: prefs.js:148
+msgid "Keep width when moving from center to south or north"
+msgstr ""
+
+#: prefs.js:172
+msgid "Width & Height"
+msgstr ""
+
+#: prefs.js:192
+msgid "First"
+msgstr ""
+
+#: prefs.js:192
+msgid "Second"
+msgstr ""
+
+#: prefs.js:192
+msgid "Third"
+msgstr ""
+
+#: prefs.js:221 prefs.js:236
+msgid "Keyboard Shortcuts"
+msgstr ""
+
+#: prefs.js:237
+msgid ""
+"Click “Edit”, then press a key combination. Press Backspace or Escape to "
+"clear."
+msgstr ""
+
+#: prefs.js:243
+msgid "Move to top right corner"
+msgstr ""
+
+#: prefs.js:244
+msgid "Move to top left corner"
+msgstr ""
+
+#: prefs.js:245
+msgid "Move to bottom right corner"
+msgstr ""
+
+#: prefs.js:246
+msgid "Move to bottom left corner"
+msgstr ""
+
+#: prefs.js:247
+msgid "Move to top"
+msgstr ""
+
+#: prefs.js:248
+msgid "Move to right"
+msgstr ""
+
+#: prefs.js:249
+msgid "Move to bottom"
+msgstr ""
+
+#: prefs.js:250
+msgid "Move to left"
+msgstr ""
+
+#: prefs.js:251
+msgid "Move to center/maximize"
+msgstr ""
+
+#: prefs.js:252
+msgid "Move to the left screen"
+msgstr ""
+
+#: prefs.js:253
+msgid "Move to the right screen"
+msgstr ""
+
+#: prefs.js:254
+msgid "Move to the previous screen"
+msgstr ""
+
+#: prefs.js:255
+msgid "Move to the next screen"
+msgstr ""
+
+#: prefs.js:284 prefs.js:311
+msgid "Edit"
+msgstr ""
+
+#: prefs.js:326
+msgid "Press keys…"
+msgstr ""

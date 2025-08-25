@@ -7,432 +7,284 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-24 15:57+0100\n"
-"PO-Revision-Date: 2019-02-24 15:59+0100\n"
+"POT-Creation-Date: 2025-08-21 09:13+0200\n"
+"PO-Revision-Date: 2025-08-21 09:15+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.2.1\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.6\n"
 
-#: prefs.js:41
+#: prefs.js:22
 msgid "Main"
 msgstr "Allgemein"
 
-#: prefs.js:44
-msgid "Width &amp; Height"
-msgstr "Breite &amp; Höhe"
+#: prefs.js:38
+msgid "Keep window on current screen"
+msgstr "Fenster auf aktuellen Bildschirm belassen"
 
-#: prefs.js:47
-msgid "Keyboard Shortcuts"
-msgstr "Tastenkombinationen"
-
-#: prefs.js:50
-msgid "Move Focus"
-msgstr ""
-
-#: prefs.js:53
-msgid "Applications"
-msgstr "Anwendungen"
-
-#: prefs.js:66
-msgid "Both"
-msgstr "Beide"
-
-#: prefs.js:67
-msgid "Only height"
-msgstr "Nur Höhe"
-
-#: prefs.js:68
-msgid "Only width"
-msgstr "Nur Breite"
-
-#: prefs.js:69
-msgid "Never change size"
-msgstr "Größe nie ändern"
-
-#: prefs.js:70
-msgid "Nothing on first move, both on second"
-msgstr "Nichts beim ersten mal, beide beim Zweiten"
-
-#: prefs.js:71
-msgid "Nothing on first move, Only height on second"
-msgstr "Nichts beim ersten mal, nur Höhe beim Zweiten"
-
-#: prefs.js:72
-msgid "Nothing on first move, Only width on second"
-msgstr "Nichts beim ersten mal, nur Breite beim Zweiten"
-
-#: prefs.js:117
-msgid "Main settings"
-msgstr "Allgemeine Einstellungen"
-
-#: prefs.js:123
-msgid "Keep window on current screen:"
-msgstr "Fenster auf aktuellen Bildschirm belassen:"
-
-#: prefs.js:124
+#: prefs.js:39
 msgid "Disable this option to move to other screen if possible"
 msgstr "Deaktivieren um Fenster auf anderen Bildschirm zu verschieben"
 
-#: prefs.js:136
-msgid "Enable move to workspace:"
-msgstr "Zwischen Arbeitsflächen verschieben"
+#: prefs.js:45
+msgid "Always ignore top panel"
+msgstr "TopPanel immer ignorieren"
 
-#: prefs.js:148
-msgid ""
-"Move to center maximizes and restores initial window size (first w/h only):"
-msgstr ""
-
-#: prefs.js:149
-msgid ""
-"Maximize the window on first move and restore original size and position on "
-"second. Only works with first width/height"
-msgstr ""
-
-#: prefs.js:162
-msgid "Always ignore top panel:"
-msgstr "TopPanel immer ignorieren:"
-
-#: prefs.js:163
+#: prefs.js:46
 msgid "Enable this if you use an extension to hide the top panel"
+msgstr "Hilfreich, wenn das TopPanel ausgeblendet ist"
+
+#: prefs.js:51
+msgid "Intelligent corner movement"
 msgstr ""
 
-#: prefs.js:176
-msgid "Intelligent corner movement:"
-msgstr ""
-
-#: prefs.js:177
+#: prefs.js:52
 msgid "Moving from E to S moves to SE not S"
 msgstr ""
+"Verschieben von rechts nach unten verschiebt in die Ecke nicht nach unten"
 
-#: prefs.js:188
-msgid "Keep width when moving north/south:"
-msgstr "Breite nicht ändern, wenn nach oben oder unten verschoben wird:"
+#: prefs.js:57
+msgid "Keep width when moving north/south"
+msgstr "Breite nicht ändern, wenn nach oben oder unten verschoben wird"
 
-#: prefs.js:189
+#: prefs.js:58
 msgid "Windows will not change their width when moved north or south"
-msgstr ""
+msgstr "Fensterbreite nicht ändern, wenn nach oben order unten verschoben wird"
 
-#: prefs.js:200
-msgid "Keep height when moving east/west:"
-msgstr "Höhe nicht ändern, wenn nach links oder rechts verschoben wird:"
+#: prefs.js:63
+msgid "Keep height when moving east/west"
+msgstr "Höhe nicht ändern, wenn nach links oder rechts verschoben wird"
 
-#: prefs.js:201
+#: prefs.js:64
 msgid "Windows will not change their height when moved east or west"
-msgstr ""
+msgstr "Höhe nicht ändern, wenn nach links order rechts verschoben wird"
 
-#: prefs.js:210
-msgid "Moving to corner:"
-msgstr "In die Ecke verschieben:"
+#: prefs.js:80
+msgid "Both"
+msgstr "Beide"
 
-#: prefs.js:212
+#: prefs.js:81
+msgid "Only height"
+msgstr "Nur Höhe"
+
+#: prefs.js:82
+msgid "Only width"
+msgstr "Nur Breite"
+
+#: prefs.js:83
+msgid "Never change size"
+msgstr "Größe nie ändern"
+
+#: prefs.js:84
+msgid "Both on second second move"
+msgstr "Beides beim zweiten Mal"
+
+#: prefs.js:85
+msgid "Height on second move"
+msgstr "Höhe beim zweiten Mal"
+
+#: prefs.js:86
+msgid "Wiidth on second move"
+msgstr "Breite beim zweiten Mal"
+
+#: prefs.js:101
+msgid "Moving to corner"
+msgstr "In die Ecke verschieben"
+
+#: prefs.js:102
 msgid "Adjust window width and height when moved to corner?"
 msgstr ""
 "Soll die Breite und Höhe des Fensters geändert werden, wenn es in eine Ecke "
 "verschoben wird?"
 
-#: prefs.js:220
-msgid "Center Width &amp; Height"
-msgstr ""
+#: prefs.js:128
+msgid "Center"
+msgstr "Zentrum"
 
-#: prefs.js:225
-msgid "Keep width when moving from center to south or north:"
+#: prefs.js:138 prefs.js:230
+msgid "Width and height to use if window is moved to the center"
+msgstr "Breite und Höhe wenn Fenster zentriert werden"
+
+#: prefs.js:143
+msgid ""
+"Maximize the window on first move and restore original size and position on "
+"second."
+msgstr ""
+"Fenster beim ersten mal maximieren und beim zweiten mal die originale Größe "
+"und Position wiederherstellen."
+
+#: prefs.js:148
+msgid "Keep width when moving from center to south or north"
 msgstr ""
 "Breite nicht ändern, wenn ein zentriertes Fenster nach oben oder unten "
-"verschoben wird:"
+"verschoben wird"
 
-#: prefs.js:226
-msgid "Don't change width when moving window from center to north or south"
-msgstr ""
+#: prefs.js:172
+msgid "Width & Height"
+msgstr "Breite & Höhe"
 
-#: prefs.js:262
+#: prefs.js:192
+msgid "First"
+msgstr "Erste"
+
+#: prefs.js:192
+msgid "Second"
+msgstr "Zweite"
+
+#: prefs.js:192
+msgid "Third"
+msgstr "Dritte"
+
+#: prefs.js:221 prefs.js:236
+msgid "Keyboard Shortcuts"
+msgstr "Tastenkombinationen"
+
+#: prefs.js:237
 msgid ""
-"You can define up to three sizes that will be used when you move a window to "
-"the same direction multiple times. Equal values are ignored."
+"Click “Edit”, then press a key combination. Press Backspace or Escape to "
+"clear."
 msgstr ""
-"Du kannst bis zu drei Größen angeben die beim wiederholtem verschieben in "
-"die gleiche Richtung verwendet werden. Gleiche Werte werden ignoriert."
+"\"Ändern\" klicke und dann die Tastenkombination festlegen. Mit Entfernen "
+"oder ESC löschen."
 
-#: prefs.js:268
-msgid "First:"
-msgstr "Erste:"
-
-#: prefs.js:268
-msgid "Second:"
-msgstr "Zweite:"
-
-#: prefs.js:268
-msgid "Third:"
-msgstr "Dritte:"
-
-#: prefs.js:270
-msgid "North height"
-msgstr "Höhe Oben"
-
-#: prefs.js:276
-msgid "South height"
-msgstr "Höhe Unten"
-
-#: prefs.js:283
-msgid "East width"
-msgstr "Breite Links"
-
-#: prefs.js:289
-msgid "West width"
-msgstr "Breite Rechts"
-
-#: prefs.js:301
+#: prefs.js:243
 msgid "Move to top right corner"
 msgstr "In die rechte obere Ecke verschieben"
 
-#: prefs.js:302
+#: prefs.js:244
 msgid "Move to top left corner"
 msgstr "In die linke obere Ecke verschieben"
 
-#: prefs.js:303
+#: prefs.js:245
 msgid "Move to bottom right corner"
 msgstr "In die rechte untere  Ecke verschieben"
 
-#: prefs.js:304
+#: prefs.js:246
 msgid "Move to bottom left corner"
 msgstr "In die linke untere Ecke verschieben"
 
-#: prefs.js:305
+#: prefs.js:247
 msgid "Move to top"
 msgstr "Nach oben verschieben"
 
-#: prefs.js:306
+#: prefs.js:248
 msgid "Move to right"
 msgstr "Nach rechts verschieben"
 
-#: prefs.js:307
+#: prefs.js:249
 msgid "Move to bottom"
 msgstr "Nach unten verschieben"
 
-#: prefs.js:308
+#: prefs.js:250
 msgid "Move to left"
 msgstr "Nach links verschieben"
 
-#: prefs.js:309
+#: prefs.js:251
 msgid "Move to center/maximize"
 msgstr "Zentrieren/Maximieren"
 
-#: prefs.js:310
-msgid "Move to configured location"
-msgstr "Auf definierte Position verschieben"
-
-#: prefs.js:311
+#: prefs.js:252
 msgid "Move to the left screen"
 msgstr "Auf den linkten Bildschirm verschieben"
 
-#: prefs.js:312
+#: prefs.js:253
 msgid "Move to the right screen"
 msgstr "Auf den rechten Bildschirm verschieben"
 
-#: prefs.js:325
-msgid ""
-"'Move Focus' allows you to change the focus based on the relative location "
-"of the current focused window using the keyboard and to push the currently "
-"focused window into the background to get the focus to the windows below."
-msgstr ""
+#: prefs.js:254
+msgid "Move to the previous screen"
+msgstr "Auf den vorherigen Bildschirm verschieben"
 
-#: prefs.js:331
-msgid "Enable 'Move focus'"
-msgstr "'Move Focus' aktivieren"
+#: prefs.js:255
+msgid "Move to the next screen"
+msgstr "Auf den nächsten Bildschirm verschieben"
 
-#: prefs.js:332
-msgid "Show animation when moving"
-msgstr ""
-
-#: prefs.js:333
-msgid "Enable cycle through windows at the same position"
-msgstr ""
-
-#: prefs.js:334
-msgid "Enable focus the window that's north of the current"
-msgstr ""
-
-#: prefs.js:335
-msgid "Enable focus the window that's east of the current"
-msgstr ""
-
-#: prefs.js:336
-msgid "Enable focus the window that's south of the current"
-msgstr ""
-
-#: prefs.js:337
-msgid "Enable focus the window that's west of the current"
-msgstr ""
-
-#: prefs.js:338
-msgid "Enable move the focus to the left screen"
-msgstr ""
-
-#: prefs.js:339
-msgid "Enable move the focus to the right screen"
-msgstr ""
-
-#: prefs.js:373
-msgid "Keyboard bindings"
-msgstr "Tastaturbelegung"
-
-#: prefs.js:377
-msgid "Move the window focus up"
-msgstr ""
-
-#: prefs.js:378
-msgid "Move the window focus right"
-msgstr ""
-
-#: prefs.js:379
-msgid "Move the window focus down"
-msgstr ""
-
-#: prefs.js:380
-msgid "Move the window focus left"
-msgstr ""
-
-#: prefs.js:381
-msgid "Push focused window to the background"
-msgstr ""
-
-#: prefs.js:382
-msgid "Move the focus to the left screen"
-msgstr ""
-
-#: prefs.js:383
-msgid "Move the focus to the right screen"
-msgstr ""
-
-#: prefs.js:430
-msgid "Enabled"
-msgstr "Aktiv"
-
-#: prefs.js:453
-msgid "Action"
-msgstr "Aktion"
-
-#: prefs.js:469
-msgid "Error updating Keybinding"
-msgstr "Fehler beim Aktualisieren der Tastenkombination"
-
-#: prefs.js:479
-msgid "Keyboard binding already defined"
-msgstr "Tastenkombination bereits definiert"
-
-#: prefs.js:480
-#, javascript-format
-msgid "The binding is already used by '%s'"
-msgstr "Tastenkombination wird bereits von '%s' verwendet"
-
-#: prefs.js:499
-msgid "Error clearing keybinding"
-msgstr "Tastenkombination konnte nicht zurückgesetzt werden"
-
-#: prefs.js:511
-msgid "Modify"
+#: prefs.js:284 prefs.js:311
+msgid "Edit"
 msgstr "Ändern"
 
-#: prefs.js:535
-msgid ""
-"Application based size and location setting, that allows you to move windows "
-"on startup or circle between multiple configured locations."
-msgstr ""
-"Größe und Position für einzelne Anwendungen festlegen. Ermöglicht "
-"automatisches verschieben und verschieben an definierte Position(en)"
+#: prefs.js:326
+msgid "Press keys…"
+msgstr "Tasten drücken..."
 
-#: prefs.js:593
-msgid "Remove an existing application setting"
-msgstr "Anwendung Einstellungen entfernen"
+#~ msgid "Nothing on first move, both on second"
+#~ msgstr "Nichts beim ersten mal, beide beim Zweiten"
 
-#: prefs.js:601
+#~ msgid "Nothing on first move, Only height on second"
+#~ msgstr "Nichts beim ersten mal, nur Höhe beim Zweiten"
+
+#~ msgid "Nothing on first move, Only width on second"
+#~ msgstr "Nichts beim ersten mal, nur Breite beim Zweiten"
+
+#~ msgid "Center Width & Height"
+#~ msgstr "Zentriert Breite & Höhe"
+
+#~ msgid "Don't change width when moving window from center to north or south"
+#~ msgstr ""
+#~ "Breite nicht ändern, wenn ein zentriertes Fenster nach oben oder unten "
+#~ "verschoben wird"
+
+#~ msgid "Move to center maximizes and restores initial window size"
+#~ msgstr ""
+#~ "Fenster zentrieren maximiert das Fenster und stellt danach die initiale "
+#~ "Größe wieder her"
+
+#~ msgid "Set"
+#~ msgstr "Setzen"
+
+#~ msgid "Flashspot"
+#~ msgstr "Flashspot"
+
+#~ msgid "Main settings"
+#~ msgstr "Allgemeine Einstellungen"
+
+#~ msgid ""
+#~ "You can define up to three sizes that will be used when you move a window "
+#~ "to the same direction multiple times. Equal values are ignored."
+#~ msgstr ""
+#~ "Du kannst bis zu drei Größen angeben die beim wiederholtem verschieben in "
+#~ "die gleiche Richtung verwendet werden. Gleiche Werte werden ignoriert."
+
+#~ msgid "North height"
+#~ msgstr "Höhe Oben"
+
+#~ msgid "South height"
+#~ msgstr "Höhe Unten"
+
+#~ msgid "East width"
+#~ msgstr "Breite Links"
+
+#~ msgid "West width"
+#~ msgstr "Breite Rechts"
+
+#~ msgid "Enable 'Move focus'"
+#~ msgstr "'Move Focus' aktivieren"
+
+#~ msgid "Keyboard bindings"
+#~ msgstr "Tastaturbelegung"
+
+#~ msgid "Enabled"
+#~ msgstr "Aktiv"
+
+#~ msgid "Action"
+#~ msgstr "Aktion"
+
+#~ msgid "Error updating Keybinding"
+#~ msgstr "Fehler beim Aktualisieren der Tastenkombination"
+
+#~ msgid "Keyboard binding already defined"
+#~ msgstr "Tastenkombination bereits definiert"
+
 #, javascript-format
-msgid "Delete application '%s'?"
-msgstr "Anwendung '%s' wirklich entfernen?"
+#~ msgid "The binding is already used by '%s'"
+#~ msgstr "Tastenkombination wird bereits von '%s' verwendet"
 
-#: prefs.js:602
-#, javascript-format
-msgid "Are you sure to delete the configuration for  '%s'?"
-msgstr "Möchtest du die Einstellungen für '%s' wirklich löschen?"
+#~ msgid "Error clearing keybinding"
+#~ msgstr "Tastenkombination konnte nicht zurückgesetzt werden"
 
-#: prefs.js:637
-msgid "Add a new application (make sure it is running)"
-msgstr "Neue Anwendung hinzufügen (muss aktiv sein)"
-
-#: prefs.js:651
-msgid "Add application"
-msgstr "Anwendung hinzufügen"
-
-#: prefs.js:652
-msgid "Please select the application you want to add"
-msgstr "Wähle bitte eine Anwendung aus"
-
-#: prefs.js:694
-msgid "'Applications' config is not saved automatically."
-msgstr "Einstellungen werden nicht automatisch gespeichert."
-
-#: prefs.js:709
-msgid "Select an application to configure using the list on the left side."
-msgstr "Wähle eine Anwendung aus der Liste."
-
-#: prefs.js:735
-msgid "Error getting running apps"
-msgstr "Aktive Anwendungen konnten nicht geladen werden"
-
-#: prefs.js:736
-msgid ""
-"We were not able to get the list of running apps from Wnck. Are you running "
-"Wayland? "
-msgstr ""
-
-#: prefs.js:800
-msgid "Move window to workspace when created"
-msgstr "Neues Fenster automatisch auf Workspace verschiebe"
-
-#: prefs.js:834
-msgid "Window target workspace"
-msgstr "Ziel Workspace des Fensters"
-
-#: prefs.js:845
-msgid "Auto-Move window when created"
-msgstr "Neue Fenster automatisch verschieben"
-
-#: prefs.js:920
-msgid "Screen"
-msgstr "Bildschirm"
-
-#: prefs.js:958
-msgid "Disable resize"
-msgstr "Größe nicht ändern"
-
-#: prefs.js:960
-msgid "Width and height of the window will not be changed"
-msgstr "Breite und Höhe des Fensters wird nicht geändert"
-
-#: prefs.js:974
-msgid "Width"
-msgstr "Breite"
-
-#: prefs.js:979
-msgid "Height"
-msgstr "Höhe"
-
-#: prefs.js:990
-msgid "Disable moving"
-msgstr "Position nicht ändern"
-
-#: prefs.js:992
-msgid "Relative position of the window will not be changed"
-msgstr "Relative Position des Fensters wird nicht geändert"
-
-#: prefs.js:1006
-msgid "X-Position"
-msgstr "X-Position"
-
-#: prefs.js:1011
-msgid "Y-Position"
-msgstr "Y-Position"
+#~ msgid "Modify"
+#~ msgstr "Ändern"
