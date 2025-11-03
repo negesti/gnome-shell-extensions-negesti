@@ -99,11 +99,7 @@ class MoveWindow {
     const size = this._bindings.length;
 
     for (let i = 0; i < size; i++) {
-      if (Main.wm.removeKeybinding) { // introduced in 3.7.2
-        Main.wm.removeKeybinding(this._bindings[i]);
-      } else {
-        global.display.remove_keybinding(this._bindings[i]);
-      }
+      Main.wm.removeKeybinding(this._bindings[i]);
     }
     this._bindings = [];
 
@@ -300,7 +296,7 @@ class MoveWindow {
     }
 
     if (wasMaximizeFlags !== 0) {
-      win.unmaximize(wasMaximizeFlags);
+      win.set_unmaximize_flags(wasMaximizeFlags);
     }
 
     const position = win.get_frame_rect();
@@ -344,7 +340,7 @@ class MoveWindow {
     this._resize(win, x, y, width, height);
 
     if (wasMaximizeFlags !== 0) {
-      win.maximize(wasMaximizeFlags);
+      win.set_maximize_flags(wasMaximizeFlags);
     }
     return true;
   }
@@ -642,9 +638,9 @@ class MoveWindow {
     if (this._utils.toggleMaximizeOnMoveCenter()) {
       const flags = Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL;
       if (win.maximized_horizontally && win.maximized_vertically) {
-        win.unmaximize(flags);
+        win.set_unmaximize_flags(flags);
       } else {
-        win.maximize(flags);
+        win.set_maximize_flags(flags);
       }
       return;
     }
@@ -728,6 +724,8 @@ class MoveWindow {
       return;
     }
 
+    console.log("moveFocused" + where + " " + config);
+
     if (config !== '' && this._utils.get_strv(config) !== '') {
       this._moveFocused(where);
     }
@@ -786,10 +784,10 @@ class MoveWindow {
     }
 
     if (maximizeFlags !== 0) {
-      win.maximize(maximizeFlags);
+      win.set_maximize_flags(maximizeFlags);
     }
     if (unMaximizeFlags !== 0) {
-      win.unmaximize(unMaximizeFlags);
+      win.set_unmaximize_flags(unMaximizeFlags);
     }
 
     if (width === 0 && height === 0) {
