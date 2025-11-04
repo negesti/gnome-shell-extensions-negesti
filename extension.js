@@ -58,7 +58,7 @@ class MoveWindow {
       this._addKeyBinding(`put-to-side-${directions[i]}`, settings, this.moveFocused.bind(this, directions[i]));
     }
 
-    // move to  nw, se, sw, nw
+    // move to  ne, se, sw, nw
     directions = ['ne', 'se', 'sw', 'nw'];
     for (let i = 0; i < directions.length; i++) {
       this._addKeyBinding(`put-to-corner-${directions[i]}`, settings, this.moveFocused.bind(this, directions[i]));
@@ -115,7 +115,6 @@ class MoveWindow {
    */
   _addKeyBinding(key, settings, handler) {
     this._bindings.push(key);
-
     const mode = Object.prototype.hasOwnProperty.call(Shell, 'ActionMode') ? Shell.ActionMode : Shell.KeyBindingMode;
 
     Main.wm.addKeybinding(key,
@@ -720,11 +719,9 @@ class MoveWindow {
     } else if (where === 'c') {
       config = 'put-to-center';
     } else {
-      console.log("Unknown direction " + where);
+      console.info("Unknown direction " + where);
       return;
     }
-
-    console.log("moveFocused" + where + " " + config);
 
     if (config !== '' && this._utils.get_strv(config) !== '') {
       this._moveFocused(where);

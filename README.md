@@ -20,6 +20,8 @@ way you can always update the extension using `git pull`. However wayland will n
 The extension can be configured using the gnome prefs tool.
 * East/West widths, North/South heights
 * Keybindings
+    * To re-assign keybindings, disable the extension before opening the settings
+    * Check build in keybindings for conflict if a keybinind can not be set (for example `Super + PageUp/NumPad_9`)
 * Change width and height when moving to corner (Always, only height, only width)
 * Use multiple widths even if moving to other screen is possible
 
@@ -43,7 +45,7 @@ may require reconfiguring features and keyboard binding.
 
 "Move Focus" and "application based configuration" are no longer supported and have been removed
 
-## Gnome SHell 45, 46, 47
+## Gnome Shell 45, 46, 47
 
 The extension "worked" with these version but no preferences can be changed.
 
@@ -66,19 +68,8 @@ Open the .po file in Poedit and update the available translations with the pot f
 
 ### Wayland & Wnck
 
-For application based configuration the extension relies on the X11 library wnck.
-
-* Suse: `sudo zypper in libwnck-devel`
-* Arch: `pacman -S libwnck3`
-* Fedora:
-  * `sudo yum install libwnck3`
-  * `sudo dnf install libwnck3`
-* Debian/Ubuntu: `apt-get install gir1.2-wnck-3.0`
-
-Because of this dependency and the different concepts of wayland and X11 to identify applications (wm_class vs.
-application_id) **Wayland is not supported**!
-
-After switching to wayland and not using this feature for ~ 2 years it was removed from the extension 
+Application based configuration was removed with the release of Gnome Shell 48. I completely switched to wayland and
+wnck is no longer required.
 
 Contributors
 -------------
