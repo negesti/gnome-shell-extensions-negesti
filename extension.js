@@ -58,7 +58,7 @@ class MoveWindow {
       this._addKeyBinding(`put-to-side-${directions[i]}`, settings, this.moveFocused.bind(this, directions[i]));
     }
 
-    // move to  nw, se, sw, nw
+    // move to  ne, se, sw, nw
     directions = ['ne', 'se', 'sw', 'nw'];
     for (let i = 0; i < directions.length; i++) {
       this._addKeyBinding(`put-to-corner-${directions[i]}`, settings, this.moveFocused.bind(this, directions[i]));
@@ -99,11 +99,7 @@ class MoveWindow {
     const size = this._bindings.length;
 
     for (let i = 0; i < size; i++) {
-      if (Main.wm.removeKeybinding) { // introduced in 3.7.2
-        Main.wm.removeKeybinding(this._bindings[i]);
-      } else {
-        global.display.remove_keybinding(this._bindings[i]);
-      }
+      Main.wm.removeKeybinding(this._bindings[i]);
     }
     this._bindings = [];
 
@@ -119,7 +115,6 @@ class MoveWindow {
    */
   _addKeyBinding(key, settings, handler) {
     this._bindings.push(key);
-
     const mode = Object.prototype.hasOwnProperty.call(Shell, 'ActionMode') ? Shell.ActionMode : Shell.KeyBindingMode;
 
     Main.wm.addKeybinding(key,
@@ -300,7 +295,7 @@ class MoveWindow {
     }
 
     if (wasMaximizeFlags !== 0) {
-      win.unmaximize(wasMaximizeFlags);
+      win.set_unmaximize_flags(wasMaximizeFlags);
     }
 
     const position = win.get_frame_rect();
@@ -344,7 +339,7 @@ class MoveWindow {
     this._resize(win, x, y, width, height);
 
     if (wasMaximizeFlags !== 0) {
-      win.maximize(wasMaximizeFlags);
+      win.set_maximize_flags(wasMaximizeFlags);
     }
     return true;
   }
@@ -642,9 +637,9 @@ class MoveWindow {
     if (this._utils.toggleMaximizeOnMoveCenter()) {
       const flags = Meta.MaximizeFlags.HORIZONTAL | Meta.MaximizeFlags.VERTICAL;
       if (win.maximized_horizontally && win.maximized_vertically) {
-        win.unmaximize(flags);
+        win.set_unmaximize_flags(flags);
       } else {
-        win.maximize(flags);
+        win.set_maximize_flags(flags);
       }
       return;
     }
@@ -724,7 +719,7 @@ class MoveWindow {
     } else if (where === 'c') {
       config = 'put-to-center';
     } else {
-      console.log("Unknown direction " + where);
+      console.info("Unknown direction " + where);
       return;
     }
 
@@ -786,10 +781,10 @@ class MoveWindow {
     }
 
     if (maximizeFlags !== 0) {
-      win.maximize(maximizeFlags);
+      win.set_maximize_flags(maximizeFlags);
     }
     if (unMaximizeFlags !== 0) {
-      win.unmaximize(unMaximizeFlags);
+      win.set_unmaximize_flags(unMaximizeFlags);
     }
 
     if (width === 0 && height === 0) {
