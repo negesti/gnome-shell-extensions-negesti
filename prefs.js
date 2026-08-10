@@ -355,14 +355,14 @@ class KeyboardSettings extends Adw.PreferencesPage {
         return Gdk.EVENT_STOP;
       }
 
-      // Only keep standard accelerator modifiers
-      const mods = state & (
-        Gdk.ModifierType.SHIFT_MASK |
-        Gdk.ModifierType.CONTROL_MASK |
-        Gdk.ModifierType.MOD1_MASK |     // Alt
-        Gdk.ModifierType.SUPER_MASK |
-        Gdk.ModifierType.META_MASK
-      );
+      // Only keep standard accelerator modifiers (Shift/Ctrl/Alt/Super/Hyper/Meta).
+      // Do not hand-roll this: GDK4 has no MOD1_MASK, so `| Gdk.ModifierType.MOD1_MASK`
+      // is `| undefined` and silently drops Alt from every shortcut.
+      const mods = state & Gtk.accelerator_get_default_mod_mask();
+      
+      if (!Gtk.accelerator_valid(keyval, mods)) {
+        return Gdk.EVENT_STOP;
+      }
 
       const accelName = Gtk.accelerator_name(keyval, mods);
 
