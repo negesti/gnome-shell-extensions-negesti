@@ -44,7 +44,8 @@ class MoveWindow {
 
     this._loadScreenData();
 
-    this._screenListener = this._utils.getMonitorManager()
+    this._monitorEmitter = this._utils.getMonitorManager();
+    this._screenListener = this._monitorEmitter
       .connect('monitors-changed', this._loadScreenData.bind(this));
 
     this._workareasChangedListener = this._utils.getScreen()
@@ -86,9 +87,10 @@ class MoveWindow {
       this._windowCreatedListener = false;
     }
 
-    if (this._screenListener) {
-      this._utils.getScreen().disconnect(this._screenListener);
-      this._screenListener = false;
+    if (this._screenListener && this._monitorEmitter) {
+      this._monitorEmitter.disconnect(this._screenListener);
+      this._screenListener = null;
+      this._monitorEmitter = null;
     }
 
     if (this._workareasChangedListener) {
@@ -839,6 +841,8 @@ class MoveWindow {
 
 
   _loadScreenData() {
+    if (!this._utils) return;
+
     // get monitor(s) geometry
     this._primary = this._utils.getScreen().get_primary_monitor();
     const numMonitors = this._utils.getScreen().get_n_monitors();
